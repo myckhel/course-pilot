@@ -35,7 +35,7 @@ A lightweight AI-powered assistant designed to enhance the learning experience o
    Note: The .env file is ignored by git to protect your API keys.
 5. Run the application:
    ```
-   streamlit run main.py
+   source venv/bin/activate && streamlit run main.py
    ```
 
 ## Usage
@@ -45,6 +45,7 @@ A lightweight AI-powered assistant designed to enhance the learning experience o
 3. Wait for the application to process the document
 4. Ask questions about the material in the text input box
 5. Receive AI-generated answers based on the content of your document
+6. Q list the output devices and their numbers in the order it was listed
 
 ## Version Control & .gitignore
 
