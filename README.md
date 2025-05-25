@@ -1,20 +1,46 @@
 # AI Virtual Assistant for Student Q&A
 
-A lightweight AI-powered assistant designed to enhance the learning experience of students in higher education. This tool enables students to upload lecture notes in PDF format and ask questions in natural language, receiving intelligent, context-aware answers extracted directly from their study materials.
+A **multi-user AI-powered assistant** designed to enhance the learning experience of students in higher education. This application enables multiple users to interact with an AI assistant within organized topic-based conversations, with persistent storage and role-based access control.
 
-## Features
+## ✨ Features
 
-- Upload lecture PDFs and process them for question answering
-- Ask questions in natural language about the uploaded material
-- Receive accurate, conversational answers from the AI
+### For Students:
+- **Topic Selection**: Choose from topics created by administrators
+- **Interactive Chat**: Ask questions about uploaded study materials
+- **Session Management**: Create and access multiple chat sessions per topic
+- **Persistent History**: Access your conversation history across sessions
+- **AI Responses**: Get intelligent, context-aware answers from study materials
+
+### For Administrators:
+- **Topic Management**: Create and organize study topics
+- **PDF Upload**: Upload and process study materials for each topic
+- **Content Control**: Manage educational content and materials
+- **Multi-user Access**: All admin features plus student capabilities
+
+### Technical Features:
+- **Multi-user Authentication**: Secure login system with role-based access
+- **Vector Storage**: Efficient similarity search using ChromaDB
+- **Persistent Database**: SQLite database for users, topics, and chat history
+- **Real-time Chat**: Modern chat interface with message history
+- **Topic Isolation**: Each topic maintains its own vector store and knowledge base
 
 ## Technology Stack
 
 - **LangChain**: Framework for developing applications powered by language models
-- **ChromaDB**: Efficient similarity search and vector storage
-- **OpenAI**: GPT model for natural language processing
-- **Streamlit**: Simple web interface for interaction
-- **PyPDF**: PDF parsing utility
+- **ChromaDB**: Efficient similarity search and vector storage for topic-based knowledge bases
+- **OpenAI**: GPT model for natural language processing and intelligent responses
+- **Streamlit**: Modern web interface with multi-user support and real-time chat
+- **SQLite**: Persistent database for user management, topics, and chat sessions
+- **PyPDF**: PDF parsing and text extraction utility
+
+## Database Schema
+
+The application uses SQLite with the following tables:
+
+- **Users**: User accounts with role-based access (admin/student)
+- **Topics**: Study topics with associated PDF materials and vector stores
+- **Chat Sessions**: Individual conversation sessions between users and topics
+- **Messages**: Chat message history with timestamps
 
 ## Setup Instructions
 
@@ -40,12 +66,39 @@ A lightweight AI-powered assistant designed to enhance the learning experience o
 
 ## Usage
 
-1. Launch the application
-2. Upload a PDF containing lecture notes or study materials
-3. Wait for the application to process the document
-4. Ask questions about the material in the text input box
-5. Receive AI-generated answers based on the content of your document
-6. Q list the output devices and their numbers in the order it was listed
+### First Time Setup
+1. Launch the application: `streamlit run main.py`
+2. **Default Admin Account**:
+   - Username: `admin`
+   - Password: `admin123`
+
+### For Administrators
+1. **Login** with admin credentials
+2. **Create Topics**:
+   - Enter topic name and description
+   - Upload PDF study materials
+   - Wait for document processing and indexing
+3. **Manage Content**: View and organize existing topics
+4. **Use Student Features**: Access all student functionality
+
+### For Students
+1. **Register** a new account or login with existing credentials
+2. **Select Topic**: Choose from available topics in the sidebar
+3. **Start Chat Session**:
+   - Click "➕ New Session" to create a new conversation
+   - Or select an existing session to continue
+4. **Ask Questions**: Type questions about the study material
+5. **Get AI Responses**: Receive intelligent answers based on the uploaded content
+6. **Session History**: Access your previous conversations anytime
+
+### Example Workflow
+1. Admin uploads "Introduction to AI" lecture notes
+2. Students log in and select the "Introduction to AI" topic
+3. Students ask questions like:
+   - "What are the main types of machine learning?"
+   - "Explain natural language processing"
+   - "What is the difference between supervised and unsupervised learning?"
+4. AI provides detailed answers based on the uploaded lecture content
 
 ## Version Control & .gitignore
 
@@ -63,16 +116,20 @@ When contributing to this project, ensure you don't manually bypass these exclus
 ## Project Structure
 
 ```
-── app/
+app/
 │   ├── __init__.py
-│   ├── config.py           # Environment configuration
+│   ├── config.py           # Environment and database configuration
+│   ├── database.py         # SQLite database operations and schema
 │   ├── document_loader.py  # PDF handling and text chunking
-│   ├── vector_store.py     # ChromaDB embedding & retrieval
-│   ├── qa_chain.py         # LangChain QA logic
-│   └── ui.py               # Streamlit interface
+│   ├── vector_store.py     # ChromaDB embedding & retrieval by topic
+│   ├── qa_chain.py         # LangChain QA logic and chain building
+│   └── ui.py               # Multi-user Streamlit interface
 │
-├── main.py                 # Entry point
-├── requirements.txt
+├── main.py                 # Application entry point
+├── assistant.db            # SQLite database (auto-created)
+├── topics_storage/         # Uploaded PDF files (auto-created)
+├── vector_stores/          # Topic-specific vector databases (auto-created)
+├── requirements.txt        # Python dependencies
 ├── .env                    # API key storage
 ├── .gitignore              # Version control exclusions
 └── README.md

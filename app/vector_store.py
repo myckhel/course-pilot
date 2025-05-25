@@ -108,3 +108,60 @@ def load_retriever(vectorstore=None):
     
     # Return the retriever for semantic search
     return vectorstore.as_retriever(search_kwargs={"k": 4})
+
+
+def create_chroma_index_for_topic(topic_id: str, chunks: list, persist_directory: str):
+    """
+    Creates and stores embeddings for a topic's study material using Chroma.
+    Persists embeddings to a topic-specific directory.
+    
+    Args:
+        topic_id (str): Unique identifier for the topic
+        chunks (list): List of document chunks to embed
+        persist_directory (str): Directory path to persist the embeddings
+    """
+    # Initialize OpenAI embeddings
+    embeddings = OpenAIEmbeddings()
+    
+    # Ensure the directory exists
+    os.makedirs(persist_directory, exist_ok=True)
+    
+    # Create the vector store with document chunks and persist to disk
+    vectorstore = Chroma.from_documents(
+        documents=chunks,
+        embedding=embeddings,
+        persist_directory=persist_directory
+    )
+    
+    # Persist the database
+    vectorstore.persist()
+    return vectorstore
+
+
+def load_retriever_for_topic(topic_id: str, persist_directory: str):
+    """
+    Loads a retriever from the Chroma vector store for the given topic.
+    Returns a retriever suitable for passing into LangChain RetrievalQA.
+    
+    Args:
+        topic_id (str): Unique identifier for the topic
+        persist_directory (str): Directory path where embeddings are stored
+        
+    Returns:
+        Retriever: A retriever object for semantic search
+    """
+    # Check if the directory exists
+    if not os.path.exists(persist_directory):
+        raise FileNotFoundError(f"Vector store directory not found: {persist_directory}")
+    
+    # Initialize OpenAI embeddings
+    embeddings = OpenAIEmbeddings()
+    
+    # Load the vector store from disk
+    vectorstore = Chroma(
+        persist_directory=persist_directory,
+        embedding_function=embeddings
+    )
+    
+    # Return the retriever for semantic search
+    return vectorstore.as_retriever(search_kwargs={"k": 4})
