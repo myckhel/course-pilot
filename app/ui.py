@@ -33,7 +33,7 @@ def initialize_session_state():
 
 def login_form():
     """Display login form and handle authentication."""
-    st.subheader("🔐 Login")
+    st.subheader("Login")
     
     with st.form("login_form"):
         username = st.text_input("Username")
@@ -53,7 +53,7 @@ def login_form():
 
 def register_form():
     """Display registration form for new users."""
-    st.subheader("📝 Register")
+    st.subheader("Register")
     
     with st.form("register_form"):
         username = st.text_input("Choose Username")
@@ -76,7 +76,7 @@ def register_form():
 
 def admin_topic_upload_ui():
     """Admin interface for creating topics and uploading PDFs."""
-    st.subheader("📚 Topic Management")
+    st.subheader("Topic Management")
     
     # Topic creation form
     with st.form("create_topic_form"):
@@ -133,7 +133,7 @@ def admin_topic_upload_ui():
 
 def student_qa_ui():
     """Student interface for selecting topics and chatting."""
-    st.subheader("💬 Chat with AI Assistant")
+    st.subheader("Chat with AI Assistant")
     
     # Topic selection
     topics = get_all_topics(DATABASE_PATH)
@@ -169,7 +169,7 @@ def student_qa_ui():
             )
             
             # New session button
-            if st.button("➕ New Session"):
+            if st.button("New Session"):
                 session_id = create_chat_session(
                     st.session_state.user['id'],
                     selected_topic['id'],
@@ -180,7 +180,7 @@ def student_qa_ui():
             
             # Existing sessions
             for session in user_sessions:
-                if st.button(f"📝 {session['session_name']}", key=f"session_{session['id']}"):
+                if st.button(f" {session['session_name']}", key=f"session_{session['id']}"):
                     st.session_state.current_session = session['id']
                     st.rerun()
     
@@ -269,7 +269,7 @@ def run_ui():
     initialize_session_state()
     
     # Header
-    st.title("📘 AI Virtual Assistant for Students")
+    st.title("AI Virtual Assistant for Students")
     st.markdown("Multi-user topic-based learning assistant")
     
     # Authentication check
@@ -282,27 +282,6 @@ def run_ui():
         with col2:
             register_form()
             
-        # Help section
-        with st.expander("ℹ️ About This Application"):
-            st.markdown("""
-            ### Welcome to the AI Study Assistant!
-            
-            **For Students:**
-            - Select topics created by administrators
-            - Ask questions about uploaded study materials
-            - Chat with AI assistant for instant answers
-            - Access your chat history across sessions
-            
-            **For Administrators:**
-            - Create new topics
-            - Upload PDF study materials
-            - Manage educational content
-            
-            **Default Admin Account:**
-            - Username: `admin`
-            - Password: `admin123`
-            """)
-        
         return
     
     # Main application for authenticated users
@@ -312,10 +291,10 @@ def run_ui():
     col1, col2, col3 = st.columns([3, 1, 1])
     
     with col1:
-        st.write(f"👋 Welcome, **{user['username']}** ({user['role']})")
+        st.write(f"Welcome, **{user['username']}** ({user['role']})")
     
     with col3:
-        if st.button("🚪 Logout"):
+        if st.button("Logout"):
             logout()
     
     # Role-based interface
