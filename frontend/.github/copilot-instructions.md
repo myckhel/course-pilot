@@ -1,20 +1,123 @@
-## Project Overview:
+# Senior React Developer Copilot Instructions - Mini Jira Frontend
+
+You are an expert in TypeScript, React, React Router, Zustand + persist + immer, Ant Design, Vite, and Tailwind CSS.
+
+## Project Overview
 
 ### **APPLICATION OF ARTIFICIAL INTELLIGENCE FOR VIRTUAL TEACHING ASSISTANCE**
 
 This project is a **lightweight AI-powered assistant** designed to enhance the **learning experience of students in higher education**. Users can ask questions in natural language based data trained by a RAG model at the backend, and receive intelligent, context-aware answers directly sourced from the trained data.
 
-## 🛠️ Tech Stack
-
-- **Framework**: React 19 + Vite + TypeScript
-- **Styling**: Tailwind CSS
-- **UI Components**: Ant Design (antd)
+- **Language**: TypeScript (strict mode)
+- **Framework**: React 19+ (functional components)
 - **Routing**: React Router v6
 - **State Management**: Zustand + persist + immer
-- **HTTP Client**: Axios
-- **Build Tool**: Vite
+- **UI Library**: Ant Design (Antd)
+- **Styling**: Tailwind CSS (mobile-first)
+- **Vite**: Build tool for fast development (alias)
+- **Authentication**: JWT-based Token
 
-## 📁 Project Structure
+## React Best Practices
+
+### Component Architecture
+
+- Use functional components with TypeScript interfaces for props
+- Use the `function` keyword for component definitions
+- Implement hooks correctly (`useState`, `useEffect`, `useCallback`, `useMemo`)
+- Follow the Rules of Hooks (only call hooks at the top level)
+- Create custom hooks to extract reusable component logic
+- Use `React.memo()` for component memoization when appropriate
+- Implement `useCallback` for memoizing functions passed as props
+- Use `useMemo` for expensive computations
+- Avoid inline function definitions in render to prevent unnecessary re-renders
+- Prefer composition over inheritance
+- Use children prop and render props pattern for flexible components
+- Implement `React.lazy()` and `Suspense` for code splitting
+- Use refs sparingly and mainly for DOM access
+- Prefer controlled components over uncontrolled components
+- Implement error boundaries to catch and handle errors gracefully
+- Use cleanup functions in `useEffect` to prevent memory leaks
+- Use short-circuit evaluation and ternary operators for conditional rendering
+
+### TypeScript Integration
+
+- Define explicit interfaces for all props and state
+- Use proper typing for event handlers
+- Implement generic types for reusable components
+- Use `as const` for immutable data structures
+- Leverage TypeScript's strict mode features
+
+## Routing
+
+- Use React Router for navigation.
+- Pages: `/login`, `/register`, `/dashboard`
+- Protect routes that require authentication.
+- Redirect unauthenticated users to `/login`.
+
+## State Management with Zustand
+
+### Store Organization
+
+- Create separate stores for different domains:
+  - `authStore`: User authentication, login state, user profile
+  - `chatStore`: Chat CRUD operations, filtering, sorting
+  - `uiStore`: Modal states, loading states, notifications
+- Use shallow comparison for store selectors to optimize re-renders
+- Implement actions as methods within stores
+- Use immer for complex state updates when needed
+- Use devtools plugin for store
+
+## UI and Styling Guidelines
+
+### Ant Design Usage
+
+- Use Antd components for complex UI elements:
+  - `Form` with validation for login/register/task creation
+  - `Table` or `List` for task display with sorting and filtering
+  - `Modal` for task creation and editing
+  - `Button`, `Input`, `Select`, `DatePicker` for form controls
+  - `Drawer` or `Sider` for navigation
+  - `Card` for task items in list view
+  - `Tag` for task status and priority
+  - `Notification` for user feedback
+
+### Tailwind CSS Integration
+
+- Use Tailwind for layout, spacing, and responsive design
+- Implement mobile-first responsive design
+- Use Tailwind utilities for rapid prototyping
+- Combine with Antd's design tokens when possible
+- Use Tailwind for custom styling that extends Antd components
+
+### Responsive Design
+
+- Mobile-first approach with `sm:`, `md:`, `lg:`, `xl:` breakpoints
+- Ensure touch-friendly interfaces on mobile
+- Implement responsive navigation (drawer on mobile, sidebar on desktop)
+- Use Antd's responsive props where available
+
+## Performance Optimization
+
+### Code Splitting
+
+- Use `React.lazy()` for route-based code splitting
+- Wrap components in `Suspense` with appropriate fallbacks
+- Implement dynamic imports for heavy components
+
+### Memoization
+
+- Use `React.memo()` for components that receive stable props
+- Implement `useCallback` for event handlers passed to child components
+- Use `useMemo` for expensive calculations
+- Optimize Zustand selectors to prevent unnecessary re-renders
+
+### Bundle Optimization
+
+- Use tree shaking for Antd components (import specific components)
+- Implement proper lazy loading for images and non-critical content
+- Use Vite or similar for fast development and optimized builds
+
+## Project Structure
 
 ```
 src/
@@ -31,648 +134,160 @@ src/
 │   ├── topicStore.ts   # Topics management
 │   └── chatStore.ts    # Chat sessions and messages
 ├── hooks/              # Custom React hooks
-├── services/           # API service functions
+├── apis/               # API service functions
 ├── utils/              # Helper functions
 ├── types/              # TypeScript type definitions
 ├── constants/          # App constants
 └── styles/             # Global styles and Tailwind config
 ```
 
-## 🎯 TypeScript Guidelines
+## API Integration
 
-### **Type Definitions**
+### HTTP Client
 
-```typescript
-// types/auth.ts
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: "student" | "admin";
-  createdAt: string;
-}
+- Use modular/abstracted axios for API calls
+- Implement request/response interceptors for JWT handling
+- Create a service layer for API endpoints
+- Handle error responses consistently
+- Implement proper loading states
 
-export interface AuthCredentials {
-  email: string;
-  password: string;
-}
+### Authentication Flow
 
-export interface AuthResponse {
-  user: User;
-  token: string;
-  refreshToken: string;
-}
+- Store JWT tokens securely
+- Implement automatic token refresh (low priority)
+- Handle 401/403 responses appropriately
+- Clear auth state on logout
 
-// types/topic.ts
-export interface Topic {
-  id: string;
-  name: string;
-  description: string;
-  documentCount: number;
-  createdAt: string;
-  updatedAt: string;
-}
+## Component Patterns
 
-export interface ChatMessage {
-  id: string;
-  sessionId: string;
-  sender: "user" | "assistant";
-  message: string;
-  timestamp: string;
-  sources?: string[];
-}
-
-export interface ChatSession {
-  id: string;
-  userId: string;
-  topicId: string;
-  title: string;
-  createdAt: string;
-  messages: ChatMessage[];
-}
-```
-
-### **Component Structure with TypeScript**
+### Form Components
 
 ```typescript
-// components/features/QuestionInput.tsx
-import React, { useState } from "react";
-import { Button, Input, Form, message } from "antd";
-import { SendOutlined } from "@ant-design/icons";
-import { useChatStore } from "@/stores/chatStore";
-
-interface QuestionInputProps {
-  topicId: string;
-  onQuestionSubmit?: (question: string) => void;
-  disabled?: boolean;
+interface TopicFormProps {
+  topic?: Topic;
+  onSubmit: (data: TopicFormData) => Promise<void>;
+  onCancel: () => void;
 }
 
-const QuestionInput: React.FC<QuestionInputProps> = ({
-  topicId,
-  onQuestionSubmit,
-  disabled = false,
-}) => {
+function TaskForm({ topic, onSubmit, onCancel }: TopicFormProps) {
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
-  const { sendMessage } = useChatStore();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (values: { question: string }) => {
-    if (!values.question.trim()) return;
-
-    setLoading(true);
-    try {
-      await sendMessage(topicId, values.question);
-      form.resetFields();
-      onQuestionSubmit?.(values.question);
-    } catch (error) {
-      message.error("Failed to send question");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const handleSubmit = useCallback(
+    async (values: TaskFormData) => {
+      setIsLoading(true);
+      try {
+        await onSubmit(values);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [onSubmit]
+  );
 
   return (
-    <Form
-      form={form}
-      onFinish={handleSubmit}
-      className="flex gap-2 p-4 border-t bg-gray-50"
-    >
-      <Form.Item
-        name="question"
-        className="flex-1 mb-0"
-        rules={[{ required: true, message: "Please enter a question" }]}
-      >
-        <Input.TextArea
-          placeholder="Ask a question about this topic..."
-          autoSize={{ minRows: 1, maxRows: 4 }}
-          disabled={disabled || loading}
-          className="resize-none"
-        />
-      </Form.Item>
-
-      <Form.Item className="mb-0">
-        <Button
-          type="primary"
-          htmlType="submit"
-          icon={<SendOutlined />}
-          loading={loading}
-          disabled={disabled}
-          className="h-10"
-        >
-          Send
-        </Button>
-      </Form.Item>
+    <Form form={form} onFinish={handleSubmit} layout="vertical">
+      {/* Form fields */}
     </Form>
   );
-};
-
-export default QuestionInput;
-```
-
-### **Zustand Store with TypeScript**
-
-```typescript
-// stores/authStore.ts
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { immer } from "zustand/middleware/immer";
-import type { User, AuthCredentials, AuthResponse } from "@/types/auth";
-import { authService } from "@/services/authService";
-
-interface AuthState {
-  user: User | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  error: string | null;
-}
-
-interface AuthActions {
-  login: (credentials: AuthCredentials) => Promise<void>;
-  logout: () => void;
-  refreshToken: () => Promise<void>;
-  clearError: () => void;
-}
-
-type AuthStore = AuthState & AuthActions;
-
-export const useAuthStore = create<AuthStore>()(
-  persist(
-    immer((set, get) => ({
-      // Initial state
-      user: null,
-      token: null,
-      isAuthenticated: false,
-      isLoading: false,
-      error: null,
-
-      // Actions
-      login: async (credentials: AuthCredentials) => {
-        set((state) => {
-          state.isLoading = true;
-          state.error = null;
-        });
-
-        try {
-          const response: AuthResponse = await authService.login(credentials);
-
-          set((state) => {
-            state.user = response.user;
-            state.token = response.token;
-            state.isAuthenticated = true;
-            state.isLoading = false;
-          });
-        } catch (error) {
-          set((state) => {
-            state.error =
-              error instanceof Error ? error.message : "Login failed";
-            state.isLoading = false;
-          });
-          throw error;
-        }
-      },
-
-      logout: () => {
-        set((state) => {
-          state.user = null;
-          state.token = null;
-          state.isAuthenticated = false;
-          state.error = null;
-        });
-      },
-
-      refreshToken: async () => {
-        const { token } = get();
-        if (!token) return;
-
-        try {
-          const response: AuthResponse = await authService.refreshToken();
-
-          set((state) => {
-            state.token = response.token;
-            state.user = response.user;
-          });
-        } catch (error) {
-          get().logout();
-          throw error;
-        }
-      },
-
-      clearError: () => {
-        set((state) => {
-          state.error = null;
-        });
-      },
-    })),
-    {
-      name: "auth-storage",
-      partialize: (state) => ({
-        user: state.user,
-        token: state.token,
-        isAuthenticated: state.isAuthenticated,
-      }),
-    }
-  )
-);
-```
-
-### **API Service with TypeScript**
-
-```typescript
-// services/apiService.ts
-import axios, { AxiosResponse } from "axios";
-import type { AuthCredentials, AuthResponse, User } from "@/types/auth";
-import type { Topic, ChatSession, ChatMessage } from "@/types/topic";
-import { useAuthStore } from "@/stores/authStore";
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api";
-
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-// Request interceptor
-apiClient.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().token;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-// Response interceptor
-apiClient.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    if (error.response?.status === 401) {
-      try {
-        await useAuthStore.getState().refreshToken();
-        // Retry the original request
-        return apiClient.request(error.config);
-      } catch {
-        useAuthStore.getState().logout();
-        window.location.href = "/login";
-      }
-    }
-    return Promise.reject(error);
-  }
-);
-
-// Auth Service
-export const authService = {
-  login: async (credentials: AuthCredentials): Promise<AuthResponse> => {
-    const response: AxiosResponse<AuthResponse> = await apiClient.post(
-      "/auth/login",
-      credentials
-    );
-    return response.data;
-  },
-
-  register: async (
-    userData: Omit<User, "id" | "createdAt"> & { password: string }
-  ): Promise<AuthResponse> => {
-    const response: AxiosResponse<AuthResponse> = await apiClient.post(
-      "/auth/register",
-      userData
-    );
-    return response.data;
-  },
-
-  refreshToken: async (): Promise<AuthResponse> => {
-    const response: AxiosResponse<AuthResponse> = await apiClient.post(
-      "/auth/refresh"
-    );
-    return response.data;
-  },
-};
-
-// Topic Service
-export const topicService = {
-  getTopics: async (): Promise<Topic[]> => {
-    const response: AxiosResponse<Topic[]> = await apiClient.get("/topics");
-    return response.data;
-  },
-
-  createTopic: async (
-    topicData: Omit<Topic, "id" | "createdAt" | "updatedAt" | "documentCount">
-  ): Promise<Topic> => {
-    const response: AxiosResponse<Topic> = await apiClient.post(
-      "/topics",
-      topicData
-    );
-    return response.data;
-  },
-
-  uploadDocument: async (
-    topicId: string,
-    file: File
-  ): Promise<{ message: string }> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    const response: AxiosResponse<{ message: string }> = await apiClient.post(
-      `/topics/${topicId}/documents`,
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } }
-    );
-    return response.data;
-  },
-};
-
-// Chat Service
-export const chatService = {
-  getChatSessions: async (topicId: string): Promise<ChatSession[]> => {
-    const response: AxiosResponse<ChatSession[]> = await apiClient.get(
-      `/chat/sessions?topicId=${topicId}`
-    );
-    return response.data;
-  },
-
-  sendMessage: async (
-    sessionId: string,
-    message: string
-  ): Promise<ChatMessage> => {
-    const response: AxiosResponse<ChatMessage> = await apiClient.post(
-      "/chat/message",
-      {
-        sessionId,
-        message,
-      }
-    );
-    return response.data;
-  },
-
-  createSession: async (
-    topicId: string,
-    title: string
-  ): Promise<ChatSession> => {
-    const response: AxiosResponse<ChatSession> = await apiClient.post(
-      "/chat/sessions",
-      {
-        topicId,
-        title,
-      }
-    );
-    return response.data;
-  },
-};
-```
-
-### **React Router with TypeScript**
-
-```typescript
-// App.tsx
-import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { ConfigProvider } from "antd";
-import { useAuthStore } from "@/stores/authStore";
-import Layout from "@/components/layout/Layout";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
-import LoginPage from "@/pages/auth/LoginPage";
-import RegisterPage from "@/pages/auth/RegisterPage";
-import DashboardPage from "@/pages/student/DashboardPage";
-import TopicsPage from "@/pages/admin/TopicsPage";
-import ChatPage from "@/pages/student/ChatPage";
-
-const App: React.FC = () => {
-  return (
-    <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: "#1890ff",
-          borderRadius: 6,
-        },
-      }}
-    >
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-
-          <Route path="/" element={<ProtectedRoute />}>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Navigate to="/dashboard" replace />} />
-              <Route path="dashboard" element={<DashboardPage />} />
-              <Route path="topics" element={<TopicsPage />} />
-              <Route path="chat/:topicId" element={<ChatPage />} />
-            </Route>
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </ConfigProvider>
-  );
-};
-
-export default App;
-```
-
-### **Custom Hook with TypeScript**
-
-```typescript
-// hooks/useApi.ts
-import { useState, useEffect } from "react";
-import { message } from "antd";
-
-interface UseApiState<T> {
-  data: T | null;
-  loading: boolean;
-  error: Error | null;
-}
-
-interface UseApiReturn<T> extends UseApiState<T> {
-  refetch: () => Promise<void>;
-}
-
-export const useApi = <T>(
-  apiCall: () => Promise<T>,
-  dependencies: React.DependencyList = []
-): UseApiReturn<T> => {
-  const [state, setState] = useState<UseApiState<T>>({
-    data: null,
-    loading: true,
-    error: null,
-  });
-
-  const fetchData = async () => {
-    try {
-      setState((prev) => ({ ...prev, loading: true, error: null }));
-      const result = await apiCall();
-      setState({ data: result, loading: false, error: null });
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error("An error occurred");
-      setState({ data: null, loading: false, error });
-      message.error(error.message || "Failed to fetch data");
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, dependencies);
-
-  return { ...state, refetch: fetchData };
-};
-
-// Usage example:
-// const { data: topics, loading, error, refetch } = useApi(() => topicService.getTopics(), []);
-```
-
-### **Environment Variables with TypeScript**
-
-```typescript
-// types/env.d.ts
-interface ImportMetaEnv {
-  readonly VITE_API_BASE_URL: string;
-  readonly VITE_APP_TITLE: string;
-  readonly VITE_OPENAI_API_KEY?: string;
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
 }
 ```
 
-### **Vite Configuration**
+### List Components
 
-```typescript
-// vite.config.ts
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import path from "path";
+- Implement virtualization for large lists
+- Use Antd's Table or List components with proper pagination
+- Implement filtering and sorting capabilities
+- Handle empty states gracefully
 
-export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
-  server: {
-    port: 3000,
-    proxy: {
-      "/api": {
-        target: "http://localhost:8000",
-        changeOrigin: true,
-      },
-    },
-  },
-});
-```
+## Error Handling
 
-## 🎨 Tailwind + Antd Best Practices
+### Error Boundaries
 
-### **Styling Guidelines**
+- Implement error boundaries for route-level error catching
+- Create fallback UI components for error states
+- Log errors appropriately for debugging
 
-```typescript
-// Use Tailwind for layout, spacing, and responsive design
-// Use Antd's built-in styling for component appearance
+### Form Validation
 
-const ChatInterface: React.FC = () => {
-  return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      {/* Header */}
-      <div className="flex-shrink-0 p-4 bg-white border-b shadow-sm">
-        <Typography.Title level={3} className="m-0">
-          AI Teaching Assistant
-        </Typography.Title>
-      </div>
+- Use Antd's form validation with custom rules
+- Implement client-side validation for better UX
+- Display validation errors clearly
+- Handle server-side validation errors
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex ${
-              message.sender === "user" ? "justify-end" : "justify-start"
-            }`}
-          >
-            <Card
-              className={`max-w-xs md:max-w-md ${
-                message.sender === "user"
-                  ? "bg-blue-500 text-white"
-                  : "bg-white"
-              }`}
-              size="small"
-            >
-              {message.message}
-            </Card>
-          </div>
-        ))}
-      </div>
+### Visual Accessibility
 
-      {/* Input Area */}
-      <div className="flex-shrink-0">
-        <QuestionInput topicId={topicId} />
-      </div>
-    </div>
-  );
-};
-```
+- Maintain proper color contrast ratios
+- Implement proper text sizing and spacing with intuitive paddings/margins
+- Support reduced motion preferences
 
-## 📋 Best Practices
+## Security Considerations
 
-### **TypeScript**
+### Input Validation
 
-1. **Strict Mode**: Always use strict TypeScript configuration
-2. **Type Definitions**: Create comprehensive type definitions for all data structures
-3. **Generic Types**: Use generics for reusable components and hooks
-4. **Utility Types**: Leverage TypeScript utility types (Pick, Omit, Partial, etc.)
+- Validate all user inputs on the client side
+- Sanitize data before displaying
+- Prevent XSS attacks through proper escaping
 
-### **Code Organization**
+### Authentication Security
 
-1. **Barrel Exports**: Use index.ts files for clean imports
-2. **Consistent Naming**: PascalCase for components, camelCase for functions/variables
-3. **File Structure**: Group related files in feature folders
+- Implement proper session management
+- Handle authentication state securely
+- Validate tokens on critical operations
 
-### **Performance**
+## Development Workflow
 
-1. **React.memo**: Memoize expensive components
-2. **useCallback/useMemo**: Optimize re-renders and computations
-3. **Code Splitting**: Use React.lazy for route-based splitting
+## **Routing & Layout**
 
-### **Error Handling**
+- Use `react-router-dom` for navigation:
+  - `/login`, `/register`
+  - `/dashboard` (student)
+  - `/topics` (admin)
+  - `/chat/:topicId`
+  - `/admin` (admin dashboard)
+- Implement a main layout with header/sidebar.
 
-1. **Error Boundaries**: Implement error boundaries for graceful failures
-2. **Try-Catch**: Wrap all async operations
-3. **User Feedback**: Always provide user feedback for errors
+## **Topic Management**
 
-### **State Management**
+- **Student**: List topics (`GET /api/topics`), view topic details.
+- **Admin**: Create topic (`POST /api/topics`), upload PDF (`POST /api/topics/{id}/documents`).
+- Show topic document status and document count.
 
-1. **Single Responsibility**: Each store should handle one domain
-2. **Immutable Updates**: Use Immer for clean state updates
-3. **Selective Persistence**: Only persist necessary state
+## **Document Upload**
 
-## 🔧 Development Setup
+- Admin-only UI for uploading PDFs to a topic.
+- Use Ant Design’s `Upload` component, POST as `multipart/form-data`.
 
-```bash
-# Install dependencies
-npm install
+## **Chat/Q&A Interface**
 
-# Start development server
-npm run dev
+- List chat sessions for a topic (`GET /api/chat/sessions?topicId=...`).
+- Create new chat session (`POST /api/chat/sessions`).
+- Chat UI with message history (`GET /api/chat/sessions/{session_id}/messages`).
+- Send question (`POST /api/chat/message`), display AI and user messages.
 
-# Type checking
-npm run type-check
+## **Admin Dashboard**
 
-# Build for production
-npm run build
+- Fetch dashboard stats (`GET /api/admin/dashboard`).
+- Show recent topics, system status, and analytics (as endpoints are implemented).
 
-# Preview production build
-npm run preview
-```
+### Code Quality
 
-## 📦 Package.json Scripts
+- Use ESLint and Prettier for code formatting
+- Use TypeScript strict mode
+- Follow consistent naming conventions
 
-```json
-{
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "type-check": "tsc --noEmit",
-    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
-  }
-}
-```
+### Environment Management
+
+- Use environment variables for API endpoints
+- Use proper build optimization for production
+
+**References:**
+
+- Asked_API_Collection.postman_collection.json (for endpoint details and payloads)
+- README.md (for project structure and setup)
+
+## Copilot assumptions
+
+- Always assume the dev server is running and avoid starting the server
+
+**Generate all code following these principles, ensuring production-ready quality with proper TypeScript typing, error handling, and accessibility features.**

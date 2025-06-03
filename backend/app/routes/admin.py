@@ -36,24 +36,19 @@ def get_admin_dashboard():
         # Verify admin access
         verify_admin(user_id, db_service)
         
-        # Get statistics
-        topics = db_service.get_all_topics()
-        total_topics = len(topics)
-        
-        # Count total documents across all topics
-        total_documents = sum(topic.document_count for topic in topics)
+        # Get comprehensive system statistics
+        system_stats = db_service.get_system_stats()
         
         # Get vector store statistics
         indexed_topics = vector_service.get_all_topic_ids()
         total_indexed_topics = len(indexed_topics)
         
-        # For now, we'll provide basic stats
-        # In a full implementation, you could add more detailed analytics
+        # Format stats according to AdminStats interface
         stats = {
-            'totalTopics': total_topics,
-            'totalDocuments': total_documents,
-            'indexedTopics': total_indexed_topics,
-            'recentTopics': [topic.to_dict() for topic in topics[:5]],  # Last 5 topics
+            'totalTopics': system_stats['total_topics'],
+            'totalUsers': system_stats['total_users'],
+            'totalSessions': system_stats['total_sessions'],
+            'totalMessages': system_stats['total_messages'],
             'systemStatus': 'healthy'
         }
         
@@ -76,14 +71,123 @@ def get_all_users():
         # Verify admin access
         verify_admin(user_id, db_service)
         
-        # For now, return a message that this feature will be implemented
-        # In a full implementation, you would add a method to get all users
-        return jsonify({'message': 'User management feature will be implemented'}), 501
+        # Get pagination parameters
+        page = int(request.args.get('page', 1))
+        limit = int(request.args.get('limit', 10))
+        
+        # Get users with pagination
+        users, total_count = db_service.get_all_users(page, limit)
+        total_pages = (total_count + limit - 1) // limit
+        
+        # Convert users to dict format (exclude password hash)
+        users_data = []
+        for user in users:
+            users_data.append({
+                'id': user.id,
+                'name': user.name,
+                'email': user.email,
+                'role': user.role,
+                'createdAt': user.created_at.isoformat()
+            })
+        
+        response = {
+            'data': users_data,
+            'pagination': {
+                'page': page,
+                'limit': limit,
+                'total': total_count,
+                'pages': total_pages
+            }
+        }
+        
+        return jsonify(response), 200
         
     except AuthorizationError as e:
         return jsonify({'error': str(e)}), 403
     except Exception as e:
         return jsonify({'error': 'Failed to fetch users'}), 500
+
+
+@admin_bp.route('/users/<user_id>/role', methods=['PATCH'])
+@jwt_required()
+def update_user_role(user_id):
+    """Update user role (admin only)."""
+    try:
+        current_user_id = get_jwt_identity()
+        db_service, _ = get_services()
+        
+        # Verify admin access
+        verify_admin(current_user_id, db_service)
+        
+        # Get request data
+        data = request.get_json()
+        new_role = data.get('role')
+        
+        if not new_role or new_role not in ['student', 'admin']:
+            return jsonify({'error': 'Invalid role. Must be "student" or "admin"'}), 400
+        
+        # Prevent admin from demoting themselves
+        if user_id == current_user_id and new_role != 'admin':
+            return jsonify({'error': 'Cannot change your own admin role'}), 400
+        
+        # Check if user exists
+        user = db_service.get_user_by_id(user_id)
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Update user role
+        updated_user = db_service.update_user(user_id, role=new_role)
+        if not updated_user:
+            return jsonify({'error': 'Failed to update user role'}), 500
+        
+        # Return updated user (exclude password hash)
+        user_data = {
+            'id': updated_user.id,
+            'name': updated_user.name,
+            'email': updated_user.email,
+            'role': updated_user.role,
+            'createdAt': updated_user.created_at.isoformat()
+        }
+        
+        return jsonify({'user': user_data}), 200
+        
+    except AuthorizationError as e:
+        return jsonify({'error': str(e)}), 403
+    except Exception as e:
+        return jsonify({'error': 'Failed to update user role'}), 500
+
+
+@admin_bp.route('/users/<user_id>', methods=['DELETE'])
+@jwt_required()
+def delete_user(user_id):
+    """Delete user (admin only)."""
+    try:
+        current_user_id = get_jwt_identity()
+        db_service, _ = get_services()
+        
+        # Verify admin access
+        verify_admin(current_user_id, db_service)
+        
+        # Prevent admin from deleting themselves
+        if user_id == current_user_id:
+            return jsonify({'error': 'Cannot delete your own account'}), 400
+        
+        # Check if user exists
+        user = db_service.get_user_by_id(user_id)
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Delete user
+        success = db_service.delete_user(user_id)
+        if not success:
+            return jsonify({'error': 'Failed to delete user'}), 500
+        
+        return jsonify({'message': 'User deleted successfully'}), 200
+        
+    except AuthorizationError as e:
+        return jsonify({'error': str(e)}), 403
+    except Exception as e:
+        return jsonify({'error': 'Failed to delete user'}), 500
 
 
 @admin_bp.route('/topics/<topic_id>/reindex', methods=['POST'])
