@@ -1,0 +1,88 @@
+/* Arc Design System Global Styles */
+
+/* Base styles */
+:root {
+  --arc-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Transitions */
+.arc-transition {
+  transition: var(--arc-transition);
+}
+
+/* Card hover effects */
+.arc-card-hover {
+  transition: var(--arc-transition);
+}
+
+.arc-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+/* Button styles */
+.arc-button {
+  transition: var(--arc-transition);
+}
+
+.arc-button:active {
+  transform: translateY(1px);
+}
+
+/* Input focus styles */
+.arc-input:focus {
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* Typography styles */
+.arc-heading {
+  letter-spacing: -0.025em;
+  font-weight: 600;
+}
+
+.arc-text-body {
+  letter-spacing: 0.01em;
+  line-height: 1.6;
+}
+
+/* Custom scrollbar */
+.arc-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #a3a3a3 transparent;
+}
+
+.arc-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.arc-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.arc-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #a3a3a3;
+  border-radius: 3px;
+}
+
+/* Loading states */
+.arc-loading {
+  @apply animate-pulse-slow bg-neutral-100;
+}
+
+/* Dark mode adjustments */
+.dark .arc-card-hover:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+}
+
+.dark .arc-scrollbar {
+  scrollbar-color: #525252 transparent;
+}
+
+.dark .arc-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #525252;
+}
+
+.dark .arc-loading {
+  @apply bg-neutral-800;
+}

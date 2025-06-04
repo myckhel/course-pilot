@@ -1,0 +1,224 @@
+/* Arc Design System - Ant Design Component Overrides */
+
+/* Button */
+.ant-btn {
+  @apply arc-transition-all;
+}
+
+.ant-btn-primary {
+  @apply shadow-sm;
+}
+
+.ant-btn:active {
+  @apply transform translate-y-px;
+}
+
+/* Input */
+.ant-input,
+.ant-input-affix-wrapper {
+  @apply arc-transition-all;
+}
+
+.ant-input:hover,
+.ant-input-affix-wrapper:hover {
+  @apply border-primary-400;
+}
+
+.ant-input:focus,
+.ant-input-affix-wrapper:focus {
+  @apply ring-2 ring-primary-500/20 border-primary-500;
+}
+
+/* Select */
+.ant-select {
+  @apply arc-transition-all;
+}
+
+.ant-select:not(.ant-select-disabled):hover .ant-select-selector {
+  @apply border-primary-400;
+}
+
+.ant-select-focused:not(.ant-select-disabled) .ant-select-selector {
+  @apply ring-2 ring-primary-500/20 border-primary-500;
+}
+
+/* Card */
+.ant-card {
+  @apply arc-transition-all rounded-lg;
+}
+
+.ant-card-hoverable:hover {
+  @apply transform -translate-y-1 shadow-lg;
+}
+
+/* Table */
+.ant-table {
+  @apply rounded-lg overflow-hidden;
+}
+
+.ant-table-thead > tr > th {
+  @apply bg-neutral-50 dark:bg-neutral-800 !important;
+}
+
+/* Modal */
+.ant-modal-content {
+  @apply rounded-lg shadow-xl;
+}
+
+.ant-modal-header {
+  @apply rounded-t-lg;
+}
+
+/* Form */
+.ant-form-item-label > label {
+  @apply text-neutral-700 dark:text-neutral-300;
+}
+
+.ant-form-item-explain-error {
+  @apply text-error-500;
+}
+
+/* Tabs */
+.ant-tabs-tab {
+  @apply arc-transition-all;
+}
+
+.ant-tabs-tab:hover {
+  @apply text-primary-500;
+}
+
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  @apply text-primary-500;
+}
+
+/* Menu */
+.ant-menu-item {
+  @apply arc-transition-all;
+}
+
+.ant-menu-item:hover {
+  @apply text-primary-500 bg-primary-50 dark:bg-primary-500/10 !important;
+}
+
+.ant-menu-item-selected {
+  @apply text-primary-500 bg-primary-50 dark:bg-primary-500/10 !important;
+}
+
+/* Dropdown */
+.ant-dropdown-menu {
+  @apply rounded-lg shadow-lg;
+}
+
+.ant-dropdown-menu-item {
+  @apply arc-transition-all;
+}
+
+.ant-dropdown-menu-item:hover {
+  @apply bg-neutral-50 dark:bg-neutral-800 !important;
+}
+
+/* Switch */
+.ant-switch {
+  @apply arc-transition-all;
+}
+
+.ant-switch-checked {
+  @apply bg-primary-500 !important;
+}
+
+/* Checkbox */
+.ant-checkbox-wrapper {
+  @apply arc-transition-all;
+}
+
+.ant-checkbox-checked .ant-checkbox-inner {
+  @apply bg-primary-500 border-primary-500 !important;
+}
+
+/* Radio */
+.ant-radio-wrapper {
+  @apply arc-transition-all;
+}
+
+.ant-radio-checked .ant-radio-inner {
+  @apply border-primary-500 !important;
+}
+
+.ant-radio-checked .ant-radio-inner::after {
+  @apply bg-primary-500 !important;
+}
+
+/* Tag */
+.ant-tag {
+  @apply rounded-full;
+}
+
+/* Avatar */
+.ant-avatar {
+  @apply arc-transition-all;
+}
+
+/* Badge */
+.ant-badge-count {
+  @apply rounded-full;
+}
+
+/* Progress */
+.ant-progress-bg {
+  @apply arc-transition-all;
+}
+
+/* Alert */
+.ant-alert {
+  @apply rounded-lg;
+}
+
+/* Message */
+.ant-message-notice-content {
+  @apply rounded-lg shadow-lg;
+}
+
+/* Notification */
+.ant-notification-notice {
+  @apply rounded-lg shadow-lg;
+}
+
+/* Tooltip */
+.ant-tooltip-inner {
+  @apply rounded-lg;
+}
+
+/* Popover */
+.ant-popover-inner {
+  @apply rounded-lg shadow-lg;
+}
+
+/* Drawer */
+.ant-drawer-content {
+  @apply rounded-lg shadow-xl;
+}
+
+/* Calendar */
+.ant-picker {
+  @apply rounded-lg;
+}
+
+/* Timeline */
+.ant-timeline-item-head {
+  @apply arc-transition-all;
+}
+
+/* List */
+.ant-list-item {
+  @apply arc-transition-all;
+}
+
+/* Empty */
+.ant-empty {
+  @apply text-neutral-400 dark:text-neutral-600;
+}
+
+/* Spin */
+.ant-spin-dot-item {
+  @apply bg-primary-500 !important;
+}
