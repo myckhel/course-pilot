@@ -2,223 +2,263 @@
 
 /* Button */
 .ant-btn {
-  @apply arc-transition-all;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ant-btn-primary {
-  @apply shadow-sm;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
 }
 
 .ant-btn:active {
-  @apply transform translate-y-px;
+  transform: translateY(1px);
 }
 
 /* Input */
 .ant-input,
 .ant-input-affix-wrapper {
-  @apply arc-transition-all;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ant-input:hover,
 .ant-input-affix-wrapper:hover {
-  @apply border-primary-400;
+  border-color: #60a5fa;
 }
 
 .ant-input:focus,
 .ant-input-affix-wrapper:focus {
-  @apply ring-2 ring-primary-500/20 border-primary-500;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
 }
 
 /* Select */
 .ant-select {
-  @apply arc-transition-all;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ant-select:not(.ant-select-disabled):hover .ant-select-selector {
-  @apply border-primary-400;
+  border-color: #60a5fa;
 }
 
 .ant-select-focused:not(.ant-select-disabled) .ant-select-selector {
-  @apply ring-2 ring-primary-500/20 border-primary-500;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
 }
 
 /* Card */
 .ant-card {
-  @apply arc-transition-all rounded-lg;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 0.5rem;
 }
 
 .ant-card-hoverable:hover {
-  @apply transform -translate-y-1 shadow-lg;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1);
 }
 
 /* Table */
 .ant-table {
-  @apply rounded-lg overflow-hidden;
+  border-radius: 0.5rem;
+  overflow: hidden;
 }
 
 .ant-table-thead > tr > th {
-  @apply bg-neutral-50 dark:bg-neutral-800 !important;
+  background: #f5f5f5;
+}
+
+.dark .ant-table-thead > tr > th {
+  background: #262626;
 }
 
 /* Modal */
 .ant-modal-content {
-  @apply rounded-lg shadow-xl;
+  border-radius: 0.5rem;
+  box-shadow: 0 20px 40px 0 rgba(0, 0, 0, 0.12);
 }
 
 .ant-modal-header {
-  @apply rounded-t-lg;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
 }
 
 /* Form */
 .ant-form-item-label > label {
-  @apply text-neutral-700 dark:text-neutral-300;
+  color: #404040;
+}
+
+.dark .ant-form-item-label > label {
+  color: #d4d4d4;
 }
 
 .ant-form-item-explain-error {
-  @apply text-error-500;
+  color: #ef4444;
 }
 
 /* Tabs */
 .ant-tabs-tab {
-  @apply arc-transition-all;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ant-tabs-tab:hover {
-  @apply text-primary-500;
+  color: #3b82f6;
 }
 
 .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
-  @apply text-primary-500;
+  color: #3b82f6;
 }
 
 /* Menu */
 .ant-menu-item {
-  @apply arc-transition-all;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ant-menu-item:hover {
-  @apply text-primary-500 bg-primary-50 dark:bg-primary-500/10 !important;
+  color: #3b82f6 !important;
+  background: #eff6ff !important;
+}
+
+.dark .ant-menu-item:hover {
+  background: rgba(59, 130, 246, 0.1) !important;
 }
 
 .ant-menu-item-selected {
-  @apply text-primary-500 bg-primary-50 dark:bg-primary-500/10 !important;
+  color: #3b82f6 !important;
+  background: #eff6ff !important;
+}
+
+.dark .ant-menu-item-selected {
+  background: rgba(59, 130, 246, 0.1) !important;
 }
 
 /* Dropdown */
 .ant-dropdown-menu {
-  @apply rounded-lg shadow-lg;
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.12);
 }
 
 .ant-dropdown-menu-item {
-  @apply arc-transition-all;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ant-dropdown-menu-item:hover {
-  @apply bg-neutral-50 dark:bg-neutral-800 !important;
+  background: #f5f5f5 !important;
+}
+
+.dark .ant-dropdown-menu-item:hover {
+  background: #262626 !important;
 }
 
 /* Switch */
 .ant-switch {
-  @apply arc-transition-all;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ant-switch-checked {
-  @apply bg-primary-500 !important;
+  background: #3b82f6 !important;
 }
 
 /* Checkbox */
 .ant-checkbox-wrapper {
-  @apply arc-transition-all;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ant-checkbox-checked .ant-checkbox-inner {
-  @apply bg-primary-500 border-primary-500 !important;
+  background: #3b82f6 !important;
+  border-color: #3b82f6 !important;
 }
 
 /* Radio */
 .ant-radio-wrapper {
-  @apply arc-transition-all;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ant-radio-checked .ant-radio-inner {
-  @apply border-primary-500 !important;
+  border-color: #3b82f6 !important;
 }
 
 .ant-radio-checked .ant-radio-inner::after {
-  @apply bg-primary-500 !important;
+  background: #3b82f6 !important;
 }
 
 /* Tag */
 .ant-tag {
-  @apply rounded-full;
+  border-radius: 9999px;
 }
 
 /* Avatar */
 .ant-avatar {
-  @apply arc-transition-all;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Badge */
 .ant-badge-count {
-  @apply rounded-full;
+  border-radius: 9999px;
 }
 
 /* Progress */
 .ant-progress-bg {
-  @apply arc-transition-all;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Alert */
 .ant-alert {
-  @apply rounded-lg;
+  border-radius: 0.5rem;
 }
 
 /* Message */
 .ant-message-notice-content {
-  @apply rounded-lg shadow-lg;
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.12);
 }
 
 /* Notification */
 .ant-notification-notice {
-  @apply rounded-lg shadow-lg;
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.12);
 }
 
 /* Tooltip */
 .ant-tooltip-inner {
-  @apply rounded-lg;
+  border-radius: 0.5rem;
 }
 
 /* Popover */
 .ant-popover-inner {
-  @apply rounded-lg shadow-lg;
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.12);
 }
 
 /* Drawer */
 .ant-drawer-content {
-  @apply rounded-lg shadow-xl;
+  border-radius: 0.5rem;
+  box-shadow: 0 20px 40px 0 rgba(0, 0, 0, 0.12);
 }
 
 /* Calendar */
 .ant-picker {
-  @apply rounded-lg;
+  border-radius: 0.5rem;
 }
 
 /* Timeline */
 .ant-timeline-item-head {
-  @apply arc-transition-all;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* List */
 .ant-list-item {
-  @apply arc-transition-all;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Empty */
 .ant-empty {
-  @apply text-neutral-400 dark:text-neutral-600;
+  color: #a3a3a3;
+}
+
+.dark .ant-empty {
+  color: #525252;
 }
 
 /* Spin */
 .ant-spin-dot-item {
-  @apply bg-primary-500 !important;
+  background: #3b82f6 !important;
 }

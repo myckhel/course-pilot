@@ -1,4 +1,4 @@
-import { Layout, Menu, Button } from "antd";
+import { Layout, Menu, Button, Typography } from "antd";
 import {
   DashboardOutlined,
   BookOutlined,
@@ -6,6 +6,8 @@ import {
   BarChartOutlined,
   CloseOutlined,
   MessageOutlined,
+  QuestionCircleOutlined,
+  HeatMapOutlined,
 } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores";
@@ -13,6 +15,7 @@ import { ROUTES } from "@/constants";
 import type { MenuProps } from "antd";
 
 const { Sider } = Layout;
+const { Title } = Typography;
 
 interface SidebarProps {
   collapsed: boolean;
@@ -99,30 +102,53 @@ function Sidebar({ collapsed, onClose, isMobile = false }: SidebarProps) {
       collapsedWidth={isMobile ? 0 : 80}
       width={240}
       className={`
+        fixed h-screen transition-all duration-300 ease-in-out
         bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700
-        ${isMobile ? "fixed inset-y-0 left-0 z-50" : ""}
+        ${isMobile ? "left-0 z-50" : "relative"}
       `}
-      style={isMobile ? { height: "100vh" } : undefined}
+      trigger={null}
     >
-      {/* Mobile close button */}
-      {isMobile && (
-        <div className="flex justify-end p-4">
+      {/* Logo Section */}
+      <div className="flex items-center h-16 px-4 border-b border-gray-200 dark:border-gray-700">
+        {isMobile && (
           <Button
             type="text"
             icon={<CloseOutlined />}
             onClick={onClose}
-            className="text-gray-600 dark:text-gray-300"
+            className="absolute right-4 top-4 text-gray-600 dark:text-gray-300"
           />
+        )}
+        <div
+          className={`flex ml-4 items-center space-x-3 ${
+            collapsed && !isMobile ? "justify-center" : "justify-center"
+          }`}
+        >
+          {(!collapsed || isMobile) && (
+            <Title level={5} className="m-0 text-gray-900 dark:text-white">
+              GSTutor
+            </Title>
+          )}
         </div>
-      )}
+      </div>
 
+      {/* Navigation Menu */}
       <div className="py-4">
         <Menu
           mode="inline"
           selectedKeys={[selectedKey]}
           items={menuItems}
-          className="bg-transparent border-none"
+          className="border-none bg-transparent"
+          theme={
+            document.documentElement.classList.contains("dark")
+              ? "dark"
+              : "light"
+          }
         />
+      </div>
+
+      {/* Bottom Section - Can add more items here */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700">
+        {/* You can add collapsed/expanded bottom content here */}
       </div>
     </Sider>
   );

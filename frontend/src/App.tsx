@@ -16,7 +16,10 @@ function App() {
   return (
     <ConfigProvider
       theme={{
-        algorithm: themeMode === "dark" ? [theme.darkAlgorithm, theme.compactAlgorithm] : [theme.defaultAlgorithm, theme.compactAlgorithm],
+        algorithm:
+          themeMode === "dark"
+            ? [theme.darkAlgorithm, theme.compactAlgorithm]
+            : [theme.defaultAlgorithm, theme.compactAlgorithm],
         token: {
           // Colors
           colorPrimary: "#1890ff",
@@ -24,19 +27,19 @@ function App() {
           colorError: "#ef4444",
           colorWarning: "#f59e0b",
           colorInfo: "#1890ff",
-          
+
           // Neutral colors
           colorText: "#171717",
           colorTextSecondary: "#525252",
           colorBgContainer: "#ffffff",
           colorBgElevated: "#fafafa",
-          
+
           // Border radius
           borderRadius: 6,
           borderRadiusSM: 4,
           borderRadiusLG: 8,
           borderRadiusXS: 2,
-          
+
           // Spacing
           marginXS: 8,
           marginSM: 12,
@@ -48,7 +51,7 @@ function App() {
           paddingSM: 12,
           paddingLG: 24,
           paddingXL: 32,
-          
+
           // Typography
           fontSize: 16,
           fontSizeSM: 14,
@@ -57,11 +60,13 @@ function App() {
           lineHeight: 1.5,
           lineHeightSM: 1.25,
           lineHeightLG: 1.75,
-          
+
           // Shadows
-          boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)",
-          boxShadowSecondary: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
-          
+          boxShadow:
+            "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)",
+          boxShadowSecondary:
+            "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
+
           // Motion
           motionDurationFast: "0.1s",
           motionDurationMid: "0.2s",
@@ -69,16 +74,16 @@ function App() {
           motionEaseInOut: "cubic-bezier(0.4, 0, 0.2, 1)",
           motionEaseOut: "cubic-bezier(0, 0, 0.2, 1)",
           motionEaseIn: "cubic-bezier(0.4, 0, 1, 1)",
-          
+
           // Component specific
           controlHeight: 36,
           controlHeightSM: 32,
           controlHeightLG: 42,
-          
+
           // Opacity
           opacityImage: 1,
           opacityLoading: 0.65,
-          
+
           // Z-index
           zIndexBase: 1000,
           zIndexPopup: 1050,
@@ -100,7 +105,8 @@ function App() {
           },
           Card: {
             borderRadius: 12,
-            boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)",
+            boxShadow:
+              "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)",
           },
           Modal: {
             borderRadius: 12,

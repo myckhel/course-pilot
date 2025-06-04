@@ -6,7 +6,6 @@ import {
   Typography,
   Empty,
   Spin,
-  Tag,
   Input,
   Dropdown,
   Modal,
@@ -134,9 +133,11 @@ function ChatSessionsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center px-4">
         <div>
-          <Title level={2}>Chat Sessions</Title>
+          <Title level={2} className="!text-3xl !mb-0">
+            Chat Sessions
+          </Title>
           <Text type="secondary">
             Continue your conversations or start new ones
           </Text>
@@ -145,13 +146,14 @@ function ChatSessionsPage() {
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => setNewChatModalVisible(true)}
+          className="px-6"
         >
           New Chat
         </Button>
       </div>
 
       {/* Search */}
-      <Card>
+      <Card className="px-4">
         <Search
           placeholder="Search chat sessions..."
           allowClear
@@ -164,43 +166,39 @@ function ChatSessionsPage() {
       </Card>
 
       {/* Sessions List */}
-      <Card>
+      <Card className="px-4">
         {filteredSessions.length > 0 ? (
           <List
             dataSource={filteredSessions}
             renderItem={(session: ChatSession) => (
               <List.Item
+                onClick={() => navigate(`/chat/${session.id}`)}
+                className="hover:bg-gray-50 dark:hover:bg-blue-100 rounded-lg transition-colors cursor-pointer group px-2 py-3 mb-2"
+                style={{ marginBottom: 8 }}
                 actions={[
-                  <Button
-                    type="primary"
-                    onClick={() => navigate(`/chat/${session.id}`)}
-                    key="continue"
-                  >
-                    Continue
-                  </Button>,
                   <Dropdown
                     menu={{ items: getSessionActions(session) }}
                     placement="bottomRight"
                     key="actions"
                   >
-                    <Button type="text" icon={<MoreOutlined />} />
+                    <Button
+                      type="text"
+                      icon={<MoreOutlined />}
+                      onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                    />
                   </Dropdown>,
                 ]}
-                className="hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
               >
                 <List.Item.Meta
                   avatar={
-                    <div className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                      <MessageOutlined className="text-blue-500" />
+                    <div className="flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                      <MessageOutlined className="text-blue-500 text-xl" />
                     </div>
                   }
                   title={
-                    <div className="flex items-center space-x-2">
-                      <span className="font-medium">{session.title}</span>
-                      <Tag color="blue" className="text-xs">
-                        {session.message_count || 0} messages
-                      </Tag>
-                    </div>
+                    <span className="font-semibold text-lg group-hover:text-blue-600 transition-colors">
+                      {session.title}
+                    </span>
                   }
                   description={
                     <Text type="secondary" className="text-xs">

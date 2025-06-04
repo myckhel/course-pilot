@@ -117,7 +117,7 @@
 
 /* Arc Transitions */
 .arc-transition-all {
-  @apply transition-all duration-200;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Arc Animations */
@@ -125,9 +125,9 @@
   @apply animate-float;
 }
 
-.arc-animate-pulse {
+/* .arc-animate-pulse {
   @apply animate-pulse-slow;
-}
+} */
 
 /* Arc Loading States */
 .arc-loading {

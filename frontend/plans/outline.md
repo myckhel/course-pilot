@@ -72,4 +72,4 @@ Design Style
 ○ Colors: calming blue & white/light gray themes
 ○ Dark mode: black/dark navy with high-contrast text
 ○ Fonts: Open Sans / Inter / Roboto for readability
-● Minimalist but informative
+

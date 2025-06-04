@@ -114,26 +114,24 @@ function ChatPage() {
       </Card>
 
       {/* Messages */}
-      <Card className="flex-grow flex flex-col min-h-0">
+      <Card className="flex-grow flex flex-col min-h-0 border-none shadow-none bg-transparent">
         <div
-          className="flex-grow overflow-y-auto"
+          className="flex-grow overflow-y-auto px-2 md:px-6 py-4 space-y-2"
           style={{ maxHeight: "60vh" }}
         >
           {messages.length > 0 ? (
             <List
               dataSource={messages}
               renderItem={(msg: ChatMessage) => (
-                <List.Item className="border-none px-0">
+                <List.Item className="border-none px-0 bg-transparent">
                   <div
                     className={`w-full flex ${
                       msg.sender === "user" ? "justify-end" : "justify-start"
                     }`}
                   >
                     <div
-                      className={`max-w-[80%] flex items-start space-x-3 ${
-                        msg.sender === "user"
-                          ? "flex-row-reverse space-x-reverse"
-                          : ""
+                      className={`max-w-[80%] flex items-end gap-2 md:gap-3 ${
+                        msg.sender === "user" ? "flex-row-reverse" : ""
                       }`}
                     >
                       <Avatar
@@ -145,25 +143,34 @@ function ChatPage() {
                           )
                         }
                         className={
-                          msg.sender === "user" ? "bg-blue-500" : "bg-green-500"
+                          msg.sender === "user"
+                            ? "bg-blue-500 shadow-md"
+                            : "bg-green-500 shadow-md"
                         }
+                        size={40}
                       />
                       <div
-                        className={`rounded-lg p-3 ${
+                        className={`relative px-4 py-2 rounded-2xl shadow-md text-base whitespace-pre-wrap break-words ${
                           msg.sender === "user"
-                            ? "bg-blue-500 text-white"
-                            : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                            ? "bg-blue-500 text-white rounded-br-md ml-2 md:ml-4 chat-bubble-user"
+                            : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-bl-md mr-2 md:mr-4 chat-bubble-ai"
                         }`}
+                        style={{
+                          borderBottomRightRadius:
+                            msg.sender === "user" ? 8 : 24,
+                          borderBottomLeftRadius:
+                            msg.sender === "user" ? 24 : 8,
+                        }}
                       >
-                        <div className="whitespace-pre-wrap">{msg.message}</div>
+                        <div>{msg.message}</div>
                         <div
-                          className={`text-xs mt-1 flex items-center ${
+                          className={`text-xs mt-1 flex items-center gap-1 ${
                             msg.sender === "user"
-                              ? "text-blue-100"
-                              : "text-gray-500 dark:text-gray-400"
+                              ? "text-blue-100/80 justify-end"
+                              : "text-gray-500 dark:text-gray-400 justify-start"
                           }`}
                         >
-                          <ClockCircleOutlined className="mr-1" />
+                          <ClockCircleOutlined />
                           {formatDistanceToNow(new Date(msg.timestamp))}
                         </div>
                       </div>
@@ -184,11 +191,15 @@ function ChatPage() {
 
           {loading && (
             <div className="flex justify-start mb-4">
-              <div className="flex items-start space-x-3">
-                <Avatar icon={<RobotOutlined />} className="bg-green-500" />
-                <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
+              <div className="flex items-end gap-2 md:gap-3">
+                <Avatar
+                  icon={<RobotOutlined />}
+                  className="bg-green-500 shadow-md"
+                  size={40}
+                />
+                <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl px-4 py-2 shadow-md flex items-center gap-2">
                   <Spin size="small" />
-                  <Text className="ml-2 text-gray-600 dark:text-gray-300">
+                  <Text className="text-gray-600 dark:text-gray-300">
                     AI is thinking...
                   </Text>
                 </div>

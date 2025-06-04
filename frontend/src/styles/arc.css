@@ -17,7 +17,8 @@
 
 .arc-card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1);
 }
 
 /* Button styles */
@@ -67,12 +68,24 @@
 
 /* Loading states */
 .arc-loading {
-  @apply animate-pulse-slow bg-neutral-100;
+  background-color: #f5f5f5; /* Tailwind bg-neutral-100 */
+  animation: arc-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes arc-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* Dark mode adjustments */
 .dark .arc-card-hover:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4),
+    0 4px 6px -4px rgba(0, 0, 0, 0.4);
 }
 
 .dark .arc-scrollbar {
@@ -84,5 +97,5 @@
 }
 
 .dark .arc-loading {
-  @apply bg-neutral-800;
+  background-color: #1f1f1f; /* Tailwind bg-neutral-800 */
 }

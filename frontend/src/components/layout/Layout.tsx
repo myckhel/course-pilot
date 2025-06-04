@@ -27,14 +27,13 @@ function Layout() {
   return (
     <AntLayout className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Desktop Sidebar */}
-      {lg && <Sidebar collapsed={sidebarCollapsed} />}
+      <Sidebar collapsed={sidebarCollapsed} />
 
-      {/* Mobile Sidebar */}
+      {/* Mobile Sidebar and Overlay */}
       {!lg && mobileMenuVisible && (
         <>
-          {/* Overlay */}
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300 ease-in-out"
             onClick={handleMobileMenuClose}
           />
           <Sidebar
@@ -45,10 +44,14 @@ function Layout() {
         </>
       )}
 
-      <AntLayout>
-        <Header onMenuToggle={handleMenuToggle} showMenuButton={!lg} />
-
-        <Content className="p-4 lg:p-6">
+      {/* Main Content */}
+      <AntLayout
+        className={`transition-all duration-300 ease-in-out ${
+          lg ? (sidebarCollapsed ? "" : "") : "ml-0"
+        }`}
+      >
+        <Header onMenuToggle={handleMenuToggle} showMenuButton={true} />
+        <Content className="p-4 lg:p-6 min-h-[calc(100vh-64px)]">
           <div className="max-w-7xl mx-auto">
             <Outlet />
           </div>

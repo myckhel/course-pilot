@@ -19,13 +19,16 @@ function LandingPage() {
   }, [isAuthenticated, navigate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-8">
         <Row gutter={[32, 32]} align="middle" className="min-h-screen">
           {/* Left Side - Features and Info */}
           <Col xs={24} lg={12}>
             <div className="text-center lg:text-left">
-              <Title level={1} className="text-4xl lg:text-5xl font-bold mb-6">
+              <Title
+                level={1}
+                className="text-4xl lg:text-5xl text-white font-bold mb-6"
+              >
                 <span className="text-blue-600">GSTutor</span> AI Assistant
               </Title>
 

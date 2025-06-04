@@ -13,7 +13,7 @@ import {
   LogoutOutlined,
   MoonOutlined,
   SunOutlined,
-  MenuOutlined,
+  MenuUnfoldOutlined,
 } from "@ant-design/icons";
 import { useAuthStore, useUIStore } from "@/stores";
 import { useNavigate } from "react-router-dom";
@@ -30,11 +30,15 @@ interface HeaderProps {
 function Header({ onMenuToggle, showMenuButton = false }: HeaderProps) {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
-  const { theme, toggleTheme } = useUIStore();
+  const { theme, setTheme } = useUIStore();
 
   const handleLogout = async () => {
     await logout();
     navigate("/login");
+  };
+
+  const handleThemeToggle = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
   };
 
   const userMenuItems: MenuProps["items"] = [
@@ -58,49 +62,49 @@ function Header({ onMenuToggle, showMenuButton = false }: HeaderProps) {
   ];
 
   return (
-    <AntHeader className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 shadow-sm">
-      <div className="flex items-center justify-between h-full">
-        <div className="flex items-center space-x-4">
+    <AntHeader className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 h-16 flex items-center sticky top-0 z-30 shadow-sm">
+      <div className="flex items-center justify-between w-full">
+        {/* Left Section */}
+        <div className="flex items-center">
           {showMenuButton && (
             <Button
               type="text"
-              icon={<MenuOutlined />}
+              icon={<MenuUnfoldOutlined className="text-white text-lg" />}
               onClick={onMenuToggle}
-              className="lg:hidden"
+              className="mr-4 text-white dark:text-white text-xl"
             />
           )}
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">GT</span>
-            </div>
-            <Text strong className="text-lg text-gray-900 dark:text-gray-100">
-              GSTutor
-            </Text>
-          </div>
         </div>
 
+        {/* Right Section */}
         <div className="flex items-center space-x-4">
           {/* Theme Toggle */}
-          <Space>
-            <SunOutlined className="text-gray-600 dark:text-gray-300" />
+          <Space align="center" className="border-r dark:border-gray-700 pr-4">
             <Switch
               checked={theme === "dark"}
-              onChange={toggleTheme}
+              onChange={handleThemeToggle}
               checkedChildren={<MoonOutlined />}
               unCheckedChildren={<SunOutlined />}
-              size="small"
+              className="bg-gray-200 dark:bg-gray-700"
             />
-            <MoonOutlined className="text-gray-600 dark:text-gray-300" />
           </Space>
 
           {/* User Menu */}
           {user && (
-            <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+            <Dropdown
+              menu={{ items: userMenuItems }}
+              placement="bottomRight"
+              trigger={["click"]}
+            >
               <Button
                 type="text"
-                className="flex items-center space-x-2 h-auto p-2"
+                className="flex items-center space-x-2 h-auto py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
               >
-                <Avatar size="small" icon={<UserOutlined />} />
+                <Avatar
+                  size="small"
+                  icon={<UserOutlined />}
+                  className="bg-blue-500"
+                />
                 <Text className="hidden sm:inline text-gray-700 dark:text-gray-200">
                   {user.name || user.email}
                 </Text>
