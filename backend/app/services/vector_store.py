@@ -36,19 +36,33 @@ class VectorStoreService:
             
             topic_persist_dir = os.path.join(self.persist_directory, topic_id)
             
-            # Create vectorstore
-            vectorstore = Chroma.from_documents(
-                documents=documents,
-                embedding=self.embeddings,
-                persist_directory=topic_persist_dir
-            )
+            # Process documents in smaller batches to avoid token limits
+            batch_size = 50  # Process 50 chunks at a time
+            vectorstore = None
             
-            # Persist the vectorstore
-            vectorstore.persist()
+            for i in range(0, len(documents), batch_size):
+                batch = documents[i:i + batch_size]
+                
+                if vectorstore is None:
+                    # Create initial vectorstore with first batch
+                    vectorstore = Chroma.from_documents(
+                        documents=batch,
+                        embedding=self.embeddings,
+                        persist_directory=topic_persist_dir
+                    )
+                else:
+                    # Add subsequent batches to existing vectorstore
+                    vectorstore.add_documents(documents=batch)
+                
+                # Persist after each batch
+                vectorstore.persist()
             
             return True
             
         except Exception as e:
+            # Clean up if creation fails
+            if os.path.exists(topic_persist_dir):
+                shutil.rmtree(topic_persist_dir)
             raise Exception(f"Failed to create vector index: {str(e)}")
     
     def get_topic_retriever(self, topic_id: str, search_kwargs: Optional[dict] = None):

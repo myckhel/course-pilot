@@ -398,6 +398,30 @@ class DatabaseService:
         except Exception:
             return False
     
+    def get_default_topic(self) -> Optional[Topic]:
+        """Get the default GST topic."""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                SELECT * FROM topics WHERE name = 'GST'
+            """)
+            
+            row = cursor.fetchone()
+            
+            if not row:
+                return None
+                
+            return Topic(
+                id=row[0],
+                name=row[1],
+                description=row[2],
+                created_by=row[3],
+                document_count=row[4],
+                created_at=datetime.fromisoformat(row[5]),
+                updated_at=datetime.fromisoformat(row[6])
+            )
+    
     # Chat session methods
     def create_chat_session(self, user_id: str, topic_id: str, title: str) -> ChatSession:
         """Create a new chat session."""

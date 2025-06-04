@@ -10,7 +10,7 @@ import type {
 
 export const chatApi = {
   getSessions: async (topicId?: string): Promise<ChatSession[]> => {
-    const params = topicId ? { topicId: topicId } : {};
+    const params = topicId ? { topicId } : {}; // Only include topicId if provided
     const response = await apiClient.get<ChatSession[]>(
       API_ENDPOINTS.CHAT_SESSIONS,
       { params }
@@ -19,6 +19,7 @@ export const chatApi = {
   },
 
   createSession: async (data: CreateSessionRequest): Promise<ChatSession> => {
+    // If no topicId provided, the backend will use the default GST topic
     const response = await apiClient.post<ChatSession>(
       API_ENDPOINTS.CHAT_SESSIONS,
       data

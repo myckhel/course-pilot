@@ -29,10 +29,15 @@ def get_chat_sessions():
     try:
         user_id = get_jwt_identity()
         topic_id = request.args.get('topicId')
-        
         db_service, _, _ = get_services()
         
-        # Get chat sessions
+        if not topic_id:
+            # If no topic ID provided, get the default topic
+            default_topic = db_service.get_default_topic()
+            if default_topic:
+                topic_id = default_topic.id
+        
+        # Get chat sessions (will get all sessions if topic_id is None)
         sessions = db_service.get_chat_sessions(user_id, topic_id)
         
         return jsonify([session.to_dict() for session in sessions]), 200
@@ -49,25 +54,31 @@ def create_chat_session():
         user_id = get_jwt_identity()
         data = request.get_json()
         
-        # Validate input
-        if not all(k in data for k in ('topicId', 'title')):
-            return jsonify({'error': 'Missing required fields: topicId, title'}), 400
+        # Validate input - topicId is now optional, title is still required
+        if 'title' not in data:
+            return jsonify({'error': 'Missing required field: title'}), 400
         
         db_service, vector_service, _ = get_services()
         
-        # Verify topic exists
-        topic = db_service.get_topic_by_id(data['topicId'])
-        if not topic:
-            return jsonify({'error': 'Topic not found'}), 404
+        # If no topic ID is provided, use the default GST topic
+        if 'topicId' not in data:
+            topic = db_service.get_default_topic()
+            if not topic:
+                return jsonify({'error': 'Default GST topic not found'}), 500
+        else:
+            # Verify specific topic exists
+            topic = db_service.get_topic_by_id(data['topicId'])
+            if not topic:
+                return jsonify({'error': 'Topic not found'}), 404
         
         # Verify topic has documents
-        if not vector_service.topic_index_exists(data['topicId']):
+        if not vector_service.topic_index_exists(topic.id):
             return jsonify({'error': 'Topic has no documents available for Q&A'}), 400
         
         # Create chat session
         session = db_service.create_chat_session(
             user_id=user_id,
-            topic_id=data['topicId'],
+            topic_id=topic.id,
             title=data['title'].strip()
         )
         

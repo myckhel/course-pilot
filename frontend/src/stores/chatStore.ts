@@ -54,6 +54,7 @@ export const useChatStore = create<ChatState & ChatActions>()(
       });
 
       try {
+        // Will use default GST topic if no topicId provided
         const sessions = await chatApi.getSessions(topicId);
         set((state) => {
           state.sessions = sessions;
@@ -77,6 +78,7 @@ export const useChatStore = create<ChatState & ChatActions>()(
       });
 
       try {
+        // Will use default GST topic if no topicId provided in data
         const newSession = await chatApi.createSession(data);
         set((state) => {
           state.sessions.unshift(newSession); // Add to beginning of list

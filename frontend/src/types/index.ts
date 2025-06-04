@@ -137,8 +137,8 @@ export interface MessageResponse {
 }
 
 export interface CreateSessionRequest {
-  topicId: number;
-  title?: string;
+  topicId?: string; // Use string type for consistency with API
+  title: string;
 }
 
 // ===== ADMIN TYPES =====

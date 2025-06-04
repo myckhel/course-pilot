@@ -63,6 +63,77 @@ def initialize_database():
         print(f"❌ Database initialization failed: {str(e)}")
 
 
+def initialize_default_topic():
+    """Initialize default GST topic and upload its document."""
+    print("\n📚 Initializing default GST topic...")
+    try:
+        from app.services import DatabaseService
+        from app.services.document_loader import DocumentLoader
+        from app.services.vector_store import VectorStoreService
+        from pathlib import Path
+        
+        db_service = DatabaseService()
+        
+        # Get admin user id (first admin in the system)
+        admin = next((user for user in db_service.get_all_users()[0] if user.role == 'admin'), None)
+        if not admin:
+            print("❌ No admin user found. Please run database initialization first.")
+            return
+        
+        # Check if GST topic already exists
+        existing_topics = db_service.get_all_topics()
+        if any(topic.name.lower() == 'gst' for topic in existing_topics):
+            print("✓ GST topic already exists")
+            return
+        
+        # Create default GST topic
+        topic = db_service.create_topic(
+            name="GST",
+            description="AI-powered companion for GST courses",
+            created_by=admin.id
+        )
+        print("✓ Default GST topic created successfully")
+
+        # Load and process the default GST document
+        pdf_path = Path(__file__).parent / 'data' / 'CCMAS GST data .pdf'
+        if pdf_path.exists():
+            try:
+                print("📄 Processing GST document...")
+                # Initialize services with smaller chunk size to handle token limits
+                doc_loader = DocumentLoader(chunk_size=500, chunk_overlap=50)
+                vector_service = VectorStoreService('chroma_db')
+                
+                # Save file to uploads folder
+                upload_dir = Path('uploads') / topic.id
+                upload_dir.mkdir(exist_ok=True)
+                dest_path = upload_dir / 'CCMAS GST data .pdf'
+                shutil.copy2(pdf_path, dest_path)
+                
+                # Process document in chunks
+                chunks = doc_loader.load_and_split_pdf(str(dest_path))
+                
+                if not chunks:
+                    print("❌ No content could be extracted from the PDF")
+                    return
+                
+                # Create or update vector index
+                if vector_service.topic_index_exists(topic.id):
+                    vector_service.update_topic_index(topic.id, chunks)
+                else:
+                    vector_service.create_topic_index(topic.id, chunks)
+                
+                # Update topic document count
+                db_service.increment_topic_document_count(topic.id)
+                print(f"✓ GST document processed and indexed successfully ({len(chunks)} chunks created)")
+            except Exception as e:
+                print(f"❌ Failed to process GST document: {str(e)}")
+        else:
+            print("⚠️  Default GST document not found at:", pdf_path)
+        
+    except Exception as e:
+        print(f"❌ Failed to initialize default topic: {str(e)}")
+
+
 def main():
     """Main setup function."""
     print("🚀 Setting up AI Virtual Assistant Flask Backend")
@@ -83,6 +154,9 @@ def main():
     # Initialize database
     print("\n🗄️  Initializing database...")
     initialize_database()
+    
+    # Initialize default topic
+    initialize_default_topic()
     
     print("\n✅ Setup completed successfully!")
     print("\nNext steps:")
