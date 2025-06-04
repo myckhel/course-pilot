@@ -1,0 +1,85 @@
+2025-05-28 14:30:51,518 - app - INFO - Logging configured successfully
+2025-05-28 14:30:51,532 - app - INFO - Flask application created successfully
+2025-05-28 14:30:54,328 - app - INFO - Logging configured successfully
+2025-05-28 14:30:54,341 - app - INFO - Flask application created successfully
+2025-05-28 14:30:54,353 - werkzeug - WARNING -  * Debugger is active!
+2025-05-28 14:31:47,043 - app - INFO - Logging configured successfully
+2025-05-28 14:31:47,055 - app - INFO - Flask application created successfully
+2025-05-28 14:31:47,068 - werkzeug - WARNING -  * Debugger is active!
+2025-05-28 14:31:59,165 - app - INFO - Logging configured successfully
+2025-05-28 14:31:59,249 - app - INFO - Flask application created successfully
+2025-05-28 14:31:59,258 - werkzeug - WARNING -  * Debugger is active!
+2025-05-28 14:32:08,096 - app - INFO - Logging configured successfully
+2025-05-28 14:32:08,112 - app - INFO - Flask application created successfully
+2025-05-28 14:32:08,118 - werkzeug - WARNING -  * Debugger is active!
+2025-05-28 14:32:53,700 - app - INFO - Logging configured successfully
+2025-05-28 14:32:53,723 - app - INFO - Flask application created successfully
+2025-05-28 14:34:04,941 - app - INFO - Logging configured successfully
+2025-05-28 14:34:04,954 - app - INFO - Flask application created successfully
+2025-05-28 14:34:07,355 - app - INFO - Logging configured successfully
+2025-05-28 14:34:07,367 - app - INFO - Flask application created successfully
+2025-05-28 14:34:07,375 - werkzeug - WARNING -  * Debugger is active!
+2025-05-28 14:45:37,225 - app - INFO - Logging configured successfully
+2025-05-28 14:45:37,241 - app - INFO - Flask application created successfully
+2025-05-28 14:45:37,252 - werkzeug - WARNING -  * Debugger is active!
+2025-05-28 15:07:48,409 - app - INFO - Logging configured successfully
+2025-05-28 15:07:48,429 - app - INFO - Flask application created successfully
+2025-05-28 15:07:51,081 - app - INFO - Logging configured successfully
+2025-05-28 15:07:51,096 - app - INFO - Flask application created successfully
+2025-05-28 15:07:51,105 - werkzeug - WARNING -  * Debugger is active!
+2025-05-28 15:11:17,171 - app - INFO - Logging configured successfully
+2025-05-28 15:11:17,184 - app - INFO - Flask application created successfully
+2025-05-28 15:11:19,736 - app - INFO - Logging configured successfully
+2025-05-28 15:11:19,751 - app - INFO - Flask application created successfully
+2025-05-28 15:11:19,759 - werkzeug - WARNING -  * Debugger is active!
+2025-05-28 15:15:54,171 - app - INFO - Logging configured successfully
+2025-05-28 15:15:54,187 - app - INFO - Flask application created successfully
+2025-05-28 15:15:54,199 - werkzeug - WARNING -  * Debugger is active!
+2025-05-28 23:35:40,681 - app - INFO - Logging configured successfully
+2025-05-28 23:35:40,695 - app - INFO - Flask application created successfully
+2025-05-28 23:35:42,986 - app - INFO - Logging configured successfully
+2025-05-28 23:35:42,999 - app - INFO - Flask application created successfully
+2025-05-28 23:35:43,007 - werkzeug - WARNING -  * Debugger is active!
+2025-05-29 01:29:14,239 - app - INFO - Logging configured successfully
+2025-05-29 01:29:14,256 - app - INFO - Flask application created successfully
+2025-05-29 01:29:14,268 - werkzeug - WARNING -  * Debugger is active!
+2025-05-29 01:29:30,556 - app - INFO - Logging configured successfully
+2025-05-29 01:29:30,570 - app - INFO - Flask application created successfully
+2025-05-29 01:29:30,582 - werkzeug - WARNING -  * Debugger is active!
+2025-05-29 01:30:03,254 - app - INFO - Logging configured successfully
+2025-05-29 01:30:03,270 - app - INFO - Flask application created successfully
+2025-05-29 01:30:03,283 - werkzeug - WARNING -  * Debugger is active!
+2025-05-29 01:31:01,256 - app - INFO - Logging configured successfully
+2025-05-29 01:31:01,272 - app - INFO - Flask application created successfully
+2025-05-29 01:31:04,506 - app - INFO - Logging configured successfully
+2025-05-29 01:31:04,521 - app - INFO - Flask application created successfully
+2025-05-29 01:31:04,528 - werkzeug - WARNING -  * Debugger is active!
+2025-05-29 01:32:11,163 - app - INFO - Logging configured successfully
+2025-05-29 01:32:11,184 - app - INFO - Flask application created successfully
+2025-05-29 11:20:51,243 - app - INFO - Logging configured successfully
+2025-05-29 11:20:51,274 - app - INFO - Flask application created successfully
+2025-05-29 11:20:51,305 - werkzeug - WARNING -  * Debugger is active!
+2025-05-29 12:11:37,946 - app - INFO - Logging configured successfully
+2025-05-29 12:11:37,963 - app - INFO - Flask application created successfully
+2025-05-29 12:11:40,688 - app - INFO - Logging configured successfully
+2025-05-29 12:11:40,711 - app - INFO - Flask application created successfully
+2025-05-29 12:11:40,720 - werkzeug - WARNING -  * Debugger is active!
+2025-05-29 14:56:56,180 - app - INFO - Logging configured successfully
+2025-05-29 14:56:56,193 - app - INFO - Flask application created successfully
+2025-05-29 14:56:59,860 - app - INFO - Logging configured successfully
+2025-05-29 14:56:59,882 - app - INFO - Flask application created successfully
+2025-05-29 14:56:59,894 - werkzeug - WARNING -  * Debugger is active!
+2025-06-02 13:30:05,577 - app - INFO - Logging configured successfully
+2025-06-02 13:30:05,593 - app - INFO - Flask application created successfully
+2025-06-02 13:30:08,686 - app - INFO - Logging configured successfully
+2025-06-02 13:30:08,701 - app - INFO - Flask application created successfully
+2025-06-02 13:30:08,710 - werkzeug - WARNING -  * Debugger is active!
+2025-06-03 17:20:37,773 - app - INFO - Logging configured successfully
+2025-06-03 17:20:37,798 - app - INFO - Flask application created successfully
+2025-06-03 17:20:37,818 - werkzeug - WARNING -  * Debugger is active!
+2025-06-03 17:21:13,515 - app - INFO - Logging configured successfully
+2025-06-03 17:21:13,530 - app - INFO - Flask application created successfully
+2025-06-03 17:21:13,542 - werkzeug - WARNING -  * Debugger is active!
+2025-06-03 17:43:50,248 - app - INFO - Logging configured successfully
+2025-06-03 17:43:50,264 - app - INFO - Flask application created successfully
+2025-06-03 17:43:50,275 - werkzeug - WARNING -  * Debugger is active!

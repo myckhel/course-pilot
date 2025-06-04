@@ -109,9 +109,6 @@ function ChatPage() {
           </div> */}
           <div className="flex items-center space-x-2">
             <Tag color="green">Active</Tag>
-            {/* <Text type="secondary" className="text-sm">
-              {formatDistanceToNow(new Date(currentSession.updated_at))}
-            </Text> */}
           </div>
         </div>
       </Card>
