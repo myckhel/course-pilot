@@ -11,30 +11,27 @@ import {
   Spin,
 } from "antd";
 import {
-  BookOutlined,
   MessageOutlined,
   ClockCircleOutlined,
   RightOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { useTopicsStore, useChatStore } from "@/stores";
+import { useChatStore } from "@/stores";
 import { formatDistanceToNow } from "@/utils";
-import type { Topic, ChatSession } from "@/types";
+import type { ChatSession } from "@/types";
 
 const { Title, Text } = Typography;
 
 function DashboardPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-
-  const { topics, fetchTopics } = useTopicsStore();
   const { sessions, fetchSessions } = useChatStore();
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       try {
-        await Promise.all([fetchTopics(), fetchSessions()]);
+        await fetchSessions();
       } catch (error) {
         console.error("Failed to load dashboard data:", error);
       } finally {
@@ -43,7 +40,7 @@ function DashboardPage() {
     };
 
     loadData();
-  }, [fetchTopics, fetchSessions]);
+  }, [fetchSessions]);
 
   if (loading) {
     return (
@@ -60,10 +57,6 @@ function DashboardPage() {
     // )
     .slice(0, 5);
 
-  const availableTopics = topics
-    .filter((topic) => topic.status === "active")
-    .slice(0, 6);
-
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
@@ -79,30 +72,20 @@ function DashboardPage() {
 
       {/* Statistics */}
       <Row gutter={[16, 16]}>
-        <Col xs={24} sm={8}>
+        <Col xs={24} sm={12}>
           <Card>
             <Statistic
-              title="Available Topics"
-              value={topics.filter((t) => t.status === "active").length}
-              prefix={<BookOutlined />}
-              valueStyle={{ color: "#3f8600" }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={8}>
-          <Card>
-            <Statistic
-              title="Chat Sessions"
+              title="Total Chat Sessions"
               value={sessions.length}
               prefix={<MessageOutlined />}
               valueStyle={{ color: "#1890ff" }}
             />
           </Card>
         </Col>
-        <Col xs={24} sm={8}>
+        <Col xs={24} sm={12}>
           <Card>
             <Statistic
-              title="Active Topics"
+              title="Recent Sessions"
               value={recentSessions.length}
               prefix={<ClockCircleOutlined />}
               valueStyle={{ color: "#722ed1" }}
@@ -111,153 +94,73 @@ function DashboardPage() {
         </Col>
       </Row>
 
-      <Row gutter={[24, 24]}>
-        {/* Available Topics */}
-        <Col xs={24} lg={12}>
-          <Card
-            title={
-              <div className="flex justify-between items-center">
-                <span>Available Topics</span>
-                <Button
-                  type="link"
-                  onClick={() => navigate("/topics")}
-                  icon={<RightOutlined />}
-                  className="p-0"
-                >
-                  View All
-                </Button>
-              </div>
-            }
-            className="h-full"
-          >
-            {availableTopics.length > 0 ? (
-              <List
-                dataSource={availableTopics}
-                renderItem={(topic: Topic) => (
-                  <List.Item
-                    actions={[
-                      <Button
-                        type="link"
-                        onClick={() => navigate(`/chat?topicId=${topic.id}`)}
-                        key="start-chat"
-                      >
-                        Start Chat
-                      </Button>,
-                    ]}
+      {/* Recent Chat Sessions */}
+      <Card
+        title={
+          <div className="flex justify-between items-center">
+            <span>Recent Chat Sessions</span>
+            <Button
+              type="link"
+              onClick={() => navigate("/chat")}
+              icon={<RightOutlined />}
+              className="p-0"
+            >
+              View All
+            </Button>
+          </div>
+        }
+        className="h-full"
+      >
+        {recentSessions.length > 0 ? (
+          <List
+            dataSource={recentSessions}
+            renderItem={(session: ChatSession) => (
+              <List.Item
+                actions={[
+                  <Button
+                    type="link"
+                    onClick={() => navigate(`/chat/${session.id}`)}
+                    key="continue"
                   >
-                    <List.Item.Meta
-                      avatar={<BookOutlined className="text-blue-500" />}
-                      title={topic.name}
-                      description={
-                        <div>
-                          <Text type="secondary">{topic.description}</Text>
-                          <br />
-                          <Text type="secondary" className="text-xs">
-                            {topic.document_count} documents
-                          </Text>
-                        </div>
-                      }
-                    />
-                  </List.Item>
-                )}
-              />
-            ) : (
-              <Empty description="No topics available yet" />
+                    Continue
+                  </Button>,
+                ]}
+              >
+                <List.Item.Meta
+                  avatar={<MessageOutlined className="text-green-500" />}
+                  title={session.title || "Untitled Session"}
+                  description={
+                    <div>
+                      <Text type="secondary" className="text-xs">
+                        {formatDistanceToNow(new Date(session.updated_at))}
+                      </Text>
+                    </div>
+                  }
+                />
+              </List.Item>
             )}
-          </Card>
-        </Col>
-
-        {/* Recent Chat Sessions */}
-        <Col xs={24} lg={12}>
-          <Card
-            title={
-              <div className="flex justify-between items-center">
-                <span>Recent Chat Sessions</span>
-                <Button
-                  type="link"
-                  onClick={() => navigate("/chat")}
-                  icon={<RightOutlined />}
-                  className="p-0"
-                >
-                  View All
-                </Button>
-              </div>
-            }
-            className="h-full"
-          >
-            {recentSessions.length > 0 ? (
-              <List
-                dataSource={recentSessions}
-                renderItem={(session: ChatSession) => {
-                  const topic = topics.find(
-                    (t) => t.id === session.topicId.toString()
-                  );
-                  return (
-                    <List.Item
-                      actions={[
-                        <Button
-                          type="link"
-                          onClick={() => navigate(`/chat/${session.id}`)}
-                          key="continue"
-                        >
-                          Continue
-                        </Button>,
-                      ]}
-                    >
-                      <List.Item.Meta
-                        avatar={<MessageOutlined className="text-green-500" />}
-                        title={session.title || "Untitled Session"}
-                        description={
-                          <div>
-                            <Text type="secondary">
-                              {topic?.name || "Unknown Topic"}
-                            </Text>
-                            <br />
-                            <Text type="secondary" className="text-xs">
-                              {formatDistanceToNow(
-                                new Date(session.updated_at)
-                              )}
-                            </Text>
-                          </div>
-                        }
-                      />
-                    </List.Item>
-                  );
-                }}
-              />
-            ) : (
-              <Empty description="No chat sessions yet">
-                <Button type="primary" onClick={() => navigate("/topics")}>
-                  Start Your First Chat
-                </Button>
-              </Empty>
-            )}
-          </Card>
-        </Col>
-      </Row>
+          />
+        ) : (
+          <Empty description="No chat sessions yet">
+            <Button type="primary" onClick={() => navigate("/chat")}>
+              Start Your First Chat
+            </Button>
+          </Empty>
+        )}
+      </Card>
 
       {/* Quick Actions */}
       <Card title="Quick Actions">
-        <Row gutter={[16, 16]}>
-          <Col xs={24} sm={12} md={6}>
+        <Row gutter={[16, 16]} className="justify-center">
+          <Col xs={24} sm={12} md={8}>
             <Button
               type="primary"
-              size="large"
-              icon={<BookOutlined />}
-              onClick={() => navigate("/chats")}
-              className="w-full h-20 flex flex-col items-center justify-center"
-            >
-              Chat Sessions
-            </Button>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Button
               size="large"
               icon={<MessageOutlined />}
               onClick={() => navigate("/chat")}
               className="w-full h-20 flex flex-col items-center justify-center"
             >
-              Chat Sessions
+              Start New Chat
             </Button>
           </Col>
         </Row>
