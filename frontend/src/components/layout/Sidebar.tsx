@@ -5,6 +5,7 @@ import {
   UsergroupAddOutlined,
   BarChartOutlined,
   CloseOutlined,
+  MessageOutlined,
 } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores";
@@ -38,11 +39,11 @@ function Sidebar({ collapsed, onClose, isMobile = false }: SidebarProps) {
       },
     },
     {
-      key: "/topics",
-      icon: <BookOutlined />,
-      label: "Topics",
+      key: "/chats",
+      icon: <MessageOutlined />,
+      label: "Chat Sessions",
       onClick: () => {
-        navigate("/topics");
+        navigate("/chats");
         if (isMobile && onClose) onClose();
       },
     },

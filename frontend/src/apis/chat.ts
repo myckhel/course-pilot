@@ -8,6 +8,11 @@ import type {
   MessageResponse,
 } from "@/types";
 
+interface NewSessionResponse {
+  session: ChatSession;
+  message: string;
+}
+
 export const chatApi = {
   getSessions: async (topicId?: string): Promise<ChatSession[]> => {
     const params = topicId ? { topicId } : {}; // Only include topicId if provided
@@ -18,9 +23,11 @@ export const chatApi = {
     return response.data!;
   },
 
-  createSession: async (data: CreateSessionRequest): Promise<ChatSession> => {
+  createSession: async (
+    data: CreateSessionRequest
+  ): Promise<NewSessionResponse> => {
     // If no topicId provided, the backend will use the default GST topic
-    const response = await apiClient.post<ChatSession>(
+    const response = await apiClient.post<NewSessionResponse>(
       API_ENDPOINTS.CHAT_SESSIONS,
       data
     );

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   List,
@@ -7,14 +7,13 @@ import {
   Empty,
   Spin,
   Tag,
-  Space,
   Input,
   Dropdown,
   Modal,
+  Form,
 } from "antd";
 import {
   MessageOutlined,
-  BookOutlined,
   SearchOutlined,
   MoreOutlined,
   DeleteOutlined,
@@ -22,7 +21,7 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { useChatStore, useTopicsStore } from "@/stores";
+import { useChatStore } from "@/stores";
 import { useDebounce } from "@/hooks";
 import { formatDistanceToNow } from "@/utils";
 import type { ChatSession } from "@/types";
@@ -36,16 +35,18 @@ function ChatSessionsPage() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [newChatModalVisible, setNewChatModalVisible] = useState(false);
 
-  const { sessions, fetchSessions, deleteSession } = useChatStore();
-  const { topics, fetchTopics } = useTopicsStore();
+  const { sessions, fetchSessions, deleteSession, createSession } =
+    useChatStore();
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const [form] = Form.useForm();
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       try {
-        await Promise.all([fetchSessions(), fetchTopics()]);
+        await fetchSessions();
       } catch (error) {
         console.error("Failed to load chat sessions:", error);
       } finally {
@@ -54,19 +55,13 @@ function ChatSessionsPage() {
     };
 
     loadData();
-  }, [fetchSessions, fetchTopics]);
+  }, [fetchSessions]);
 
   // Filter sessions based on search term
   const filteredSessions = sessions.filter((session) => {
     if (!debouncedSearchTerm) return true;
-
     const searchLower = debouncedSearchTerm.toLowerCase();
-    const topic = topics.find((t) => t.id === session.topicId);
-
-    return (
-      session.title?.toLowerCase().includes(searchLower) ||
-      topic?.title?.toLowerCase().includes(searchLower)
-    );
+    return session.title?.toLowerCase().includes(searchLower);
   });
 
   const handleDeleteSession = (sessionId: string) => {
@@ -85,6 +80,20 @@ function ChatSessionsPage() {
         }
       },
     });
+  };
+
+  const handleCreateNewChat = async (values: { title: string }) => {
+    try {
+      const newSession = await createSession({
+        title: values.title,
+      });
+
+      setNewChatModalVisible(false);
+      form.resetFields();
+      navigate(`/chat/${newSession.id}`);
+    } catch (error) {
+      console.error("Failed to create new chat session:", error);
+    }
   };
 
   const getSessionActions = (session: ChatSession): MenuProps["items"] => [
@@ -135,7 +144,7 @@ function ChatSessionsPage() {
         <Button
           type="primary"
           icon={<PlusOutlined />}
-          onClick={() => navigate("/topics")}
+          onClick={() => setNewChatModalVisible(true)}
         >
           New Chat
         </Button>
@@ -159,61 +168,49 @@ function ChatSessionsPage() {
         {filteredSessions.length > 0 ? (
           <List
             dataSource={filteredSessions}
-            renderItem={(session: ChatSession) => {
-              const topic = topics.find((t) => t.id === session.topicId);
-
-              return (
-                <List.Item
-                  actions={[
-                    <Button
-                      type="primary"
-                      onClick={() => navigate(`/chat/${session.id}`)}
-                      key="continue"
-                    >
-                      Continue
-                    </Button>,
-                    <Dropdown
-                      menu={{ items: getSessionActions(session) }}
-                      placement="bottomRight"
-                      key="actions"
-                    >
-                      <Button type="text" icon={<MoreOutlined />} />
-                    </Dropdown>,
-                  ]}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
-                >
-                  <List.Item.Meta
-                    avatar={
-                      <div className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                        <MessageOutlined className="text-blue-500" />
-                      </div>
-                    }
-                    title={
-                      <div className="flex items-center space-x-2">
-                        <span className="font-medium">{session.title}</span>
-                        <Tag color="blue" className="text-xs">
-                          {session.messageCount || 0} messages
-                        </Tag>
-                      </div>
-                    }
-                    description={
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2 text-sm">
-                          <BookOutlined className="text-gray-400" />
-                          <Text type="secondary">
-                            {topic?.title || "Unknown Topic"}
-                          </Text>
-                        </div>
-                        <Text type="secondary" className="text-xs">
-                          Last active{" "}
-                          {formatDistanceToNow(new Date(session.updatedAt))}
-                        </Text>
-                      </div>
-                    }
-                  />
-                </List.Item>
-              );
-            }}
+            renderItem={(session: ChatSession) => (
+              <List.Item
+                actions={[
+                  <Button
+                    type="primary"
+                    onClick={() => navigate(`/chat/${session.id}`)}
+                    key="continue"
+                  >
+                    Continue
+                  </Button>,
+                  <Dropdown
+                    menu={{ items: getSessionActions(session) }}
+                    placement="bottomRight"
+                    key="actions"
+                  >
+                    <Button type="text" icon={<MoreOutlined />} />
+                  </Dropdown>,
+                ]}
+                className="hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                <List.Item.Meta
+                  avatar={
+                    <div className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                      <MessageOutlined className="text-blue-500" />
+                    </div>
+                  }
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <span className="font-medium">{session.title}</span>
+                      <Tag color="blue" className="text-xs">
+                        {session.message_count || 0} messages
+                      </Tag>
+                    </div>
+                  }
+                  description={
+                    <Text type="secondary" className="text-xs">
+                      Last active{" "}
+                      {formatDistanceToNow(new Date(session.updated_at))}
+                    </Text>
+                  }
+                />
+              </List.Item>
+            )}
           />
         ) : (
           <Empty
@@ -228,7 +225,7 @@ function ChatSessionsPage() {
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
-                onClick={() => navigate("/topics")}
+                onClick={() => setNewChatModalVisible(true)}
               >
                 Start Your First Chat
               </Button>
@@ -236,6 +233,35 @@ function ChatSessionsPage() {
           </Empty>
         )}
       </Card>
+
+      {/* New Chat Modal */}
+      <Modal
+        title="Start New Chat"
+        open={newChatModalVisible}
+        onCancel={() => {
+          setNewChatModalVisible(false);
+          form.resetFields();
+        }}
+        footer={null}
+      >
+        <Form form={form} layout="vertical" onFinish={handleCreateNewChat}>
+          <Form.Item
+            name="title"
+            label="Chat Title"
+            rules={[
+              { required: true, message: "Please enter a title for your chat" },
+            ]}
+          >
+            <Input placeholder="e.g., GST Questions" />
+          </Form.Item>
+
+          <Form.Item className="mb-0 flex justify-end">
+            <Button type="primary" htmlType="submit">
+              Start Chat
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 }

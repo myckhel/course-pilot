@@ -81,12 +81,12 @@ export const useChatStore = create<ChatState & ChatActions>()(
         // Will use default GST topic if no topicId provided in data
         const newSession = await chatApi.createSession(data);
         set((state) => {
-          state.sessions.unshift(newSession); // Add to beginning of list
-          state.currentSession = newSession;
+          state.sessions.unshift(newSession.session); // Add to beginning of list
+          state.currentSession = newSession.session;
           state.messages = []; // Clear messages for new session
           state.isLoading = false;
         });
-        return newSession;
+        return newSession.session;
       } catch (error: any) {
         set((state) => {
           state.error =

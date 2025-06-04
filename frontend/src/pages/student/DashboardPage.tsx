@@ -244,10 +244,10 @@ function DashboardPage() {
               type="primary"
               size="large"
               icon={<BookOutlined />}
-              onClick={() => navigate("/topics")}
+              onClick={() => navigate("/chats")}
               className="w-full h-20 flex flex-col items-center justify-center"
             >
-              Browse Topics
+              Chat Sessions
             </Button>
           </Col>
           <Col xs={24} sm={12} md={6}>

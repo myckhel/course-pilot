@@ -15,6 +15,7 @@ import {
   SendOutlined,
   UserOutlined,
   RobotOutlined,
+  MessageOutlined,
   ClockCircleOutlined,
 } from "@ant-design/icons";
 import { useParams, useNavigate } from "react-router-dom";
@@ -34,9 +35,8 @@ function ChatPage() {
   const [sessionLoading, setSessionLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { messages, sendMessage, fetchMessages } = useChatStore();
-
-  // get current session based on sessionId from store
+  const { messages, sendMessage, fetchMessages, currentSession } =
+    useChatStore();
 
   useEffect(() => {
     const initializeChat = async () => {
@@ -45,7 +45,7 @@ function ChatPage() {
         await fetchMessages(sessionId as string);
       } catch (error) {
         console.error("Failed to initialize chat:", error);
-        navigate("/topics");
+        navigate("/chats");
       } finally {
         setSessionLoading(false);
       }
@@ -98,18 +98,18 @@ function ChatPage() {
       {/* Header */}
       <Card className="mb-4 flex-shrink-0">
         <div className="flex items-center justify-between">
-          {/* <div className="flex items-center space-x-3">
-            <BookOutlined className="text-blue-500 text-xl" />
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg">
+              <MessageOutlined className="text-blue-500" />
+            </div>
             <div>
               <Title level={4} className="mb-0">
-                {currentTopic.name}
+                {currentSession?.title || "Chat Session"}
               </Title>
-              <Text type="secondary">{currentSession.title}</Text>
+              <Text type="secondary">{messages.length} messages</Text>
             </div>
-          </div> */}
-          <div className="flex items-center space-x-2">
-            <Tag color="green">Active</Tag>
           </div>
+          <Tag color="green">Active</Tag>
         </div>
       </Card>
 
@@ -178,9 +178,7 @@ function ChatPage() {
               <Title level={4} type="secondary">
                 Start a conversation
               </Title>
-              <Text type="secondary">
-                Ask me anything about "currentTopic.name!"
-              </Text>
+              <Text type="secondary">Ask me anything!</Text>
             </div>
           )}
 
@@ -210,7 +208,7 @@ function ChatPage() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Ask a question about this topic..."
+              placeholder="Type your message..."
               autoSize={{ minRows: 1, maxRows: 4 }}
               disabled={loading}
               className="flex-grow"
@@ -225,6 +223,7 @@ function ChatPage() {
               Send
             </Button>
           </Space.Compact>
+
           <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
             Press Enter to send, Shift+Enter for new line
           </div>

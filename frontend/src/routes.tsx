@@ -13,7 +13,6 @@ const RegisterPage = React.lazy(() => import("@/pages/auth/RegisterPage"));
 
 // Student Pages
 const DashboardPage = React.lazy(() => import("@/pages/student/DashboardPage"));
-const TopicsPage = React.lazy(() => import("@/pages/student/TopicsPage"));
 const ChatPage = React.lazy(() => import("@/pages/student/ChatPage"));
 const ChatSessionsPage = React.lazy(
   () => import("@/pages/student/ChatSessionsPage")
@@ -76,11 +75,7 @@ export const appRouter = createBrowserRouter([
         element: withSuspense(DashboardPage),
       },
       {
-        path: "/topics",
-        element: withSuspense(TopicsPage),
-      },
-      {
-        path: "/topics/:topicId/chat",
+        path: "/chats",
         element: withSuspense(ChatSessionsPage),
       },
       {
