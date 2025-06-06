@@ -1,11 +1,11 @@
 # Docker Compose for AI Virtual Assistant
-version: '3.8'
+version: "3.8"
 
 services:
   backend:
     build: .
     ports:
-      - "5000:5000"
+      - "8000:8000"
     environment:
       - FLASK_ENV=production
       - DATABASE_PATH=/app/data/assistant.db
@@ -18,7 +18,7 @@ services:
       - .env
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3

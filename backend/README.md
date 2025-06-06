@@ -75,7 +75,7 @@ OPENAI_API_KEY=sk-your-openai-api-key-here
 python app.py
 ```
 
-The API will be available at `http://localhost:5000`
+The API will be available at `http://localhost:8000`
 
 ## API Endpoints
 
@@ -121,7 +121,7 @@ pytest --cov=app tests/
 ### Using Gunicorn
 
 ```bash
-gunicorn -w 4 -b 0.0.0.0:5000 wsgi:app
+gunicorn -w 4 -b 0.0.0.0:8000 wsgi:app
 ```
 
 ### Environment Variables
@@ -150,8 +150,8 @@ RUN pip install -r requirements.txt
 COPY . .
 RUN python migrations/migrate.py
 
-EXPOSE 5000
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "wsgi:app"]
+EXPOSE 8000
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "wsgi:app"]
 ```
 
 ## Development

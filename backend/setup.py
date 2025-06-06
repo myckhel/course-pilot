@@ -162,9 +162,9 @@ def main():
     print("\nNext steps:")
     print("1. Edit .env file and add your OpenAI API key")
     print("2. Run the development server: python app.py")
-    print("3. API will be available at: http://localhost:5000")
+    print("3. API will be available at: http://localhost:8000")
     print("\nFor production deployment:")
-    print("- Use gunicorn: gunicorn -w 4 -b 0.0.0.0:5000 wsgi:app")
+    print("- Use gunicorn: gunicorn -w 4 -b 0.0.0.0:8000 wsgi:app")
 
 
 if __name__ == "__main__":
