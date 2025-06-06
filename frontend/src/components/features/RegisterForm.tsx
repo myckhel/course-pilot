@@ -16,7 +16,7 @@ function RegisterForm() {
     try {
       clearError();
       await register({
-        username: values.username,
+        name: values.name,
         email: values.email,
         password: values.password,
         role: values.role,
@@ -68,7 +68,7 @@ function RegisterForm() {
       )}
 
       <Form.Item
-        name="username"
+        name="name"
         label="Username"
         rules={[
           { required: true, message: "Please enter your username!" },

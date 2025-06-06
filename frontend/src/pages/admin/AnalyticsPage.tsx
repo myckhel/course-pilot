@@ -155,8 +155,8 @@ function AnalyticsPage() {
   const userColumns: ColumnsType<UserAnalytics> = [
     {
       title: "User",
-      dataIndex: "username",
-      key: "username",
+      dataIndex: "name",
+      key: "name",
     },
     {
       title: "Questions Asked",

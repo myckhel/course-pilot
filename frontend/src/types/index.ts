@@ -15,7 +15,7 @@ export interface User {
 
 // ===== ADDITIONAL USER TYPES =====
 export interface UserFormData {
-  username: string;
+  name: string;
   email: string;
   first_name?: string;
   last_name?: string;
@@ -25,7 +25,7 @@ export interface UserFormData {
 }
 
 export interface UpdateProfileData {
-  username: string;
+  name: string;
   email: string;
   first_name?: string;
   last_name?: string;
@@ -51,7 +51,7 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
-  username: string;
+  name: string;
   email: string;
   password: string;
   role: "student" | "admin";
@@ -180,7 +180,7 @@ export interface TopicAnalytics {
 
 export interface UserAnalytics {
   user_id: string;
-  username: string;
+  name: string;
   questions_count: number;
   sessions_count: number;
   total_time: number;
@@ -224,7 +224,7 @@ export interface LoginFormData {
 }
 
 export interface RegisterFormData {
-  username: string;
+  name: string;
   email: string;
   password: string;
   confirmPassword: string;

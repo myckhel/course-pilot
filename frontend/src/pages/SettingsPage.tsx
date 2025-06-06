@@ -68,7 +68,7 @@ function SettingsPage() {
   React.useEffect(() => {
     if (user) {
       profileForm.setFieldsValue({
-        username: user.username,
+        name: user.name,
         email: user.email,
         first_name: user.first_name,
         last_name: user.last_name,
@@ -223,7 +223,7 @@ function SettingsPage() {
         </Row>
 
         <Form.Item
-          name="username"
+          name="name"
           label="Username"
           rules={[{ required: true, message: "Username is required" }]}
         >
