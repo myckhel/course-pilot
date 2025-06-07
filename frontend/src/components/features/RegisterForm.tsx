@@ -138,9 +138,9 @@ function RegisterForm() {
           <Option value="student">
             Student - Access learning materials and ask questions
           </Option>
-          <Option value="admin">
+          {/* <Option value="admin">
             Admin - Manage topics and upload materials
-          </Option>
+          </Option> */}
         </Select>
       </Form.Item>
 

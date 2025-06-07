@@ -106,7 +106,6 @@ function ChatPage() {
               <Title level={4} className="mb-0">
                 {currentSession?.title || "Chat Session"}
               </Title>
-              <Text type="secondary">{messages.length} messages</Text>
             </div>
           </div>
           <Tag color="green">Active</Tag>
@@ -148,6 +147,7 @@ function ChatPage() {
                             : "bg-green-500 shadow-md"
                         }
                         size={40}
+                        style={{ flexShrink: 0 }}
                       />
                       <div
                         className={`relative px-4 py-2 rounded-2xl shadow-md text-base whitespace-pre-wrap break-words ${
@@ -196,6 +196,7 @@ function ChatPage() {
                   icon={<RobotOutlined />}
                   className="bg-green-500 shadow-md"
                   size={40}
+                  style={{ flexShrink: 0 }}
                 />
                 <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl px-4 py-2 shadow-md flex items-center gap-2">
                   <Spin size="small" />
