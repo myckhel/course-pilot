@@ -154,7 +154,7 @@ function ChatSessionsPage() {
 
       {/* Search */}
       <Row>
-        <Card className="px-4">
+        <Card className="px-4 w-full">
           <Search
             placeholder="Search chat sessions..."
             allowClear

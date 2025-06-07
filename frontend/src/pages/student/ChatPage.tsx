@@ -10,6 +10,7 @@ import {
   Spin,
   Tag,
   Divider,
+  Row,
 } from "antd";
 import {
   SendOutlined,
@@ -96,21 +97,23 @@ function ChatPage() {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <Card className="mb-4 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg">
-              <MessageOutlined className="text-blue-500" />
+      <Row className="mb-4">
+        <Card className="w-full flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                <MessageOutlined className="text-blue-500" />
+              </div>
+              <div>
+                <Title level={4} className="mb-0">
+                  {currentSession?.title || "Chat Session"}
+                </Title>
+              </div>
             </div>
-            <div>
-              <Title level={4} className="mb-0">
-                {currentSession?.title || "Chat Session"}
-              </Title>
-            </div>
+            <Tag color="green">Active</Tag>
           </div>
-          <Tag color="green">Active</Tag>
-        </div>
-      </Card>
+        </Card>
+      </Row>
 
       {/* Messages */}
       <Card className="flex-grow flex flex-col min-h-0 border-none shadow-none bg-transparent">
