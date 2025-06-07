@@ -22,7 +22,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useChatStore } from "@/stores";
 import { useDebounce } from "@/hooks";
-import { formatDistanceToNow } from "@/utils";
 import type { ChatSession } from "@/types";
 import type { MenuProps } from "antd";
 
@@ -173,8 +172,8 @@ function ChatSessionsPage() {
             renderItem={(session: ChatSession) => (
               <List.Item
                 onClick={() => navigate(`/chat/${session.id}`)}
-                className="hover:bg-gray-50 dark:hover:bg-blue-100 rounded-lg transition-colors cursor-pointer group px-2 py-3 mb-2"
-                style={{ marginBottom: 8 }}
+                className="hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:shadow-lg dark:hover:shadow-xl rounded-xl transition-all duration-200 cursor-pointer group px-6 py-6 mb-3 border border-transparent hover:border-blue-200 dark:hover:border-blue-700/50"
+                style={{ marginBottom: 16 }}
                 actions={[
                   <Dropdown
                     menu={{ items: getSessionActions(session) }}
@@ -185,26 +184,23 @@ function ChatSessionsPage() {
                       type="text"
                       icon={<MoreOutlined />}
                       onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                      className="opacity-0 group-hover:opacity-100 hover:bg-blue-100 dark:hover:bg-blue-800/40 transition-all duration-200"
                     />
                   </Dropdown>,
                 ]}
               >
                 <List.Item.Meta
                   avatar={
-                    <div className="flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                      <MessageOutlined className="text-blue-500 text-xl" />
+                    <div className="flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-blue-900/50 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/60 rounded-xl transition-all duration-200 group-hover:scale-105 ml-3 shadow-sm group-hover:shadow-md">
+                      <MessageOutlined className="text-blue-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 text-2xl transition-colors duration-200" />
                     </div>
                   }
                   title={
-                    <span className="font-semibold text-lg group-hover:text-blue-600 transition-colors">
-                      {session.title}
-                    </span>
-                  }
-                  description={
-                    <Text type="secondary" className="text-xs">
-                      Last active{" "}
-                      {formatDistanceToNow(new Date(session.updated_at))}
-                    </Text>
+                    <div className="flex pt-3 self-center items-center">
+                      <span className="font-semibold text-2xl group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 leading-tight">
+                        {session.title}
+                      </span>
+                    </div>
                   }
                 />
               </List.Item>

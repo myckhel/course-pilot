@@ -105,6 +105,9 @@ function Sidebar({ collapsed, onClose, isMobile = false }: SidebarProps) {
         bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700
         ${isMobile ? "left-0 z-50" : "relative"}
       `}
+      style={{
+        backgroundColor: theme === "dark" ? "#1f2937" : "#ffffff",
+      }}
       trigger={null}
     >
       {/* Logo Section */}
