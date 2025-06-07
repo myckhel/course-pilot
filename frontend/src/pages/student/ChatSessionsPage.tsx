@@ -10,6 +10,7 @@ import {
   Dropdown,
   Modal,
   Form,
+  Row,
 } from "antd";
 import {
   MessageOutlined,
@@ -152,17 +153,19 @@ function ChatSessionsPage() {
       </div>
 
       {/* Search */}
-      <Card className="px-4">
-        <Search
-          placeholder="Search chat sessions..."
-          allowClear
-          size="large"
-          prefix={<SearchOutlined />}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-md"
-        />
-      </Card>
+      <Row>
+        <Card className="px-4">
+          <Search
+            placeholder="Search chat sessions..."
+            allowClear
+            size="large"
+            prefix={<SearchOutlined />}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="max-w-md"
+          />
+        </Card>
+      </Row>
 
       {/* Sessions List */}
       <Card className="px-4">

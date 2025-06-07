@@ -121,13 +121,17 @@ function Sidebar({ collapsed, onClose, isMobile = false }: SidebarProps) {
           />
         )}
         <div
-          className={`flex ml-4 items-center space-x-3 ${
+          className={`flex justify-center items-center space-x-3 ${
             collapsed && !isMobile ? "justify-center" : "justify-center"
           }`}
         >
-          {(!collapsed || isMobile) && (
+          {!collapsed || isMobile ? (
             <Title level={5} className="m-0 text-gray-900 dark:text-white">
               GSTutor
+            </Title>
+          ) : (
+            <Title level={5} className="m-0 text-gray-900 dark:text-white">
+              GST
             </Title>
           )}
         </div>

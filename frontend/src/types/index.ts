@@ -195,6 +195,7 @@ export interface UIState {
   fontSize: "small" | "medium" | "large";
   showOnboarding: boolean;
   notifications: Notification[];
+  themeSetByUser: boolean;
 }
 
 export interface Notification {

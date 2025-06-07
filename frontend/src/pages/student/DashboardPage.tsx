@@ -95,59 +95,54 @@ function DashboardPage() {
       </Row>
 
       {/* Recent Chat Sessions */}
-      <Card
-        title={
-          <div className="flex justify-between items-center">
-            <span>Recent Chat Sessions</span>
-            <Button
-              type="link"
-              onClick={() => navigate("/chat")}
-              icon={<RightOutlined />}
-              className="p-0"
-            >
-              View All
-            </Button>
-          </div>
-        }
-        className="h-full"
-      >
-        {recentSessions.length > 0 ? (
-          <List
-            dataSource={recentSessions}
-            renderItem={(session: ChatSession) => (
-              <List.Item
-                actions={[
-                  <Button
-                    type="link"
-                    onClick={() => navigate(`/chat/${session.id}`)}
-                    key="continue"
-                  >
-                    Continue
-                  </Button>,
-                ]}
+      <Row>
+        <Card
+          title={
+            <div className="flex justify-between items-center">
+              <span>Recent Chat Sessions</span>
+              <Button
+                type="link"
+                onClick={() => navigate("/chat")}
+                icon={<RightOutlined />}
+                className="p-0"
               >
-                <List.Item.Meta
-                  avatar={<MessageOutlined className="text-green-500" />}
-                  title={session.title || "Untitled Session"}
-                  description={
-                    <div>
-                      <Text type="secondary" className="text-xs">
-                        {formatDistanceToNow(new Date(session.updated_at))}
-                      </Text>
-                    </div>
-                  }
-                />
-              </List.Item>
-            )}
-          />
-        ) : (
-          <Empty description="No chat sessions yet">
-            <Button type="primary" onClick={() => navigate("/chat")}>
-              Start Your First Chat
-            </Button>
-          </Empty>
-        )}
-      </Card>
+                View All
+              </Button>
+            </div>
+          }
+          className="h-full w-full"
+        >
+          {recentSessions.length > 0 ? (
+            <List
+              dataSource={recentSessions}
+              renderItem={(session: ChatSession) => (
+                <List.Item
+                  actions={[
+                    <Button
+                      type="link"
+                      onClick={() => navigate(`/chat/${session.id}`)}
+                      key="continue"
+                    >
+                      Continue
+                    </Button>,
+                  ]}
+                >
+                  <List.Item.Meta
+                    avatar={<MessageOutlined className="text-green-500" />}
+                    title={session.title || "Untitled Session"}
+                  />
+                </List.Item>
+              )}
+            />
+          ) : (
+            <Empty description="No chat sessions yet">
+              <Button type="primary" onClick={() => navigate("/chat")}>
+                Start Your First Chat
+              </Button>
+            </Empty>
+          )}
+        </Card>
+      </Row>
 
       {/* Quick Actions */}
       <Card title="Quick Actions">

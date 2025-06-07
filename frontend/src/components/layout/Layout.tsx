@@ -51,7 +51,7 @@ function Layout() {
         }`}
       >
         <Header onMenuToggle={handleMenuToggle} showMenuButton={true} />
-        <Content className="p-4 lg:p-6 min-h-[calc(100vh-64px)] bg-gray-50 dark:bg-gray-900">
+        <Content className="p-4 lg:p-6 min-h-[calc(100vh-64px)]">
           <div className="max-w-7xl mx-auto bg-transparent">
             <Outlet />
           </div>
