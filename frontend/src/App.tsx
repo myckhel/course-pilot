@@ -28,11 +28,14 @@ function App() {
           colorWarning: "#f59e0b",
           colorInfo: "#1890ff",
 
-          // Neutral colors
-          colorText: "#171717",
-          colorTextSecondary: "#525252",
-          colorBgContainer: "#ffffff",
-          colorBgElevated: "#fafafa",
+          // Neutral colors - Dynamic based on theme
+          colorText: themeMode === "dark" ? "#ffffff" : "#171717",
+          colorTextSecondary: themeMode === "dark" ? "#a3a3a3" : "#525252",
+          colorBgContainer: themeMode === "dark" ? "#1f2937" : "#ffffff",
+          colorBgElevated: themeMode === "dark" ? "#374151" : "#fafafa",
+          colorBgLayout: themeMode === "dark" ? "#111827" : "#f9fafb",
+          colorBorder: themeMode === "dark" ? "#374151" : "#d1d5db",
+          colorBorderSecondary: themeMode === "dark" ? "#4b5563" : "#e5e7eb",
 
           // Border radius
           borderRadius: 6,
@@ -61,11 +64,15 @@ function App() {
           lineHeightSM: 1.25,
           lineHeightLG: 1.75,
 
-          // Shadows
+          // Shadows - Adapted for dark mode
           boxShadow:
-            "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)",
+            themeMode === "dark"
+              ? "0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.3)"
+              : "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)",
           boxShadowSecondary:
-            "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
+            themeMode === "dark"
+              ? "0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4)"
+              : "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
 
           // Motion
           motionDurationFast: "0.1s",
@@ -73,7 +80,6 @@ function App() {
           motionDurationSlow: "0.3s",
           motionEaseInOut: "cubic-bezier(0.4, 0, 0.2, 1)",
           motionEaseOut: "cubic-bezier(0, 0, 0.2, 1)",
-          motionEaseIn: "cubic-bezier(0.4, 0, 1, 1)",
 
           // Component specific
           controlHeight: 36,
@@ -85,9 +91,8 @@ function App() {
           opacityLoading: 0.65,
 
           // Z-index
-          zIndexBase: 1000,
-          zIndexPopup: 1050,
-          zIndexModal: 1100,
+          zIndexBase: 0,
+          zIndexPopupBase: 1000,
         },
         components: {
           Button: {
@@ -106,7 +111,13 @@ function App() {
           Card: {
             borderRadius: 12,
             boxShadow:
-              "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)",
+              themeMode === "dark"
+                ? "0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.3)"
+                : "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)",
+            colorBgContainer: themeMode === "dark" ? "#1f2937" : "#ffffff",
+            colorText: themeMode === "dark" ? "#ffffff" : "#171717",
+            colorTextSecondary: themeMode === "dark" ? "#a3a3a3" : "#525252",
+            colorBorder: themeMode === "dark" ? "#374151" : "#d1d5db",
           },
           Modal: {
             borderRadius: 12,
@@ -115,6 +126,20 @@ function App() {
           Dropdown: {
             borderRadius: 8,
             controlHeight: 36,
+          },
+          Layout: {
+            headerBg: themeMode === "dark" ? "#1f2937" : "#ffffff",
+            bodyBg: themeMode === "dark" ? "#111827" : "#f9fafb",
+            siderBg: themeMode === "dark" ? "#1f2937" : "#ffffff",
+          },
+          Menu: {
+            itemBg: "transparent",
+            itemSelectedBg:
+              themeMode === "dark" ? "rgba(59, 130, 246, 0.1)" : "#e6f7ff",
+            itemHoverBg:
+              themeMode === "dark" ? "rgba(59, 130, 246, 0.05)" : "#f0f9ff",
+            itemSelectedColor: "#1890ff",
+            itemColor: themeMode === "dark" ? "#ffffff" : "#171717",
           },
         },
       }}

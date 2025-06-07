@@ -46,13 +46,13 @@ function Layout() {
 
       {/* Main Content */}
       <AntLayout
-        className={`transition-all duration-300 ease-in-out ${
+        className={`transition-all duration-300 ease-in-out bg-gray-50 dark:bg-gray-900 ${
           lg ? (sidebarCollapsed ? "" : "") : "ml-0"
         }`}
       >
         <Header onMenuToggle={handleMenuToggle} showMenuButton={true} />
-        <Content className="p-4 lg:p-6 min-h-[calc(100vh-64px)]">
-          <div className="max-w-7xl mx-auto">
+        <Content className="p-4 lg:p-6 min-h-[calc(100vh-64px)] bg-gray-50 dark:bg-gray-900">
+          <div className="max-w-7xl mx-auto bg-transparent">
             <Outlet />
           </div>
         </Content>

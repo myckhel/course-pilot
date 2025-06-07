@@ -6,11 +6,9 @@ import {
   BarChartOutlined,
   CloseOutlined,
   MessageOutlined,
-  QuestionCircleOutlined,
-  HeatMapOutlined,
 } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuthStore } from "@/stores";
+import { useAuthStore, useUIStore } from "@/stores";
 import { ROUTES } from "@/constants";
 import type { MenuProps } from "antd";
 
@@ -27,6 +25,7 @@ function Sidebar({ collapsed, onClose, isMobile = false }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const { theme } = useUIStore();
 
   const isAdmin = user?.role === "admin";
 
@@ -138,11 +137,7 @@ function Sidebar({ collapsed, onClose, isMobile = false }: SidebarProps) {
           selectedKeys={[selectedKey]}
           items={menuItems}
           className="border-none bg-transparent"
-          theme={
-            document.documentElement.classList.contains("dark")
-              ? "dark"
-              : "light"
-          }
+          theme={theme === "dark" ? "dark" : "light"}
         />
       </div>
 

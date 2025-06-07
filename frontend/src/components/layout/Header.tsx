@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Layout,
   Button,
@@ -69,9 +68,11 @@ function Header({ onMenuToggle, showMenuButton = false }: HeaderProps) {
           {showMenuButton && (
             <Button
               type="text"
-              icon={<MenuUnfoldOutlined className="text-white text-lg" />}
+              icon={
+                <MenuUnfoldOutlined className="text-gray-600 dark:text-gray-300 text-lg" />
+              }
               onClick={onMenuToggle}
-              className="mr-4 text-white dark:text-white text-xl"
+              className="mr-4 hover:bg-gray-100 dark:hover:bg-gray-700"
             />
           )}
         </div>
@@ -79,13 +80,15 @@ function Header({ onMenuToggle, showMenuButton = false }: HeaderProps) {
         {/* Right Section */}
         <div className="flex items-center space-x-4">
           {/* Theme Toggle */}
-          <Space align="center" className="border-r dark:border-gray-700 pr-4">
+          <Space
+            align="center"
+            className="border-r border-gray-200 dark:border-gray-700 pr-4"
+          >
             <Switch
               checked={theme === "dark"}
               onChange={handleThemeToggle}
               checkedChildren={<MoonOutlined />}
               unCheckedChildren={<SunOutlined />}
-              className="bg-gray-200 dark:bg-gray-700"
             />
           </Space>
 
