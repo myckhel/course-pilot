@@ -152,7 +152,7 @@ function DashboardPage() {
               type="primary"
               size="large"
               icon={<MessageOutlined />}
-              onClick={() => navigate("/chat")}
+              onClick={() => navigate("/chats")}
               className="w-full h-20 flex items-center justify-center"
             >
               Start New Chat
