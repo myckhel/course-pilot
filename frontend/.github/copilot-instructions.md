@@ -38,6 +38,8 @@ This project is a **lightweight AI-powered assistant** designed to enhance the *
 - Implement error boundaries to catch and handle errors gracefully
 - Use cleanup functions in `useEffect` to prevent memory leaks
 - Use short-circuit evaluation and ternary operators for conditional rendering
+- put dark and light mode into consideration when designing components to ensure visibility and usability across themes
+- create sub components in same file when needed, this will help to keep the code clean and organized
 
 ### TypeScript Integration
 
