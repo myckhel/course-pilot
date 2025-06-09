@@ -46,7 +46,7 @@ function Header({ onMenuToggle, showMenuButton = false }: HeaderProps) {
       icon: <UserOutlined />,
       label: "Profile",
       onClick: () => {
-        // TODO: Navigate to profile page
+        navigate("/profile");
       },
     },
     {

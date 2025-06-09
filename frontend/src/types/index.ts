@@ -8,7 +8,7 @@ export interface User {
   avatar?: string;
   role: "student" | "admin";
   status: "active" | "inactive" | "suspended";
-  created_at: string;
+  createdAt: string;
   updated_at: string;
   last_login?: string;
 }
@@ -207,6 +207,12 @@ export interface Notification {
 }
 
 // ===== API RESPONSE TYPES =====
+export interface ApiResponse<T = any> {
+  data: T;
+  message?: string;
+  status?: number;
+}
+
 export interface PaginatedResponse<T> {
   data: T[];
   pagination: {

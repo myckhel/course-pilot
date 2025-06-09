@@ -6,6 +6,7 @@ import {
   BarChartOutlined,
   CloseOutlined,
   MessageOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore, useUIStore } from "@/stores";
@@ -49,6 +50,18 @@ function Sidebar({ collapsed, onClose, isMobile = false }: SidebarProps) {
         if (isMobile && onClose) onClose();
       },
     },
+    {
+      type: "divider",
+    },
+    {
+      key: "/profile",
+      icon: <UserOutlined />,
+      label: "Profile",
+      onClick: () => {
+        navigate("/profile");
+        if (isMobile && onClose) onClose();
+      },
+    },
   ];
 
   // Admin menu items
@@ -86,6 +99,18 @@ function Sidebar({ collapsed, onClose, isMobile = false }: SidebarProps) {
       label: "Analytics",
       onClick: () => {
         navigate("/admin/analytics");
+        if (isMobile && onClose) onClose();
+      },
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "/profile",
+      icon: <UserOutlined />,
+      label: "Profile",
+      onClick: () => {
+        navigate("/profile");
         if (isMobile && onClose) onClose();
       },
     },

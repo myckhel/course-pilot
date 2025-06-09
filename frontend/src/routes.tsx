@@ -18,6 +18,9 @@ const ChatSessionsPage = React.lazy(
   () => import("@/pages/student/ChatSessionsPage")
 );
 
+// Profile Page
+const ProfilePage = React.lazy(() => import("@/pages/ProfilePage"));
+
 // Admin Pages
 const AdminDashboardPage = React.lazy(
   () => import("@/pages/admin/AdminDashboardPage")
@@ -81,6 +84,10 @@ export const appRouter = createBrowserRouter([
       {
         path: "/chat/:sessionId",
         element: withSuspense(ChatPage),
+      },
+      {
+        path: ROUTES.PROFILE,
+        element: withSuspense(ProfilePage),
       },
 
       // Admin routes

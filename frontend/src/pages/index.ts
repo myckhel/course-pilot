@@ -11,4 +11,7 @@ export { default as LandingPage } from "./auth/LandingPage";
 
 // Settings page
 export { default as SettingsPage } from "./SettingsPage";
-export { TopicDocumentsPage } from "./TopicDocumentsPage";
+export { default as TopicDocumentsPage } from "./TopicDocumentsPage";
+
+// Profile page
+export { default as ProfilePage } from "./ProfilePage";

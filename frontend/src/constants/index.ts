@@ -7,6 +7,7 @@ export const ROUTES = {
   DASHBOARD: "/dashboard",
   CHATS: "/chats",
   CHAT: "/chat/:sessionId",
+  PROFILE: "/profile",
   SETTINGS: "/settings",
   ADMIN: "/admin",
   ADMIN_DASHBOARD: "/admin",

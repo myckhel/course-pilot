@@ -31,12 +31,14 @@ export const userApi = {
     apiClient.delete(`/admin/users/${id}`),
 
   // Update own profile
-  updateProfile: (data: UpdateProfileData): Promise<ApiResponse<User>> =>
+  updateProfile: (
+    data: UpdateProfileData
+  ): Promise<ApiResponse<{ user: User }>> =>
     apiClient.put("/user/profile", data),
 
   // Change password
   changePassword: (data: ChangePasswordData): Promise<ApiResponse<void>> =>
-    apiClient.post("/user/change-password", data),
+    apiClient.put("/user/change-password", data),
 
   // Upload avatar
   uploadAvatar: (

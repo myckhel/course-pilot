@@ -17,7 +17,6 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useChatStore } from "@/stores";
-import { formatDistanceToNow } from "@/utils";
 import type { ChatSession } from "@/types";
 
 const { Title, Text } = Typography;
