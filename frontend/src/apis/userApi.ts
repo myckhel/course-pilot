@@ -9,6 +9,22 @@ import type {
 import apiClient from "./client";
 
 export const userApi = {
+  // Get current user profile
+  getProfile: (): Promise<ApiResponse<{ user: User }>> =>
+    apiClient.get("/user/profile"),
+
+  // Get user statistics
+  getStats: (): Promise<
+    ApiResponse<{
+      stats: {
+        total_sessions: number;
+        total_messages: number;
+        total_topics: number;
+        recent_sessions: number;
+      };
+    }>
+  > => apiClient.get("/user/stats"),
+
   // Get all users (admin only)
   getUsers: (): Promise<ApiResponse<User[]>> => apiClient.get("/admin/users"),
 
