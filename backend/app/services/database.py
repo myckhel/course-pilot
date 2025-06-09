@@ -169,6 +169,59 @@ class DatabaseService:
         
         return None
     
+    def update_user_password(self, user_id: str, new_password: str) -> bool:
+        """Update user password."""
+        password_hash = generate_password_hash(new_password, method='pbkdf2:sha256')
+        
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE users SET password_hash = ? WHERE id = ?",
+                (password_hash, user_id)
+            )
+            conn.commit()
+            return cursor.rowcount > 0
+    
+    def get_user_stats(self, user_id: str) -> dict:
+        """Get user statistics."""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            
+            # Total chat sessions for user
+            cursor.execute(
+                "SELECT COUNT(*) FROM chat_sessions WHERE user_id = ?",
+                (user_id,)
+            )
+            total_sessions = cursor.fetchone()[0]
+            
+            # Total messages from user
+            cursor.execute("""
+                SELECT COUNT(*) FROM messages 
+                WHERE session_id IN (
+                    SELECT id FROM chat_sessions WHERE user_id = ?
+                ) AND sender = 'user'
+            """, (user_id,))
+            total_messages = cursor.fetchone()[0]
+            
+            # Total topics available to user
+            cursor.execute("SELECT COUNT(*) FROM topics")
+            total_topics = cursor.fetchone()[0]
+            
+            # Recent activity (last 7 days)
+            seven_days_ago = (datetime.now() - timedelta(days=7)).isoformat()
+            cursor.execute("""
+                SELECT COUNT(*) FROM chat_sessions 
+                WHERE user_id = ? AND created_at >= ?
+            """, (user_id, seven_days_ago))
+            recent_sessions = cursor.fetchone()[0]
+            
+            return {
+                "total_sessions": total_sessions,
+                "total_messages": total_messages,
+                "total_topics": total_topics,
+                "recent_sessions": recent_sessions
+            }
+
     def delete_user(self, user_id: str) -> bool:
         """Delete a user and all associated data."""
         with sqlite3.connect(self.db_path) as conn:

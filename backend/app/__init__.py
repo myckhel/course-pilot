@@ -9,6 +9,7 @@ from app.routes.auth import auth_bp
 from app.routes.topics import topics_bp
 from app.routes.chat import chat_bp
 from app.routes.admin import admin_bp
+from app.routes.user import user_bp
 from app.utils.logging import setup_logging
 
 
@@ -55,6 +56,7 @@ def create_app(config_name=None):
     app.register_blueprint(topics_bp, url_prefix='/api/topics')
     app.register_blueprint(chat_bp, url_prefix='/api/chat')
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
+    app.register_blueprint(user_bp, url_prefix='/api/user')
     
     # Health check endpoint
     @app.route('/api/health')
