@@ -40,6 +40,8 @@ This project is a **lightweight AI-powered assistant** designed to enhance the *
 - Use short-circuit evaluation and ternary operators for conditional rendering
 - put dark and light mode into consideration when designing components to ensure visibility and usability across themes
 - create sub components in same file when needed, this will help to keep the code clean and organized
+- component state encapsulation: keep state local to the component unless it needs to be shared
+- component Composition: Break down UI into small, reusable components. Favor composition over inheritance.
 
 ### TypeScript Integration
 

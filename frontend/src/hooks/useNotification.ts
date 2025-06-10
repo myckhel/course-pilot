@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { useUIStore } from "@/stores";
-import type { Notification } from "@/types";
 
 export function useNotification() {
   const { addNotification, removeNotification, clearNotifications } =

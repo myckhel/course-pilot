@@ -18,12 +18,14 @@ import {
   RobotOutlined,
   MessageOutlined,
   ClockCircleOutlined,
+  CopyOutlined,
 } from "@ant-design/icons";
 import { useParams, useNavigate } from "react-router-dom";
 import { useChatStore } from "@/stores";
 import { formatDistanceToNow } from "@/utils";
 import RatingButtons from "@/components/features/RatingButtons";
 import type { ChatMessage } from "@/types";
+import { useNotification } from "@/hooks";
 
 const { Text, Title } = Typography;
 const { TextArea } = Input;
@@ -31,6 +33,7 @@ const { TextArea } = Input;
 function ChatPage() {
   const { sessionId } = useParams();
   const navigate = useNavigate();
+  const { notify } = useNotification();
 
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -93,6 +96,16 @@ function ChatPage() {
       await updateMessageFeedback(messageId, rating);
     } catch (error) {
       console.error("Failed to update rating:", error);
+    }
+  };
+
+  const handleCopy = async (textToCopy: string) => {
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      notify({ type: "success", message: "Copied to clipboard!" });
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+      notify({ type: "error", message: "Failed to copy text." });
     }
   };
 
@@ -204,11 +217,18 @@ function ChatPage() {
 
                         {/* Rating buttons for AI messages */}
                         {msg.sender === "assistant" && (
-                          <div className="mr-2 md:mr-4">
+                          <div className="mr-2 md:mr-4 mt-2 flex items-center space-x-2">
                             <RatingButtons
                               message={msg}
                               onRating={handleRating}
                               disabled={loading}
+                            />
+                            <Button
+                              icon={<CopyOutlined />}
+                              size="small"
+                              onClick={() => handleCopy(msg.message)}
+                              disabled={loading}
+                              title="Copy message"
                             />
                           </div>
                         )}
