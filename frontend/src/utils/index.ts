@@ -1,4 +1,8 @@
 import { UPLOAD_CONFIG } from "@/constants";
+import {
+  formatDistanceToNow as formatDistanceToNowDateFns,
+  parseISO,
+} from "date-fns";
 
 // ===== DATE UTILITIES =====
 export function formatDate(dateString: string): string {
@@ -39,6 +43,16 @@ export function formatRelativeTime(dateString: string): string {
     return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
   } else {
     return "Just now";
+  }
+}
+
+export function formatDistanceToNow(date: string | Date): string {
+  try {
+    const dateObj = typeof date === "string" ? parseISO(date) : date;
+    return formatDistanceToNowDateFns(dateObj, { addSuffix: true });
+  } catch (error) {
+    console.error("Error formatting date:", error);
+    return "Invalid date";
   }
 }
 
@@ -198,25 +212,4 @@ export function cn(
   ...classes: (string | undefined | null | boolean)[]
 ): string {
   return classes.filter(Boolean).join(" ");
-}
-
-export function formatDistanceToNow(date: Date | string): string {
-  const now = new Date();
-  const targetDate = new Date(date);
-  const diff = Math.abs(now.getTime() - targetDate.getTime());
-
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-
-  if (days > 0) {
-    return `${days} day${days > 1 ? "s" : ""} ago`;
-  } else if (hours > 0) {
-    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-  } else if (minutes > 0) {
-    return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-  } else {
-    return "Just now";
-  }
 }
