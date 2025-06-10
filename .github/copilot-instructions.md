@@ -88,3 +88,7 @@ def build_qa_chain(retriever):
     llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
     return RetrievalQA.from_chain_type(llm=llm, retriever=retriever)
 ```
+
+## Copilot assumptions
+
+- Always assume the dev server is running and avoid starting the server
