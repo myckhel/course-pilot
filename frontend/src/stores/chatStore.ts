@@ -28,7 +28,7 @@ interface ChatActions {
   deleteSession: (sessionId: string) => Promise<void>;
   updateMessageFeedback: (
     messageId: string,
-    feedback: "positive" | "negative" | null
+    rating: "positive" | "negative" | null
   ) => Promise<void>;
   clearMessages: () => void;
   clearError: () => void;
@@ -255,12 +255,12 @@ export const useChatStore = create<ChatState & ChatActions>()(
 
     updateMessageFeedback: async (
       messageId: string,
-      feedback: "positive" | "negative" | null
+      rating: "positive" | "negative" | null
     ) => {
       try {
         const updatedMessage = await chatApi.updateMessageFeedback(
           messageId,
-          feedback
+          rating
         );
         set((state) => {
           const messageIndex = state.messages.findIndex(
@@ -275,7 +275,7 @@ export const useChatStore = create<ChatState & ChatActions>()(
           state.error =
             error.response?.data?.message ||
             error.message ||
-            "Failed to update feedback";
+            "Failed to update rating";
         });
         throw error;
       }

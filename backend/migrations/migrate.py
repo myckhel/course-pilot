@@ -10,7 +10,7 @@ from pathlib import Path
 class DatabaseMigration:
     """Handle database migrations."""
     
-    def __init__(self, db_path: str = "asked.db"):
+    def __init__(self, db_path: str = "assistant.db"):
         self.db_path = db_path
         self.migrations_dir = Path("migrations")
         self.migrations_dir.mkdir(exist_ok=True)
@@ -107,6 +107,26 @@ class DatabaseMigration:
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_messages_session_id ON messages (session_id)")
             
             conn.commit()
+
+    def run_migration_002_add_message_rating(self):
+        """Add rating column to messages table."""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            
+            # Check if rating column already exists
+            cursor.execute("PRAGMA table_info(messages)")
+            columns = [column[1] for column in cursor.fetchall()]
+            
+            if 'rating' not in columns:
+                cursor.execute("""
+                    ALTER TABLE messages 
+                    ADD COLUMN rating TEXT CHECK (rating IN ('positive', 'negative') OR rating IS NULL)
+                """)
+                print("Added rating column to messages table")
+            else:
+                print("Rating column already exists in messages table")
+            
+            conn.commit()
     
     def apply_migration(self, version: int, description: str, migration_func):
         """Apply a specific migration."""
@@ -146,6 +166,7 @@ class DatabaseMigration:
         # Define migrations
         migrations = [
             (1, "Initial database schema", self.run_migration_001_initial_schema),
+            (2, "Add message rating column", self.run_migration_002_add_message_rating),
         ]
         
         # Apply each migration
@@ -170,7 +191,7 @@ def main():
     
     parser = argparse.ArgumentParser(description="Database migration tool")
     parser.add_argument("--reset", action="store_true", help="Reset database")
-    parser.add_argument("--db-path", default="asked.db", help="Database file path")
+    parser.add_argument("--db-path", default="assistant.db", help="Database file path")
     
     args = parser.parse_args()
     

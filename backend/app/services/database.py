@@ -69,6 +69,7 @@ class DatabaseService:
                     sender TEXT NOT NULL CHECK (sender IN ('user', 'assistant')),
                     message TEXT NOT NULL,
                     sources TEXT,
+                    rating TEXT CHECK (rating IN ('positive', 'negative') OR rating IS NULL),
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (session_id) REFERENCES chat_sessions (id)
                 )
@@ -542,7 +543,7 @@ class DatabaseService:
     
     # Message methods
     def save_message(self, session_id: str, sender: str, message: str, 
-                    sources: Optional[List[str]] = None) -> Message:
+                    sources: Optional[List[str]] = None, rating: Optional[str] = None) -> Message:
         """Save a message to the database."""
         message_id = str(uuid.uuid4())
         now = datetime.utcnow()
@@ -551,9 +552,9 @@ class DatabaseService:
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                INSERT INTO messages (id, session_id, sender, message, sources, created_at)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (message_id, session_id, sender, message, sources_json, now))
+                INSERT INTO messages (id, session_id, sender, message, sources, rating, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (message_id, session_id, sender, message, sources_json, rating, now))
             conn.commit()
         
         return Message(
@@ -562,6 +563,7 @@ class DatabaseService:
             sender=sender,
             message=message,
             sources=sources,
+            rating=rating,
             created_at=now
         )
     
@@ -585,10 +587,57 @@ class DatabaseService:
                     sender=row[2],
                     message=row[3],
                     sources=sources,
-                    created_at=datetime.fromisoformat(row[5])
+                    created_at=datetime.fromisoformat(row[5]),  # created_at is at index 5
+                    rating=row[6] if len(row) > 6 else None  # rating is at index 6, with fallback
                 ))
         
         return messages
+
+    def update_message_rating(self, message_id: str, rating: Optional[str]) -> Optional[Message]:
+        """Update the rating of a message."""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE messages SET rating = ? WHERE id = ?
+            """, (rating, message_id))
+            conn.commit()
+            
+            if cursor.rowcount > 0:
+                # Return the updated message
+                cursor.execute("SELECT * FROM messages WHERE id = ?", (message_id,))
+                row = cursor.fetchone()
+                if row:
+                    sources = json.loads(row[4]) if row[4] else None
+                    return Message(
+                        id=row[0],
+                        session_id=row[1],
+                        sender=row[2],
+                        message=row[3],
+                        sources=sources,
+                        created_at=datetime.fromisoformat(row[5]),  # created_at is at index 5
+                        rating=row[6] if len(row) > 6 else None  # rating is at index 6
+                    )
+        return None
+
+    def get_message_by_id(self, message_id: str) -> Optional[Message]:
+        """Get a message by ID."""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM messages WHERE id = ?", (message_id,))
+            row = cursor.fetchone()
+            
+            if row:
+                sources = json.loads(row[4]) if row[4] else None
+                return Message(
+                    id=row[0],
+                    session_id=row[1],
+                    sender=row[2],
+                    message=row[3],
+                    sources=sources,
+                    created_at=datetime.fromisoformat(row[5]),  # created_at is at index 5
+                    rating=row[6] if len(row) > 6 else None  # rating is at index 6
+                )
+        return None
     
     def get_system_stats(self) -> dict:
         """Get system statistics for admin dashboard."""

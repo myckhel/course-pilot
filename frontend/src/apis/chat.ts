@@ -73,12 +73,12 @@ export const chatApi = {
 
   updateMessageFeedback: async (
     messageId: string,
-    feedback: "positive" | "negative" | null
+    rating: "positive" | "negative" | null
   ): Promise<ChatMessage> => {
-    const response = await apiClient.patch<ChatMessage>(
-      `/api/chat/messages/${messageId}/feedback`,
-      { feedback }
+    const response = await apiClient.patch<{ message: ChatMessage }>(
+      `/chat/messages/${messageId}/rating`,
+      { rating }
     );
-    return response.data!;
+    return response.data!.message;
   },
 };

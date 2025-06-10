@@ -22,6 +22,7 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import { useChatStore } from "@/stores";
 import { formatDistanceToNow } from "@/utils";
+import RatingButtons from "@/components/features/RatingButtons";
 import type { ChatMessage } from "@/types";
 
 const { Text, Title } = Typography;
@@ -36,7 +37,7 @@ function ChatPage() {
   const [sessionLoading, setSessionLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { messages, sendMessage, fetchMessages, currentSession } =
+  const { messages, sendMessage, fetchMessages, currentSession, updateMessageFeedback } =
     useChatStore();
 
   useEffect(() => {
@@ -76,6 +77,14 @@ function ChatPage() {
       console.error("Failed to send message:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRating = async (messageId: string, rating: "positive" | "negative" | null) => {
+    try {
+      await updateMessageFeedback(messageId, rating);
+    } catch (error) {
+      console.error("Failed to update rating:", error);
     }
   };
 
@@ -153,29 +162,46 @@ function ChatPage() {
                         style={{ flexShrink: 0 }}
                       />
                       <div
-                        className={`relative px-4 py-2 rounded-2xl shadow-md text-base whitespace-pre-wrap break-words ${
-                          msg.sender === "user"
-                            ? "bg-blue-500 text-white rounded-br-md ml-2 md:ml-4 chat-bubble-user"
-                            : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-bl-md mr-2 md:mr-4 chat-bubble-ai"
+                        className={`relative ${
+                          msg.sender === "user" ? "flex flex-col items-end" : "flex flex-col items-start"
                         }`}
-                        style={{
-                          borderBottomRightRadius:
-                            msg.sender === "user" ? 8 : 24,
-                          borderBottomLeftRadius:
-                            msg.sender === "user" ? 24 : 8,
-                        }}
                       >
-                        <div>{msg.message}</div>
                         <div
-                          className={`text-xs mt-1 flex items-center gap-1 ${
+                          className={`px-4 py-2 rounded-2xl shadow-md text-base whitespace-pre-wrap break-words ${
                             msg.sender === "user"
-                              ? "text-blue-100/80 justify-end"
-                              : "text-gray-500 dark:text-gray-400 justify-start"
+                              ? "bg-blue-500 text-white rounded-br-md ml-2 md:ml-4 chat-bubble-user"
+                              : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-bl-md mr-2 md:mr-4 chat-bubble-ai"
                           }`}
+                          style={{
+                            borderBottomRightRadius:
+                              msg.sender === "user" ? 8 : 24,
+                            borderBottomLeftRadius:
+                              msg.sender === "user" ? 24 : 8,
+                          }}
                         >
-                          <ClockCircleOutlined />
-                          {formatDistanceToNow(new Date(msg.timestamp))}
+                          <div>{msg.message}</div>
+                          <div
+                            className={`text-xs mt-1 flex items-center gap-1 ${
+                              msg.sender === "user"
+                                ? "text-blue-100/80 justify-end"
+                                : "text-gray-500 dark:text-gray-400 justify-start"
+                            }`}
+                          >
+                            <ClockCircleOutlined />
+                            {formatDistanceToNow(new Date(msg.timestamp))}
+                          </div>
                         </div>
+                        
+                        {/* Rating buttons for AI messages */}
+                        {msg.sender === "assistant" && (
+                          <div className="mr-2 md:mr-4">
+                            <RatingButtons
+                              message={msg}
+                              onRating={handleRating}
+                              disabled={loading}
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

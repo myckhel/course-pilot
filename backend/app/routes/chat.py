@@ -259,6 +259,53 @@ def delete_chat_session(session_id):
         return jsonify({'error': 'Failed to delete session'}), 500
 
 
+@chat_bp.route('/messages/<message_id>/rating', methods=['PATCH'])
+@jwt_required()
+def update_message_rating(message_id):
+    """Update the rating of a message."""
+    try:
+        user_id = get_jwt_identity()
+        data = request.get_json()
+        
+        # Validate input
+        if 'rating' not in data:
+            return jsonify({'error': 'Missing required field: rating'}), 400
+        
+        rating = data['rating']
+        if rating not in ['positive', 'negative', None]:
+            return jsonify({'error': 'Invalid rating value. Must be "positive", "negative", or null'}), 400
+        
+        db_service, _, _ = get_services()
+        
+        # Get the message and verify ownership
+        message = db_service.get_message_by_id(message_id)
+        if not message:
+            return jsonify({'error': 'Message not found'}), 404
+        
+        # Get the session to verify user ownership
+        session = db_service.get_chat_session_by_id(message.session_id)
+        if not session or session.user_id != user_id:
+            return jsonify({'error': 'Access denied'}), 403
+        
+        # Only allow rating assistant messages
+        if message.sender != 'assistant':
+            return jsonify({'error': 'Can only rate AI assistant messages'}), 400
+        
+        # Update the rating
+        updated_message = db_service.update_message_rating(message_id, rating)
+        
+        if updated_message:
+            return jsonify({
+                'message': updated_message.to_dict(),
+                'success': True
+            }), 200
+        else:
+            return jsonify({'error': 'Failed to update rating'}), 500
+        
+    except Exception as e:
+        return jsonify({'error': 'Failed to update message rating'}), 500
+
+
 # Error handlers for chat blueprint
 @chat_bp.errorhandler(ValidationError)
 def handle_validation_error(e):

@@ -122,7 +122,7 @@ export interface ChatMessage {
   message: string;
   sender: "user" | "assistant";
   timestamp: string;
-  feedback?: "positive" | "negative" | null;
+  rating?: "positive" | "negative" | null;
   sources?: string[];
 }
 

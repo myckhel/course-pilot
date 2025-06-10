@@ -80,6 +80,7 @@ class Message:
     sender: str  # 'user' or 'assistant'
     message: str
     sources: Optional[List[str]]
+    rating: Optional[str]  # 'positive', 'negative', or None (neutral)
     created_at: datetime
     
     def to_dict(self) -> Dict[str, Any]:
@@ -90,5 +91,6 @@ class Message:
             'sender': self.sender,
             'message': self.message,
             'sources': self.sources or [],
+            'rating': self.rating,
             'timestamp': self.created_at.isoformat()
         }
