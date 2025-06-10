@@ -37,8 +37,13 @@ function ChatPage() {
   const [sessionLoading, setSessionLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { messages, sendMessage, fetchMessages, currentSession, updateMessageFeedback } =
-    useChatStore();
+  const {
+    messages,
+    sendMessage,
+    fetchMessages,
+    currentSession,
+    updateMessageFeedback,
+  } = useChatStore();
 
   useEffect(() => {
     const initializeChat = async () => {
@@ -80,7 +85,10 @@ function ChatPage() {
     }
   };
 
-  const handleRating = async (messageId: string, rating: "positive" | "negative" | null) => {
+  const handleRating = async (
+    messageId: string,
+    rating: "positive" | "negative" | null
+  ) => {
     try {
       await updateMessageFeedback(messageId, rating);
     } catch (error) {
@@ -163,7 +171,9 @@ function ChatPage() {
                       />
                       <div
                         className={`relative ${
-                          msg.sender === "user" ? "flex flex-col items-end" : "flex flex-col items-start"
+                          msg.sender === "user"
+                            ? "flex flex-col items-end"
+                            : "flex flex-col items-start"
                         }`}
                       >
                         <div
@@ -188,10 +198,10 @@ function ChatPage() {
                             }`}
                           >
                             <ClockCircleOutlined />
-                            {formatDistanceToNow(new Date(msg.timestamp))}
+                            {formatDistanceToNow(msg.timestamp)}
                           </div>
                         </div>
-                        
+
                         {/* Rating buttons for AI messages */}
                         {msg.sender === "assistant" && (
                           <div className="mr-2 md:mr-4">

@@ -1,55 +1,59 @@
 import { UPLOAD_CONFIG } from "@/constants";
 import {
   formatDistanceToNow as formatDistanceToNowDateFns,
+  formatRelative as formatRelativeDateFns,
   parseISO,
 } from "date-fns";
+import { formatInTimeZone, toZonedTime } from "date-fns-tz";
 
 // ===== DATE UTILITIES =====
-export function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+export function formatDate(dateString: string, timeZone = "UTC"): string {
+  try {
+    const date = parseISO(dateString);
+    return formatInTimeZone(date, timeZone, "MMM d, yyyy");
+  } catch (error) {
+    console.error("Error formatting date:", error);
+    return "Invalid date";
+  }
 }
 
-export function formatDateTime(dateString: string): string {
-  const date = new Date(dateString);
-  return date.toLocaleString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+export function formatDateTime(dateString: string, timeZone = "UTC"): string {
+  try {
+    const date = parseISO(dateString);
+    return formatInTimeZone(date, timeZone, "MMM d, yyyy, HH:mm");
+  } catch (error) {
+    console.error("Error formatting date time:", error);
+    return "Invalid date";
+  }
 }
 
-export function formatRelativeTime(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-
-  if (days > 0) {
-    return `${days} day${days > 1 ? "s" : ""} ago`;
-  } else if (hours > 0) {
-    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-  } else if (minutes > 0) {
-    return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-  } else {
-    return "Just now";
+export function formatRelativeTime(
+  dateString: string,
+  baseDate: Date = new Date()
+): string {
+  try {
+    const date = parseISO(dateString);
+    return formatRelativeDateFns(date, baseDate);
+  } catch (error) {
+    console.error("Error formatting relative time:", error);
+    return "Invalid date";
   }
 }
 
 export function formatDistanceToNow(date: string | Date): string {
   try {
-    const dateObj = typeof date === "string" ? parseISO(date) : date;
-    return formatDistanceToNowDateFns(dateObj, { addSuffix: true });
+    // Always treat string input as UTC, even if no 'Z' is present
+    let dateObj: Date;
+    if (typeof date === "string") {
+      // If the string does not end with 'Z' or a timezone, append 'Z' to treat as UTC
+      const iso = /[zZ]|[+-]\\d{2}:?\\d{2}$/.test(date) ? date : date + "Z";
+      dateObj = parseISO(iso);
+    } else {
+      dateObj = date;
+    }
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const zonedDate = toZonedTime(dateObj, timeZone);
+    return formatDistanceToNowDateFns(zonedDate, { addSuffix: true });
   } catch (error) {
     console.error("Error formatting date:", error);
     return "Invalid date";
