@@ -17,15 +17,15 @@ def app():
     app = create_app('testing')
     app.config.update({
         'TESTING': True,
-        'DATABASE_URL': f'sqlite:///{db_path}',
+        'SQLALCHEMY_DATABASE_URI': f'sqlite:///{db_path}',
         'JWT_SECRET_KEY': 'test-secret-key',
         'SECRET_KEY': 'test-secret-key'
     })
     
     # Initialize database
     with app.app_context():
-        db_service = DatabaseService(db_path)
-        db_service.setup_database()
+        from app.extensions import db
+        db.create_all()
     
     yield app
     
@@ -63,7 +63,7 @@ def auth_headers(client):
         'password': 'testpassword'
     })
     
-    token = response.get_json()['access_token']
+    token = response.get_json()['token']
     
     return {'Authorization': f'Bearer {token}'}
 
@@ -85,7 +85,7 @@ def admin_headers(client):
         'password': 'adminpassword'
     })
     
-    token = response.get_json()['access_token']
+    token = response.get_json()['token']
     
     return {'Authorization': f'Bearer {token}'}
 

@@ -21,6 +21,12 @@ class Config:
     
     # Database settings
     DATABASE_PATH = os.environ.get('DATABASE_PATH') or 'assistant.db'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or f'sqlite:///{DATABASE_PATH}'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,
+        'pool_recycle': 300,
+    }
     
     # Vector store settings
     CHROMA_PERSIST_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'chroma_db')
@@ -71,6 +77,7 @@ class TestingConfig(Config):
     TESTING = True
     FLASK_ENV = 'testing'
     DATABASE_PATH = ':memory:'  # Use in-memory database for tests
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     SECRET_KEY = 'test-secret-key'
     JWT_SECRET_KEY = 'test-jwt-secret-key'
     LOG_LEVEL = 'ERROR'

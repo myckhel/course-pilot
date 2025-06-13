@@ -150,31 +150,6 @@ class DatabaseService:
         except SQLAlchemyError:
             return [], 0
     
-    def delete_user(self, user_id: str) -> bool:
-        """Delete a user and all associated data."""
-        try:
-            # Delete associated messages first (through cascade or explicit deletion)
-            db.session.query(Message).join(ChatSession).filter(
-                ChatSession.user_id == user_id
-            ).delete(synchronize_session=False)
-            
-            # Delete chat sessions
-            ChatSession.query.filter_by(user_id=user_id).delete()
-            
-            # Delete topics created by user
-            Topic.query.filter_by(created_by=user_id).delete()
-            
-            # Delete the user
-            user = User.query.filter_by(id=user_id).first()
-            if user:
-                db.session.delete(user)
-                db.session.commit()
-                return True
-            return False
-        except SQLAlchemyError:
-            db.session.rollback()
-            return False
-    
     # Topic methods
     def create_topic(self, name: str, description: str, created_by: str) -> Topic:
         """Create a new topic."""
@@ -254,19 +229,6 @@ class DatabaseService:
         except SQLAlchemyError:
             return 0
     
-    def get_default_topic(self) -> Optional[Topic]:
-        """Get the default GST topic (first topic named 'GST' or the first topic)."""
-        try:
-            # First try to find a topic named 'GST'
-            gst_topic = Topic.query.filter(Topic.name.ilike('%GST%')).first()
-            if gst_topic:
-                return gst_topic
-            
-            # If no GST topic found, return the first available topic
-            return Topic.query.order_by(Topic.created_at.asc()).first()
-        except SQLAlchemyError:
-            return None
-    
     # Chat session methods
     def create_chat_session(self, user_id: str, topic_id: str, title: str) -> ChatSession:
         """Create a new chat session."""
@@ -304,10 +266,6 @@ class DatabaseService:
             return query.order_by(ChatSession.created_at.desc()).all()
         except SQLAlchemyError:
             return []
-    
-    def get_chat_sessions(self, user_id: str, topic_id: str = None) -> List[ChatSession]:
-        """Get chat sessions for a user (alias for get_user_chat_sessions for backward compatibility)."""
-        return self.get_user_chat_sessions(user_id, topic_id)
     
     def delete_chat_session(self, session_id: str) -> bool:
         """Delete a chat session and all its messages."""
@@ -347,11 +305,6 @@ class DatabaseService:
             db.session.rollback()
             raise RuntimeError(f"Database error: {str(e)}")
     
-    def save_message(self, session_id: str, sender: str, message: str, 
-                    sources: Optional[List[str]] = None) -> Message:
-        """Save a message (alias for create_message for backward compatibility)."""
-        return self.create_message(session_id, sender, message, sources)
-    
     def get_session_messages(self, session_id: str, limit: int = 100) -> List[Message]:
         """Get all messages for a chat session."""
         try:
@@ -361,19 +314,19 @@ class DatabaseService:
         except SQLAlchemyError:
             return []
     
-    def update_message_rating(self, message_id: str, rating: str) -> Optional[Message]:
+    def update_message_rating(self, message_id: str, rating: str) -> bool:
         """Update the rating for a message."""
         try:
             message = Message.query.filter_by(id=message_id).first()
             if not message:
-                return None
+                return False
             
             message.rating = rating
             db.session.commit()
-            return message
+            return True
         except SQLAlchemyError:
             db.session.rollback()
-            return None
+            return False
     
     def get_message_by_id(self, message_id: str) -> Optional[Message]:
         """Get message by ID."""
@@ -492,29 +445,3 @@ class DatabaseService:
             ).limit(limit).all()
         except SQLAlchemyError:
             return []
-    
-    def get_default_topic(self) -> Optional[Topic]:
-        """Get the default GST topic (first topic named 'GST' or the first topic)."""
-        try:
-            # First try to find a topic named 'GST'
-            gst_topic = Topic.query.filter(Topic.name.ilike('%GST%')).first()
-            if gst_topic:
-                return gst_topic
-            
-            # If no GST topic found, return the first available topic
-            return Topic.query.order_by(Topic.created_at.asc()).first()
-        except SQLAlchemyError:
-            return None
-    
-    def get_chat_sessions(self, user_id: str, topic_id: str = None) -> List[ChatSession]:
-        """Get chat sessions for a user (alias for get_user_chat_sessions for backward compatibility)."""
-        return self.get_user_chat_sessions(user_id, topic_id)
-    
-    def save_message(self, session_id: str, sender: str, message: str, 
-                    sources: Optional[List[str]] = None) -> Message:
-        """Save a message (alias for create_message for backward compatibility)."""
-        return self.create_message(session_id, sender, message, sources)
-    
-    def get_system_stats(self) -> dict:
-        """Get system statistics (alias for get_admin_stats for backward compatibility)."""
-        return self.get_admin_stats()

@@ -5,6 +5,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from app.config import Config
+from app.extensions import init_extensions
 from app.routes.auth import auth_bp
 from app.routes.topics import topics_bp
 from app.routes.chat import chat_bp
@@ -33,6 +34,9 @@ def create_app(config_name=None):
     
     # Setup logging
     setup_logging(app)
+    
+    # Initialize extensions (SQLAlchemy, Migrate, etc.)
+    init_extensions(app)
     
     # Initialize extensions
     CORS(app, origins=app.config.get('CORS_ORIGINS', '').split(','))

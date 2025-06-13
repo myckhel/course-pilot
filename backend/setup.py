@@ -50,15 +50,59 @@ def install_requirements():
 def initialize_database():
     """Initialize the database."""
     try:
-        from migrations.migrate import DatabaseMigration
+        from app import create_app
+        from app.extensions import db
+        from app.services.database import DatabaseService
         
         print("Initializing database...")
-        migration = DatabaseMigration()
-        migration.migrate()
+        
+        # Create Flask application context
+        app = create_app('development')
+        
+        with app.app_context():
+            # Create all tables
+            db.create_all()
+            print("✓ Database tables created successfully")
+            
+            # Create default admin user
+            db_service = DatabaseService()
+            
+            # Check if admin user already exists
+            admin_email = 'admin@asked.com'
+            existing_admin = db_service.get_user_by_email(admin_email)
+            
+            if not existing_admin:
+                admin_user = db_service.create_user(
+                    name='Admin User',
+                    email=admin_email,
+                    password='admin123',  # Default password - should be changed
+                    role='admin'
+                )
+                print(f"✓ Default admin user created: {admin_email}")
+                print("⚠️  Default password is 'admin123' - please change it after first login")
+            else:
+                print("✓ Admin user already exists")
+            
+            # Create default student user for testing (optional)
+            student_email = 'student@asked.com'
+            existing_student = db_service.get_user_by_email(student_email)
+            
+            if not existing_student:
+                student_user = db_service.create_user(
+                    name='Test Student',
+                    email=student_email,
+                    password='student123',  # Default password - should be changed
+                    role='student'
+                )
+                print(f"✓ Default student user created: {student_email}")
+                print("⚠️  Default password is 'student123' - please change it after first login")
+            else:
+                print("✓ Student test user already exists")
+        
         print("✓ Database initialized successfully")
         
-    except ImportError:
-        print("❌ Could not import migration module. Make sure requirements are installed.")
+    except ImportError as e:
+        print(f"❌ Could not import required modules: {str(e)}")
     except Exception as e:
         print(f"❌ Database initialization failed: {str(e)}")
 
@@ -67,68 +111,74 @@ def initialize_default_topic():
     """Initialize default GST topic and upload its document."""
     print("\n📚 Initializing default GST topic...")
     try:
-        from app.services import DatabaseService
+        from app import create_app
+        from app.services.database import DatabaseService
         from app.services.document_loader import DocumentLoader
         from app.services.vector_store import VectorStoreService
         from pathlib import Path
         
-        db_service = DatabaseService()
+        # Create Flask application context
+        app = create_app('development')
         
-        # Get admin user id (first admin in the system)
-        admin = next((user for user in db_service.get_all_users()[0] if user.role == 'admin'), None)
-        if not admin:
-            print("❌ No admin user found. Please run database initialization first.")
-            return
-        
-        # Check if GST topic already exists
-        existing_topics = db_service.get_all_topics()
-        if any(topic.name.lower() == 'gst' for topic in existing_topics):
-            print("✓ GST topic already exists")
-            return
-        
-        # Create default GST topic
-        topic = db_service.create_topic(
-            name="GST",
-            description="AI-powered companion for GST courses",
-            created_by=admin.id
-        )
-        print("✓ Default GST topic created successfully")
+        with app.app_context():
+            db_service = DatabaseService()
+            
+            # Get admin user id (first admin in the system)
+            users, _ = db_service.get_all_users()
+            admin = next((user for user in users if user.role == 'admin'), None)
+            if not admin:
+                print("❌ No admin user found. Please run database initialization first.")
+                return
+            
+            # Check if GST topic already exists
+            existing_topics = db_service.get_all_topics()
+            if any(topic.name.lower() == 'gst' for topic in existing_topics):
+                print("✓ GST topic already exists")
+                return
+            
+            # Create default GST topic
+            topic = db_service.create_topic(
+                name="GST",
+                description="AI-powered companion for GST courses",
+                created_by=admin.id
+            )
+            print("✓ Default GST topic created successfully")
 
-        # Load and process the default GST document
-        pdf_path = Path(__file__).parent / 'data' / 'CCMAS GST data .pdf'
-        if pdf_path.exists():
-            try:
-                print("📄 Processing GST document...")
-                # Initialize services with smaller chunk size to handle token limits
-                doc_loader = DocumentLoader(chunk_size=500, chunk_overlap=50)
-                vector_service = VectorStoreService('chroma_db')
-                
-                # Save file to uploads folder
-                upload_dir = Path('uploads') / topic.id
-                upload_dir.mkdir(exist_ok=True)
-                dest_path = upload_dir / 'CCMAS GST data .pdf'
-                shutil.copy2(pdf_path, dest_path)
-                
-                # Process document in chunks
-                chunks = doc_loader.load_and_split_pdf(str(dest_path))
-                
-                if not chunks:
-                    print("❌ No content could be extracted from the PDF")
-                    return
-                
-                # Create or update vector index
-                if vector_service.topic_index_exists(topic.id):
-                    vector_service.update_topic_index(topic.id, chunks)
-                else:
-                    vector_service.create_topic_index(topic.id, chunks)
-                
-                # Update topic document count
-                db_service.increment_topic_document_count(topic.id)
-                print(f"✓ GST document processed and indexed successfully ({len(chunks)} chunks created)")
-            except Exception as e:
-                print(f"❌ Failed to process GST document: {str(e)}")
-        else:
-            print("⚠️  Default GST document not found at:", pdf_path)
+            # Load and process the default GST document
+            pdf_path = Path(__file__).parent / 'data' / 'CCMAS GST data .pdf'
+            if pdf_path.exists():
+                try:
+                    print("📄 Processing GST document...")
+                    # Initialize services with smaller chunk size to handle token limits
+                    doc_loader = DocumentLoader(chunk_size=500, chunk_overlap=50)
+                    vector_service = VectorStoreService('chroma_db')
+                    
+                    # Save file to uploads folder
+                    upload_dir = Path('uploads') / topic.id
+                    upload_dir.mkdir(exist_ok=True)
+                    dest_path = upload_dir / 'CCMAS GST data .pdf'
+                    shutil.copy2(pdf_path, dest_path)
+                    
+                    # Process document in chunks
+                    chunks = doc_loader.load_and_split_pdf(str(dest_path))
+                    
+                    if not chunks:
+                        print("❌ No content could be extracted from the PDF")
+                        return
+                    
+                    # Create or update vector index
+                    if vector_service.topic_index_exists(topic.id):
+                        vector_service.update_topic_index(topic.id, chunks)
+                    else:
+                        vector_service.create_topic_index(topic.id, chunks)
+                    
+                    # Update topic document count
+                    db_service.increment_topic_document_count(topic.id)
+                    print(f"✓ GST document processed and indexed successfully ({len(chunks)} chunks created)")
+                except Exception as e:
+                    print(f"❌ Failed to process GST document: {str(e)}")
+            else:
+                print("⚠️  Default GST document not found at:", pdf_path)
         
     except Exception as e:
         print(f"❌ Failed to initialize default topic: {str(e)}")
@@ -159,6 +209,14 @@ def main():
     initialize_default_topic()
     
     print("\n✅ Setup completed successfully!")
+    print("\nDefault Credentials:")
+    print("🔑 Admin Login:")
+    print("   Email: admin@asked.com")
+    print("   Password: admin123")
+    print("🔑 Student Login (for testing):")
+    print("   Email: student@asked.com") 
+    print("   Password: student123")
+    print("\n⚠️  IMPORTANT: Change default passwords after first login!")
     print("\nNext steps:")
     print("1. Edit .env file and add your OpenAI API key")
     print("2. Run the development server: python app.py")
