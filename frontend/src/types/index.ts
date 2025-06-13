@@ -187,6 +187,28 @@ export interface UserAnalytics {
   last_active: string;
 }
 
+export interface NPSData {
+  nps_score: number;
+  total_responses: number;
+  promoters: number;
+  detractors: number;
+  passives: number;
+  promoter_percentage: number;
+  detractor_percentage: number;
+  passive_percentage: number;
+  daily_breakdown: NPSDailyData[];
+  period_days: number;
+}
+
+export interface NPSDailyData {
+  date: string;
+  nps_score: number;
+  total_responses: number;
+  positive_ratings: number;
+  negative_ratings: number;
+  no_ratings: number;
+}
+
 // ===== UI TYPES =====
 export interface UIState {
   isLoading: boolean;

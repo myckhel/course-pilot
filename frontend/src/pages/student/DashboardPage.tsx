@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Card,
   Row,
@@ -9,6 +9,7 @@ import {
   Typography,
   Empty,
   Spin,
+  Select,
 } from "antd";
 import {
   MessageOutlined,
@@ -17,14 +18,35 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useChatStore } from "@/stores";
-import type { ChatSession } from "@/types";
+import { userApi } from "@/apis";
+import NPSChart from "@/components/features/NPSChart";
+import type { ChatSession, NPSData } from "@/types";
 
 const { Title, Text } = Typography;
 
 function DashboardPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [npsLoading, setNpsLoading] = useState(false);
+  const [npsData, setNpsData] = useState<NPSData | null>(null);
+  const [npsTimeRange, setNpsTimeRange] = useState(30);
   const { sessions, fetchSessions } = useChatStore();
+
+  const loadNPSData = useCallback(async () => {
+    setNpsLoading(true);
+    try {
+      const response = await userApi.getNPSAnalytics({ days: npsTimeRange });
+      setNpsData(response.data);
+    } catch (error) {
+      console.error("Failed to load NPS data:", error);
+    } finally {
+      setNpsLoading(false);
+    }
+  }, [npsTimeRange]);
+
+  useEffect(() => {
+    loadNPSData();
+  }, [loadNPSData]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -91,6 +113,38 @@ function DashboardPage() {
             />
           </Card>
         </Col>
+      </Row>
+
+      {/* NPS Analytics Section */}
+      <Row>
+        <Card
+          title={
+            <div className="flex justify-between items-center">
+              <span>Your Learning Experience Rating</span>
+              <div className="flex items-center space-x-2">
+                <Select
+                  value={npsTimeRange}
+                  onChange={setNpsTimeRange}
+                  size="small"
+                  style={{ width: 120 }}
+                >
+                  <Select.Option value={7}>Last 7 days</Select.Option>
+                  <Select.Option value={30}>Last 30 days</Select.Option>
+                  <Select.Option value={90}>Last 90 days</Select.Option>
+                </Select>
+              </div>
+            </div>
+          }
+        >
+          <Row>
+            <NPSChart
+              data={npsData}
+              loading={npsLoading}
+              title=""
+              showDailyBreakdown={true}
+            />
+          </Row>
+        </Card>
       </Row>
 
       {/* Recent Chat Sessions */}

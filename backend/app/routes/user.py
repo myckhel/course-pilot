@@ -177,6 +177,39 @@ def get_user_stats():
         return jsonify({'error': 'Internal server error'}), 500
 
 
+@user_bp.route('/nps-analytics', methods=['GET'])
+@jwt_required()
+def get_user_nps_analytics():
+    """Get NPS analytics for the current user."""
+    try:
+        user_id = get_jwt_identity()
+        print(user_id)
+        db_service = get_db_service()
+        
+        # Verify user exists
+        user = db_service.get_user_by_id(user_id)
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Get query parameters
+        topic_id = request.args.get('topic_id')
+        days = int(request.args.get('days', 30))
+        
+        # Validate days parameter
+        if days < 1 or days > 365:
+            return jsonify({'error': 'Days must be between 1 and 365'}), 400
+        
+        # Get NPS analytics for this user
+        nps_data = db_service.get_nps_analytics(user_id=user_id, topic_id=topic_id, days=days)
+        
+        return jsonify(nps_data), 200
+        
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        return jsonify({'error': 'Failed to fetch NPS analytics'}), 500
+
+
 # Error handlers for the user blueprint
 @user_bp.errorhandler(ValidationError)
 def handle_validation_error(e):

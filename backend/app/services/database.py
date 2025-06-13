@@ -382,6 +382,120 @@ class DatabaseService:
         except SQLAlchemyError:
             return None
     
+    def get_nps_analytics(self, user_id: str = None, topic_id: str = None, 
+                         days: int = 30) -> dict:
+        """Get NPS analytics based on message ratings."""
+        try:
+            # Calculate date range
+            start_date = datetime.utcnow() - timedelta(days=days)
+            
+            # Base query for AI messages (only assistant messages can be rated)
+            query = db.session.query(Message).filter(
+                Message.sender == 'assistant',
+                Message.created_at >= start_date
+            )
+            
+            # Filter by user if specified
+            if user_id:
+                query = query.join(ChatSession).filter(
+                    ChatSession.user_id == user_id
+                )
+            
+            # Filter by topic if specified
+            if topic_id:
+                if not user_id:  # Need to join if not already joined
+                    query = query.join(ChatSession)
+                query = query.filter(ChatSession.topic_id == topic_id)
+            
+            # Get all rated messages
+            messages = query.all()
+            
+            # Count ratings
+            total_messages = len(messages)
+            positive_ratings = len([m for m in messages if m.rating == 'positive'])
+            negative_ratings = len([m for m in messages if m.rating == 'negative'])
+            no_ratings = total_messages - positive_ratings - negative_ratings
+            
+            # Calculate NPS
+            if total_messages > 0:
+                promoter_percentage = (positive_ratings / total_messages) * 100
+                detractor_percentage = (negative_ratings / total_messages) * 100
+                passive_percentage = (no_ratings / total_messages) * 100
+                nps_score = promoter_percentage - detractor_percentage
+            else:
+                promoter_percentage = 0
+                detractor_percentage = 0
+                passive_percentage = 0
+                nps_score = 0
+            
+            # Get daily breakdown for the chart
+            daily_breakdown = []
+            for i in range(days):
+                day_start = start_date + timedelta(days=i)
+                day_end = day_start + timedelta(days=1)
+                
+                day_query = db.session.query(Message).filter(
+                    Message.sender == 'assistant',
+                    Message.created_at >= day_start,
+                    Message.created_at < day_end
+                )
+                
+                if user_id:
+                    day_query = day_query.join(ChatSession).filter(
+                        ChatSession.user_id == user_id
+                    )
+                
+                if topic_id:
+                    if not user_id:
+                        day_query = day_query.join(ChatSession)
+                    day_query = day_query.filter(ChatSession.topic_id == topic_id)
+                
+                day_messages = day_query.all()
+                day_total = len(day_messages)
+                day_positive = len([m for m in day_messages if m.rating == 'positive'])
+                day_negative = len([m for m in day_messages if m.rating == 'negative'])
+                
+                if day_total > 0:
+                    day_nps = ((day_positive / day_total) * 100) - ((day_negative / day_total) * 100)
+                else:
+                    day_nps = 0
+                
+                daily_breakdown.append({
+                    'date': day_start.strftime('%Y-%m-%d'),
+                    'nps_score': round(day_nps, 1),
+                    'total_responses': day_total,
+                    'positive_ratings': day_positive,
+                    'negative_ratings': day_negative,
+                    'no_ratings': day_total - day_positive - day_negative
+                })
+            
+            return {
+                'nps_score': round(nps_score, 1),
+                'total_responses': total_messages,
+                'promoters': positive_ratings,
+                'detractors': negative_ratings,
+                'passives': no_ratings,
+                'promoter_percentage': round(promoter_percentage, 1),
+                'detractor_percentage': round(detractor_percentage, 1),
+                'passive_percentage': round(passive_percentage, 1),
+                'daily_breakdown': daily_breakdown,
+                'period_days': days
+            }
+        except SQLAlchemyError as e:
+            return {
+                'nps_score': 0,
+                'total_responses': 0,
+                'promoters': 0,
+                'detractors': 0,
+                'passives': 0,
+                'promoter_percentage': 0,
+                'detractor_percentage': 0,
+                'passive_percentage': 0,
+                'daily_breakdown': [],
+                'period_days': days,
+                'error': str(e)
+            }
+
     # Admin methods
     def get_admin_stats(self) -> dict:
         """Get admin dashboard statistics."""

@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Card,
   Row,
   Col,
   Statistic,
   Select,
-  DatePicker,
   Typography,
   Table,
   Tag,
@@ -17,8 +16,6 @@ import {
   Line,
   AreaChart,
   Area,
-  BarChart,
-  Bar,
   PieChart,
   Pie,
   Cell,
@@ -40,10 +37,15 @@ import {
 import type { ColumnsType } from "antd/es/table";
 
 import { analyticsApi } from "@/apis/analyticsApi";
-import type { AnalyticsData, TopicAnalytics, UserAnalytics } from "@/types";
+import NPSChart from "@/components/features/NPSChart";
+import type {
+  AnalyticsData,
+  TopicAnalytics,
+  UserAnalytics,
+  NPSData,
+} from "@/types";
 
 const { Title } = Typography;
-const { RangePicker } = DatePicker;
 const { Option } = Select;
 
 function AnalyticsPage() {
@@ -54,29 +56,37 @@ function AnalyticsPage() {
   );
   const [topicAnalytics, setTopicAnalytics] = useState<TopicAnalytics[]>([]);
   const [userAnalytics, setUserAnalytics] = useState<UserAnalytics[]>([]);
+  const [npsData, setNpsData] = useState<NPSData | null>(null);
+  const [npsLoading, setNpsLoading] = useState(false);
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, [timeRange]);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     try {
       setLoading(true);
-      const [analytics, topics, users] = await Promise.all([
+      setNpsLoading(true);
+      const [analytics, topics, users, nps] = await Promise.all([
         analyticsApi.getOverviewAnalytics(timeRange),
         analyticsApi.getTopicAnalytics(timeRange),
         analyticsApi.getUserAnalytics(timeRange),
+        analyticsApi.getNPSAnalytics({
+          days: parseInt(timeRange.replace("d", "")),
+        }),
       ]);
 
       setAnalyticsData(analytics.data);
       setTopicAnalytics(topics.data);
       setUserAnalytics(users.data);
+      setNpsData(nps.data);
     } catch (error) {
       console.error("Failed to fetch analytics:", error);
     } finally {
       setLoading(false);
+      setNpsLoading(false);
     }
-  };
+  }, [timeRange]);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [fetchAnalytics]);
 
   const handleExportReport = async () => {
     try {
@@ -380,6 +390,18 @@ function AnalyticsPage() {
               size="small"
             />
           </Card>
+        </Col>
+      </Row>
+
+      {/* NPS Analytics Section */}
+      <Row gutter={16}>
+        <Col span={24}>
+          <NPSChart
+            data={npsData}
+            loading={npsLoading}
+            title="System-wide Net Promoter Score (NPS)"
+            showDailyBreakdown={true}
+          />
         </Col>
       </Row>
     </div>

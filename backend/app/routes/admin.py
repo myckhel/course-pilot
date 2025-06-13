@@ -311,6 +311,38 @@ def cleanup_system():
         return jsonify({'error': 'Failed to perform cleanup'}), 500
 
 
+@admin_bp.route('/nps-analytics', methods=['GET'])
+@jwt_required()
+def get_admin_nps_analytics():
+    """Get system-wide NPS analytics (admin only)."""
+    try:
+        user_id = get_jwt_identity()
+        db_service, _ = get_services()
+        
+        # Verify admin access
+        verify_admin(user_id, db_service)
+        
+        # Get query parameters
+        topic_id = request.args.get('topic_id')
+        days = int(request.args.get('days', 30))
+        
+        # Validate days parameter
+        if days < 1 or days > 365:
+            return jsonify({'error': 'Days must be between 1 and 365'}), 400
+        
+        # Get system-wide NPS analytics (no user_id filter)
+        nps_data = db_service.get_nps_analytics(user_id=None, topic_id=topic_id, days=days)
+        
+        return jsonify(nps_data), 200
+        
+    except AuthorizationError as e:
+        return jsonify({'error': str(e)}), 403
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        return jsonify({'error': 'Failed to fetch NPS analytics'}), 500
+
+
 # Error handlers for admin blueprint
 @admin_bp.errorhandler(AuthorizationError)
 def handle_authorization_error(e):

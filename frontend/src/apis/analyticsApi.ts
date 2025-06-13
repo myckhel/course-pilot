@@ -2,6 +2,7 @@ import type {
   AnalyticsData,
   TopicAnalytics,
   UserAnalytics,
+  NPSData,
   ApiResponse,
 } from "@/types";
 import apiClient from "./client";
@@ -65,4 +66,11 @@ export const analyticsApi = {
     apiClient.get("/admin/analytics/trends", {
       params: { timeRange },
     }),
+
+  // Get NPS analytics (admin)
+  getNPSAnalytics: (params?: {
+    topic_id?: string;
+    days?: number;
+  }): Promise<ApiResponse<NPSData>> =>
+    apiClient.get("/admin/nps-analytics", { params }),
 };

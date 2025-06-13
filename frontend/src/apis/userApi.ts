@@ -5,6 +5,7 @@ import type {
   ChangePasswordData,
   NotificationSettings,
   ApiResponse,
+  NPSData,
 } from "@/types";
 import apiClient from "./client";
 
@@ -108,4 +109,11 @@ export const userApi = {
       }>
     >
   > => apiClient.get("/user/api-keys"),
+
+  // Get NPS analytics for current user
+  getNPSAnalytics: (params?: {
+    topic_id?: string;
+    days?: number;
+  }): Promise<ApiResponse<NPSData>> =>
+    apiClient.get("/user/nps-analytics", { params }),
 };
