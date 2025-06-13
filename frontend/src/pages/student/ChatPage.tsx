@@ -17,12 +17,10 @@ import {
   UserOutlined,
   RobotOutlined,
   MessageOutlined,
-  ClockCircleOutlined,
   CopyOutlined,
 } from "@ant-design/icons";
 import { useParams, useNavigate } from "react-router-dom";
 import { useChatStore } from "@/stores";
-import { formatDistanceToNow } from "@/utils";
 import RatingButtons from "@/components/features/RatingButtons";
 import type { ChatMessage } from "@/types";
 import { useNotification } from "@/hooks";
@@ -102,10 +100,10 @@ function ChatPage() {
   const handleCopy = async (textToCopy: string) => {
     try {
       await navigator.clipboard.writeText(textToCopy);
-      notify({ type: "success", message: "Copied to clipboard!" });
+      notify.success("Copied to clipboard!");
     } catch (err) {
       console.error("Failed to copy text: ", err);
-      notify({ type: "error", message: "Failed to copy text." });
+      notify.error("Failed to copy text");
     }
   };
 
@@ -203,16 +201,6 @@ function ChatPage() {
                           }}
                         >
                           <div>{msg.message}</div>
-                          <div
-                            className={`text-xs mt-1 flex items-center gap-1 ${
-                              msg.sender === "user"
-                                ? "text-blue-100/80 justify-end"
-                                : "text-gray-500 dark:text-gray-400 justify-start"
-                            }`}
-                          >
-                            <ClockCircleOutlined />
-                            {formatDistanceToNow(msg.timestamp)}
-                          </div>
                         </div>
 
                         {/* Rating buttons for AI messages */}

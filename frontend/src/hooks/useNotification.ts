@@ -5,9 +5,9 @@ export function useNotification() {
   const { addNotification, removeNotification, clearNotifications } =
     useUIStore();
 
-  const notify = useCallback(
-    {
-      success: (title: string, message?: string, duration?: number) => {
+  const notify = {
+    success: useCallback(
+      (title: string, message?: string, duration?: number) => {
         addNotification({
           type: "success",
           title,
@@ -15,8 +15,11 @@ export function useNotification() {
           duration,
         });
       },
+      [addNotification]
+    ),
 
-      error: (title: string, message?: string, duration?: number) => {
+    error: useCallback(
+      (title: string, message?: string, duration?: number) => {
         addNotification({
           type: "error",
           title,
@@ -24,8 +27,11 @@ export function useNotification() {
           duration: duration || 6000, // Longer duration for errors
         });
       },
+      [addNotification]
+    ),
 
-      info: (title: string, message?: string, duration?: number) => {
+    info: useCallback(
+      (title: string, message?: string, duration?: number) => {
         addNotification({
           type: "info",
           title,
@@ -33,8 +39,11 @@ export function useNotification() {
           duration,
         });
       },
+      [addNotification]
+    ),
 
-      warning: (title: string, message?: string, duration?: number) => {
+    warning: useCallback(
+      (title: string, message?: string, duration?: number) => {
         addNotification({
           type: "warning",
           title,
@@ -42,9 +51,9 @@ export function useNotification() {
           duration: duration || 5000,
         });
       },
-    },
-    [addNotification]
-  );
+      [addNotification]
+    ),
+  };
 
   return {
     notify,
