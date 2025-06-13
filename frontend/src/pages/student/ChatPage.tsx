@@ -138,7 +138,6 @@ function ChatPage() {
                 </Title>
               </div>
             </div>
-            <Tag color="green">Active</Tag>
           </div>
         </Card>
       </Row>
