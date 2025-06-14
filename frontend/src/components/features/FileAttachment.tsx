@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Button, message, Typography, Tag } from "antd";
 import {
   PaperClipOutlined,
@@ -18,6 +18,7 @@ interface FileAttachmentProps {
   disabled?: boolean;
   maxSize?: number; // in MB
   className?: string;
+  selectedFile?: File | null; // Add prop to control the selected file externally
 }
 
 function FileAttachment({
@@ -25,9 +26,29 @@ function FileAttachment({
   disabled = false,
   maxSize = 5,
   className = "",
+  selectedFile: externalSelectedFile = null,
 }: FileAttachmentProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync internal state with external prop
+  useEffect(() => {
+    setSelectedFile(externalSelectedFile);
+    if (!externalSelectedFile && fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }, [externalSelectedFile]);
+
+  // Cleanup effect to prevent memory leaks
+  useEffect(() => {
+    const currentRef = fileInputRef.current;
+    return () => {
+      // Clear file input on component unmount
+      if (currentRef) {
+        currentRef.value = "";
+      }
+    };
+  }, []);
 
   const allowedTypes = [
     ".pdf",

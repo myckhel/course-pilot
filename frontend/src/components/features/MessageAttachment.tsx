@@ -126,14 +126,14 @@ function MessageAttachment({
     <div className={`w-full mt-3 ${className}`}>
       <div
         className="flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 hover:shadow-sm
-                      bg-gray-50 hover:bg-gray-100 border-gray-200 
-                      dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-600"
+                       border-gray-200 
+                        dark:border-gray-600"
       >
         {/* File Icon */}
         <div
           className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg
-                        bg-white border border-gray-200
-                        dark:bg-gray-700 dark:border-gray-600"
+                         border border-gray-200
+                         dark:border-gray-600"
         >
           {getFileIcon(attachment.filename)}
         </div>
@@ -141,18 +141,15 @@ function MessageAttachment({
         {/* File Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <Text
-              className="text-sm font-medium truncate max-w-48 
-                         text-gray-900 dark:text-gray-100"
+            <div
+              className="text-sm text-white font-medium truncate max-w-48"
               title={attachment.filename}
             >
               {attachment.filename}
-            </Text>
+            </div>
             {getFileTypeTag(attachment.filename)}
           </div>
-          <Text className="text-xs text-gray-500 dark:text-gray-400">
-            {formatFileSize(attachment.size)}
-          </Text>
+          <div className="text-xs">{formatFileSize(attachment.size)}</div>
         </div>
       </div>
     </div>

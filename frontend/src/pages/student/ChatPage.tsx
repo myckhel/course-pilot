@@ -68,12 +68,24 @@ function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Cleanup effect for file attachments
+  useEffect(() => {
+    return () => {
+      // Clean up any pending file attachments when component unmounts
+      if (attachment) {
+        setAttachment(null);
+      }
+    };
+  }, [attachment]);
+
   const handleSendMessage = async () => {
     if ((!message.trim() && !attachment) || loading) return;
 
     const userMessage = message.trim();
-    setMessage("");
     const attachmentFile = attachment;
+
+    // Clear input immediately for better UX
+    setMessage("");
     setAttachment(null);
     setLoading(true);
 
@@ -83,10 +95,20 @@ function ChatPage() {
         message: userMessage || "📎 File attachment",
         attachment: attachmentFile || undefined,
       });
+
+      // Success - attachment is already cleared above
+      notify.success("Message sent successfully!");
     } catch (error) {
       console.error("Failed to send message:", error);
+      notify.error("Failed to send message. Please try again.");
+
+      // On error, restore the message but keep attachment cleared for safety
+      // This prevents potential issues with stale file references
+      setMessage(userMessage);
     } finally {
       setLoading(false);
+      // Ensure attachment is always null after send attempt
+      setAttachment(null);
     }
   };
 
@@ -115,6 +137,10 @@ function ChatPage() {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
+    } else if (e.key === "Escape" && attachment) {
+      // Allow users to clear attachment with Escape key
+      e.preventDefault();
+      setAttachment(null);
     }
   };
 
@@ -283,7 +309,11 @@ function ChatPage() {
               />
             </div>
             <div className="flex items-center gap-1">
-              <FileAttachment onFileSelect={setAttachment} disabled={loading} />
+              <FileAttachment
+                onFileSelect={setAttachment}
+                disabled={loading}
+                selectedFile={attachment}
+              />
               <Button
                 type="primary"
                 icon={<SendOutlined />}
@@ -297,7 +327,8 @@ function ChatPage() {
           </div>
 
           <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-            Press Enter to send, Shift+Enter for new line • Max 5MB file size
+            Press Enter to send, Shift+Enter for new line
+            {attachment && ", Esc to clear attachment"} • Max 5MB file size
           </div>
         </div>
       </Card>
