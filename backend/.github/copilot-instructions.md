@@ -2,6 +2,40 @@
 
 > ✅ Use Blueprints, Flask-RESTful (or Flask-RestX), SQLAlchemy, Marshmallow, JWT Auth, environment config, and type hints throughout.
 
+## Tech Stack
+
+- **Framework**: Flask 3.0
+- **Authentication**: Flask-JWT-Extended
+- **Database**: SQLite3
+- **Vector Store**: ChromaDB
+- **AI/ML**: LangChain + OpenAI
+- **Document Processing**: PyPDF
+- **CORS**: Flask-CORS
+
+## Project File Structure
+
+```
+backend/
+├── app/
+│   ├── __init__.py              # Flask app factory
+│   ├── config.py                # Configuration classes
+│   ├── models/                  # Data models
+│   ├── services/                # Business logic services
+│   ├── routes/                  # API endpoints
+│   ├── utils/                   # Utility functions
+│   └── middleware/              # Custom middleware
+├── migrations/                  # Database migrations
+├── tests/                       # Test suite
+├── uploads/                     # File uploads
+├── chroma_db/                   # Vector store data
+├── logs/                        # Application logs
+├── requirements.txt             # Python dependencies
+├── .env.template               # Environment variables template
+├── app.py                      # Development server entry point
+├── wsgi.py                     # Production WSGI entry point
+└── setup.py                    # Setup script
+```
+
 ### 🔧 Project Structure
 
 ```python
