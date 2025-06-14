@@ -20,7 +20,7 @@ def migrate_existing_data():
         
         # Check if old database exists
         try:
-            old_conn = sqlite3.connect(app.config['DATABASE_PATH'])
+            old_conn = sqlite3.connect(app.config['SQLALCHEMY_DATABASE_URI'])
             old_cursor = old_conn.cursor()
         except Exception as e:
             print(f"Could not connect to old database: {e}")

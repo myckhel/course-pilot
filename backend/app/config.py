@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
 
 class Config:
     """Base configuration class."""
@@ -20,8 +21,9 @@ class Config:
     ALLOWED_EXTENSIONS = {'pdf'}
     
     # Database settings
-    DATABASE_PATH = os.environ.get('DATABASE_PATH') or 'assistant.db'
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or f'sqlite:///{DATABASE_PATH}'
+    ROOT_PATH = os.path.dirname(current_dir)
+    DATABASE_PATH = os.environ.get('DATABASE_PATH', 'instance/assistant.db')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or f"sqlite:///{ROOT_PATH}/{DATABASE_PATH}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
