@@ -6,9 +6,7 @@ import {
   List,
   Avatar,
   Typography,
-  Space,
   Spin,
-  Tag,
   Divider,
   Row,
 } from "antd";
@@ -22,6 +20,8 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import { useChatStore } from "@/stores";
 import RatingButtons from "@/components/features/RatingButtons";
+import FileAttachment from "@/components/features/FileAttachment";
+import MessageAttachment from "@/components/features/MessageAttachment";
 import type { ChatMessage } from "@/types";
 import { useNotification } from "@/hooks";
 
@@ -34,6 +34,7 @@ function ChatPage() {
   const { notify } = useNotification();
 
   const [message, setMessage] = useState("");
+  const [attachment, setAttachment] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [sessionLoading, setSessionLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -68,16 +69,19 @@ function ChatPage() {
   }, [messages]);
 
   const handleSendMessage = async () => {
-    if (!message.trim() || loading) return;
+    if ((!message.trim() && !attachment) || loading) return;
 
     const userMessage = message.trim();
     setMessage("");
+    const attachmentFile = attachment;
+    setAttachment(null);
     setLoading(true);
 
     try {
       await sendMessage({
         sessionId: sessionId as string,
-        message: userMessage,
+        message: userMessage || "📎 File attachment",
+        attachment: attachmentFile || undefined,
       });
     } catch (error) {
       console.error("Failed to send message:", error);
@@ -200,6 +204,12 @@ function ChatPage() {
                           }}
                         >
                           <div>{msg.message}</div>
+                          {msg.attachment && (
+                            <MessageAttachment
+                              attachment={msg.attachment}
+                              className="mt-2"
+                            />
+                          )}
                         </div>
 
                         {/* Rating buttons for AI messages */}
@@ -261,29 +271,33 @@ function ChatPage() {
 
         {/* Message Input */}
         <div className="flex-shrink-0">
-          <Space.Compact className="w-full">
-            <TextArea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Type your message..."
-              autoSize={{ minRows: 1, maxRows: 4 }}
-              disabled={loading}
-              className="flex-grow"
-            />
-            <Button
-              type="primary"
-              icon={<SendOutlined />}
-              onClick={handleSendMessage}
-              disabled={!message.trim() || loading}
-              className="h-auto"
-            >
-              Send
-            </Button>
-          </Space.Compact>
+          <div className="flex items-end gap-2">
+            <div className="flex-grow">
+              <TextArea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Type your message..."
+                autoSize={{ minRows: 1, maxRows: 4 }}
+                disabled={loading}
+              />
+            </div>
+            <div className="flex items-center gap-1">
+              <FileAttachment onFileSelect={setAttachment} disabled={loading} />
+              <Button
+                type="primary"
+                icon={<SendOutlined />}
+                onClick={handleSendMessage}
+                disabled={(!message.trim() && !attachment) || loading}
+                className="h-auto"
+              >
+                Send
+              </Button>
+            </div>
+          </div>
 
           <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-            Press Enter to send, Shift+Enter for new line
+            Press Enter to send, Shift+Enter for new line • Max 5MB file size
           </div>
         </div>
       </Card>

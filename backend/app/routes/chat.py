@@ -6,7 +6,9 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services.database import DatabaseService
 from app.services.vector_store import VectorStoreService
 from app.services.qa_chain import QAChainService
+from app.services.attachment_processor import AttachmentProcessor
 from app.utils.exceptions import ValidationError
+from app.utils.file_upload import FileUploadService
 
 chat_bp = Blueprint('chat', __name__)
 
@@ -19,7 +21,9 @@ def get_services():
         model_name=current_app.config.get('MODEL_NAME', 'gpt-3.5-turbo'),
         temperature=current_app.config.get('MODEL_TEMPERATURE', 0.0)
     )
-    return db_service, vector_service, qa_service
+    file_service = FileUploadService(current_app.config.get('UPLOAD_DIR', 'uploads/attachments'))
+    attachment_processor = AttachmentProcessor()
+    return db_service, vector_service, qa_service, file_service, attachment_processor
 
 
 @chat_bp.route('/sessions', methods=['GET'])
@@ -29,7 +33,7 @@ def get_chat_sessions():
     try:
         user_id = get_jwt_identity()
         topic_id = request.args.get('topicId')
-        db_service, _, _ = get_services()
+        db_service, _, _, _, _ = get_services()
         
         if not topic_id:
             # If no topic ID provided, get the default topic
@@ -58,7 +62,7 @@ def create_chat_session():
         if 'title' not in data:
             return jsonify({'error': 'Missing required field: title'}), 400
         
-        db_service, vector_service, _ = get_services()
+        db_service, vector_service, _, _, _ = get_services()
         
         # If no topic ID is provided, use the default GST topic
         if 'topicId' not in data:
@@ -99,7 +103,7 @@ def get_chat_session(session_id):
     """Get a specific chat session with its messages."""
     try:
         user_id = get_jwt_identity()
-        db_service, _, _ = get_services()
+        db_service, _, _, _, _ = get_services()
         
         # Get session
         session = db_service.get_chat_session_by_id(session_id)
@@ -120,6 +124,7 @@ def get_chat_session(session_id):
         }), 200
         
     except Exception as e:
+        print(e)
         return jsonify({'error': 'Failed to fetch chat session'}), 500
 
 
@@ -129,16 +134,31 @@ def send_message():
     """Send a message and get AI response."""
     try:
         user_id = get_jwt_identity()
-        data = request.get_json()
+        
+        # Handle both form data (with file) and JSON data
+        if request.content_type and 'multipart/form-data' in request.content_type:
+            # Handle form data with potential file attachment
+            session_id = request.form.get('sessionId')
+            message_text = request.form.get('message')
+            attachment_file = request.files.get('attachment')
+        else:
+            # Handle JSON data (backward compatibility)
+            data = request.get_json()
+            if not data:
+                return jsonify({'error': 'No data provided'}), 400
+            
+            session_id = data.get('sessionId')
+            message_text = data.get('message')
+            attachment_file = None
         
         # Validate input
-        if not all(k in data for k in ('sessionId', 'message')):
+        if not session_id or not message_text:
             return jsonify({'error': 'Missing required fields: sessionId, message'}), 400
         
-        db_service, vector_service, qa_service = get_services()
+        db_service, vector_service, qa_service, file_service, attachment_processor = get_services()
         
         # Get and validate session
-        session = db_service.get_chat_session_by_id(data['sessionId'])
+        session = db_service.get_chat_session_by_id(session_id)
         
         if not session:
             return jsonify({'error': 'Chat session not found'}), 404
@@ -147,30 +167,73 @@ def send_message():
             return jsonify({'error': 'Access denied'}), 403
         
         # Validate message
-        message_text = data['message'].strip()
+        message_text = message_text.strip()
         if not qa_service.validate_question(message_text):
             return jsonify({'error': 'Invalid question format'}), 400
         
-        # Save user message
+        # Handle file attachment if provided
+        attachment_filename = None
+        attachment_path = None
+        attachment_size = None
+        
+        if attachment_file:
+            try:
+                attachment_filename, attachment_path, attachment_size = file_service.save_file(
+                    attachment_file, session_id
+                )
+            except ValueError as e:
+                return jsonify({'error': f'File upload error: {str(e)}'}), 400
+        
+        # Save user message with attachment info
         user_message = db_service.save_message(
             session_id=session.id,
             sender='user',
-            message=message_text
+            message=message_text,
+            attachment_filename=attachment_filename,
+            attachment_path=attachment_path,
+            attachment_size=attachment_size
         )
         
         try:
             # Get retriever for the topic
             retriever = vector_service.get_topic_retriever(session.topic_id)
             
-            # Create QA chain
-            qa_chain = qa_service.create_qa_chain(retriever)
+            # Process attachment content if available
+            attachment_content = None
+            has_attachment = attachment_path is not None
+            
+            if has_attachment:
+                try:
+                    # Extract content from attachment
+                    content_data = attachment_processor.extract_content(attachment_path, attachment_filename)
+                    
+                    if content_data and content_data.get('content'):
+                        # Create enhanced context with attachment
+                        attachment_content = attachment_processor.create_attachment_context(
+                            content_data, message_text
+                        )
+                except Exception as attachment_error:
+                    # Log attachment processing error but continue with regular processing
+                    print(f"Attachment processing error: {attachment_error}")
+                    has_attachment = False
+            
+            # Create QA chain (with or without attachment support)
+            qa_chain = qa_service.create_qa_chain_with_attachment(
+                retriever, 
+                attachment_context=has_attachment
+            )
             
             # Get conversation context (optional enhancement)
             previous_messages = db_service.get_session_messages(session.id)
             previous_message_dicts = [msg.to_dict() for msg in previous_messages[-6:]]  # Last 3 exchanges
             
-            # Generate AI response
-            result = qa_service.ask_question(qa_chain, message_text)
+            # Generate AI response with attachment context if available
+            if has_attachment and attachment_content:
+                result = qa_service.ask_question_with_attachment(
+                    qa_chain, message_text, attachment_content
+                )
+            else:
+                result = qa_service.ask_question(qa_chain, message_text)
             
             # Save AI response
             ai_message = db_service.save_message(
@@ -205,6 +268,7 @@ def send_message():
     except ValidationError as e:
         return jsonify({'error': str(e)}), 400
     except Exception as e:
+        print(e)
         return jsonify({'error': 'Failed to process message'}), 500
 
 
@@ -214,7 +278,7 @@ def get_session_messages(session_id):
     """Get all messages for a chat session."""
     try:
         user_id = get_jwt_identity()
-        db_service, _, _ = get_services()
+        db_service, _, _, _, _ = get_services()
         
         # Verify session exists and user has access
         session = db_service.get_chat_session_by_id(session_id)
@@ -231,6 +295,7 @@ def get_session_messages(session_id):
         return jsonify([message.to_dict() for message in messages]), 200
         
     except Exception as e:
+        print(e)
         return jsonify({'error': 'Failed to fetch messages'}), 500
 
 
@@ -240,7 +305,7 @@ def delete_chat_session(session_id):
     """Delete a chat session (for future implementation)."""
     try:
         user_id = get_jwt_identity()
-        db_service, _, _ = get_services()
+        db_service, _, _, _, _ = get_services()
         
         # Verify session exists and user has access
         session = db_service.get_chat_session_by_id(session_id)
@@ -275,7 +340,7 @@ def update_message_rating(message_id):
         if rating not in ['positive', 'negative', None]:
             return jsonify({'error': 'Invalid rating value. Must be "positive", "negative", or null'}), 400
         
-        db_service, _, _ = get_services()
+        db_service, _, _, _, _ = get_services()
         
         # Get the message and verify ownership
         message = db_service.get_message_by_id(message_id)

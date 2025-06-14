@@ -5,13 +5,30 @@ import sqlite3
 import os
 from datetime import datetime
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 
 class DatabaseMigration:
     """Handle database migrations."""
     
-    def __init__(self, db_path: str = "assistant.db"):
+    def __init__(self, db_path: str = None):
+        # Get database path using the same logic as config
+        if db_path is None:
+            current_dir = Path(__file__).resolve().parent
+            app_dir = current_dir.parent / "app"
+            database_path = os.environ.get('DATABASE_PATH', 'instance/assistant.db')
+            db_path = str(app_dir / database_path)
+        
         self.db_path = db_path
+        print(f"Using database path: {db_path}")
+        
+        # Ensure the directory exists
+        db_dir = Path(self.db_path).parent
+        db_dir.mkdir(parents=True, exist_ok=True)
+        
         self.migrations_dir = Path("migrations")
         self.migrations_dir.mkdir(exist_ok=True)
     
@@ -128,6 +145,44 @@ class DatabaseMigration:
             
             conn.commit()
     
+    def run_migration_003_add_message_attachments(self):
+        """Add attachment support to messages table."""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            
+            # Check if attachment columns already exist
+            cursor.execute("PRAGMA table_info(messages)")
+            columns = [column[1] for column in cursor.fetchall()]
+            
+            if 'attachment_filename' not in columns:
+                cursor.execute("""
+                    ALTER TABLE messages 
+                    ADD COLUMN attachment_filename TEXT
+                """)
+                print("Added attachment_filename column to messages table")
+            else:
+                print("attachment_filename column already exists in messages table")
+                
+            if 'attachment_path' not in columns:
+                cursor.execute("""
+                    ALTER TABLE messages 
+                    ADD COLUMN attachment_path TEXT
+                """)
+                print("Added attachment_path column to messages table")
+            else:
+                print("attachment_path column already exists in messages table")
+                
+            if 'attachment_size' not in columns:
+                cursor.execute("""
+                    ALTER TABLE messages 
+                    ADD COLUMN attachment_size INTEGER
+                """)
+                print("Added attachment_size column to messages table")
+            else:
+                print("attachment_size column already exists in messages table")
+            
+            conn.commit()
+
     def apply_migration(self, version: int, description: str, migration_func):
         """Apply a specific migration."""
         current_version = self.get_current_version()
@@ -167,6 +222,7 @@ class DatabaseMigration:
         migrations = [
             (1, "Initial database schema", self.run_migration_001_initial_schema),
             (2, "Add message rating column", self.run_migration_002_add_message_rating),
+            (3, "Add message attachments support", self.run_migration_003_add_message_attachments),
         ]
         
         # Apply each migration
@@ -191,7 +247,7 @@ def main():
     
     parser = argparse.ArgumentParser(description="Database migration tool")
     parser.add_argument("--reset", action="store_true", help="Reset database")
-    parser.add_argument("--db-path", default="assistant.db", help="Database file path")
+    parser.add_argument("--db-path", default=os.environ.get('DATABASE_PATH'), help="Database file path")
     
     args = parser.parse_args()
     

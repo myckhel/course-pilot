@@ -134,19 +134,27 @@ class Message(db.Model):
     message = Column(Text, nullable=False)
     sources = Column(Text)  # JSON string of source list
     rating = Column(String(20))  # 'positive', 'negative', or None
+    attachment_filename = Column(String(255))  # Original filename of attachment
+    attachment_path = Column(String(500))  # File path on server
+    attachment_size = Column(Integer)  # File size in bytes
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     
     # Relationships
     session = relationship("ChatSession", back_populates="messages")
     
     def __init__(self, id: str, session_id: str, sender: str, message: str, 
-                 sources: Optional[List[str]] = None, rating: Optional[str] = None, created_at: datetime = None):
+                 sources: Optional[List[str]] = None, rating: Optional[str] = None, 
+                 attachment_filename: Optional[str] = None, attachment_path: Optional[str] = None,
+                 attachment_size: Optional[int] = None, created_at: datetime = None):
         self.id = id
         self.session_id = session_id
         self.sender = sender
         self.message = message
         self.sources = json.dumps(sources) if sources else None
         self.rating = rating
+        self.attachment_filename = attachment_filename
+        self.attachment_path = attachment_path
+        self.attachment_size = attachment_size
         self.created_at = created_at or datetime.utcnow()
     
     @property
@@ -173,7 +181,11 @@ class Message(db.Model):
             'message': self.message,
             'sources': self.sources_list,
             'rating': self.rating,
-            'timestamp': self.created_at.isoformat()
+            'timestamp': self.created_at.isoformat(),
+            'attachment': {
+                'filename': self.attachment_filename,
+                'size': self.attachment_size
+            } if self.attachment_filename else None
         }
     
     def __repr__(self):

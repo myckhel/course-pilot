@@ -124,11 +124,16 @@ export interface ChatMessage {
   timestamp: string;
   rating?: "positive" | "negative" | null;
   sources?: string[];
+  attachment?: {
+    filename: string;
+    size: number;
+  } | null;
 }
 
 export interface SendMessageRequest {
   sessionId: string;
   message: string;
+  attachment?: File;
 }
 
 export interface MessageResponse {

@@ -328,7 +328,8 @@ class DatabaseService:
     
     # Message methods
     def create_message(self, session_id: str, sender: str, message: str, 
-                      sources: Optional[List[str]] = None) -> Message:
+                      sources: Optional[List[str]] = None, attachment_filename: Optional[str] = None,
+                      attachment_path: Optional[str] = None, attachment_size: Optional[int] = None) -> Message:
         """Create a new message."""
         try:
             message_id = str(uuid.uuid4())
@@ -337,7 +338,10 @@ class DatabaseService:
                 session_id=session_id,
                 sender=sender,
                 message=message,
-                sources=sources
+                sources=sources,
+                attachment_filename=attachment_filename,
+                attachment_path=attachment_path,
+                attachment_size=attachment_size
             )
             
             db.session.add(msg)
@@ -348,9 +352,11 @@ class DatabaseService:
             raise RuntimeError(f"Database error: {str(e)}")
     
     def save_message(self, session_id: str, sender: str, message: str, 
-                    sources: Optional[List[str]] = None) -> Message:
+                    sources: Optional[List[str]] = None, attachment_filename: Optional[str] = None,
+                    attachment_path: Optional[str] = None, attachment_size: Optional[int] = None) -> Message:
         """Save a message (alias for create_message for backward compatibility)."""
-        return self.create_message(session_id, sender, message, sources)
+        return self.create_message(session_id, sender, message, sources, 
+                                 attachment_filename, attachment_path, attachment_size)
     
     def get_session_messages(self, session_id: str, limit: int = 100) -> List[Message]:
         """Get all messages for a chat session."""
@@ -623,11 +629,6 @@ class DatabaseService:
     def get_chat_sessions(self, user_id: str, topic_id: str = None) -> List[ChatSession]:
         """Get chat sessions for a user (alias for get_user_chat_sessions for backward compatibility)."""
         return self.get_user_chat_sessions(user_id, topic_id)
-    
-    def save_message(self, session_id: str, sender: str, message: str, 
-                    sources: Optional[List[str]] = None) -> Message:
-        """Save a message (alias for create_message for backward compatibility)."""
-        return self.create_message(session_id, sender, message, sources)
     
     def get_system_stats(self) -> dict:
         """Get system statistics (alias for get_admin_stats for backward compatibility)."""

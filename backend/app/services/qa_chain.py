@@ -1,7 +1,7 @@
 """
 QA chain service for handling question-answering operations.
 """
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from langchain.chains import RetrievalQA
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
@@ -25,6 +25,26 @@ class QAChainService:
             
             Answer: Please provide a helpful and accurate answer based on the context provided above. 
             If you reference specific information, mention that it comes from the course materials.""",
+            input_variables=["context", "question"]
+        )
+        
+        # Enhanced prompt template for handling attachments
+        self.attachment_prompt_template = PromptTemplate(
+            template="""You are an AI teaching assistant. Use the following pieces of context to answer the question. 
+            The user has provided both course materials and an uploaded file attachment. 
+            
+            If the question is specifically about the uploaded file, prioritize information from the file content.
+            If the question relates to both the course materials and the uploaded file, provide a comprehensive answer using both sources.
+            If you don't know the answer based on the provided context, just say that you don't know.
+
+            Course Materials Context:
+            {context}
+
+            User's Question and Attachment Context:
+            {question}
+            
+            Answer: Please provide a helpful and accurate answer based on the context provided above. 
+            When referencing information, clearly indicate whether it comes from the course materials or the uploaded file.""",
             input_variables=["context", "question"]
         )
     
@@ -195,3 +215,61 @@ class QAChainService:
         context_parts.append(f"Current question: {current_question}")
         
         return "\n".join(context_parts)
+    
+    def create_qa_chain_with_attachment(self, retriever, attachment_context: bool = False):
+        """
+        Create QA chain with attachment-aware prompt.
+        
+        Args:
+            retriever: Document retriever for the topic
+            attachment_context: Whether to use attachment-aware prompt
+            
+        Returns:
+            Configured QA chain
+        """
+        try:
+            prompt = self.attachment_prompt_template if attachment_context else self.prompt_template
+            
+            return RetrievalQA.from_chain_type(
+                llm=self.llm,
+                chain_type="stuff",
+                retriever=retriever,
+                return_source_documents=True,
+                chain_type_kwargs={"prompt": prompt}
+            )
+        except Exception as e:
+            raise Exception(f"Failed to create QA chain: {str(e)}")
+    
+    def ask_question_with_attachment(self, qa_chain, question: str, attachment_content: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Ask question with optional attachment context.
+        
+        Args:
+            qa_chain: Configured QA chain
+            question: User's question
+            attachment_content: Enhanced question with attachment context
+            
+        Returns:
+            Dictionary containing answer and sources
+        """
+        try:
+            # Use attachment-enhanced question if provided, otherwise use original question
+            enhanced_question = attachment_content if attachment_content else question
+            
+            # Run the QA chain
+            result = qa_chain({"query": enhanced_question})
+            
+            # Extract source information
+            sources = []
+            if "source_documents" in result:
+                sources = self._extract_sources(result["source_documents"])
+            
+            return {
+                "answer": result.get("result", "I'm sorry, I couldn't generate an answer."),
+                "sources": sources,
+                "question": question,  # Return original question
+                "has_attachment": attachment_content is not None
+            }
+            
+        except Exception as e:
+            raise Exception(f"Failed to generate answer: {str(e)}")

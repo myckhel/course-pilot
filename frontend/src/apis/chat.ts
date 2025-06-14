@@ -64,11 +64,31 @@ export const chatApi = {
   },
 
   sendMessage: async (data: SendMessageRequest): Promise<MessageResponse> => {
-    const response = await apiClient.post<MessageResponse>(
-      API_ENDPOINTS.SEND_MESSAGE,
-      data
-    );
-    return response.data!;
+    // Create FormData if there's an attachment, otherwise use JSON
+    if (data.attachment) {
+      const formData = new FormData();
+      formData.append("sessionId", data.sessionId);
+      formData.append("message", data.message);
+      formData.append("attachment", data.attachment);
+
+      const response = await apiClient.post<MessageResponse>(
+        API_ENDPOINTS.SEND_MESSAGE,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response.data!;
+    } else {
+      // Use JSON for messages without attachments
+      const response = await apiClient.post<MessageResponse>(
+        API_ENDPOINTS.SEND_MESSAGE,
+        { sessionId: data.sessionId, message: data.message }
+      );
+      return response.data!;
+    }
   },
 
   updateMessageFeedback: async (

@@ -146,6 +146,12 @@ export const useChatStore = create<ChatState & ChatActions>()(
           message: data.message,
           sender: "user",
           timestamp: new Date().toISOString(),
+          attachment: data.attachment
+            ? {
+                filename: data.attachment.name,
+                size: data.attachment.size,
+              }
+            : null,
         };
 
         set((state) => {
