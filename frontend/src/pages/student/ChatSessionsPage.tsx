@@ -100,13 +100,17 @@ function ChatSessionsPage() {
       key: "continue",
       icon: <MessageOutlined />,
       label: "Continue Chat",
-      onClick: () => navigate(`/chat/${session.id}`),
+      onClick: (e) => {
+        e?.domEvent?.stopPropagation();
+        navigate(`/chat/${session.id}`);
+      },
     },
     {
       key: "rename",
       icon: <EditOutlined />,
       label: "Rename",
-      onClick: () => {
+      onClick: (e) => {
+        e?.domEvent?.stopPropagation();
         // TODO: Implement rename functionality
       },
     },
@@ -118,7 +122,10 @@ function ChatSessionsPage() {
       icon: <DeleteOutlined />,
       label: "Delete",
       danger: true,
-      onClick: () => handleDeleteSession(session.id),
+      onClick: (e) => {
+        e?.domEvent?.stopPropagation();
+        handleDeleteSession(session.id);
+      },
     },
   ];
 
@@ -178,18 +185,25 @@ function ChatSessionsPage() {
                 className="hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:shadow-lg dark:hover:shadow-xl rounded-xl transition-all duration-200 cursor-pointer group px-6 py-6 mb-3 border border-transparent hover:border-blue-200 dark:hover:border-blue-700/50"
                 style={{ marginBottom: 16 }}
                 actions={[
-                  <Dropdown
-                    menu={{ items: getSessionActions(session) }}
-                    placement="bottomRight"
+                  <div
                     key="actions"
+                    onClick={(e: React.MouseEvent) => e.stopPropagation()}
                   >
-                    <Button
-                      type="text"
-                      icon={<MoreOutlined />}
-                      onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                      className="opacity-0 group-hover:opacity-100 hover:bg-blue-100 dark:hover:bg-blue-800/40 transition-all duration-200"
-                    />
-                  </Dropdown>,
+                    <Dropdown
+                      menu={{
+                        items: getSessionActions(session),
+                        onClick: (e) => e.domEvent?.stopPropagation(),
+                      }}
+                      placement="bottomRight"
+                      trigger={["click"]}
+                    >
+                      <Button
+                        type="text"
+                        icon={<MoreOutlined />}
+                        className="opacity-0 group-hover:opacity-100 hover:bg-blue-100 dark:hover:bg-blue-800/40 transition-all duration-200"
+                      />
+                    </Dropdown>
+                  </div>,
                 ]}
               >
                 <List.Item.Meta
