@@ -11,6 +11,7 @@ import {
   Modal,
   Form,
   Row,
+  message,
 } from "antd";
 import {
   MessageOutlined,
@@ -35,11 +36,21 @@ function ChatSessionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [newChatModalVisible, setNewChatModalVisible] = useState(false);
+  const [renameModalVisible, setRenameModalVisible] = useState(false);
+  const [sessionToRename, setSessionToRename] = useState<ChatSession | null>(
+    null
+  );
 
-  const { sessions, fetchSessions, deleteSession, createSession } =
-    useChatStore();
+  const {
+    sessions,
+    fetchSessions,
+    deleteSession,
+    createSession,
+    updateSessionTitle,
+  } = useChatStore();
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [form] = Form.useForm();
+  const [renameForm] = Form.useForm();
 
   useEffect(() => {
     const loadData = async () => {
@@ -74,8 +85,10 @@ function ChatSessionsPage() {
       onOk: async () => {
         try {
           await deleteSession(sessionId);
+          message.success("Chat session deleted successfully");
         } catch (error) {
           console.error("Failed to delete session:", error);
+          message.error("Failed to delete chat session. Please try again.");
         }
       },
     });
@@ -87,11 +100,34 @@ function ChatSessionsPage() {
         title: values.title,
       });
 
+      message.success("New chat session created successfully");
       setNewChatModalVisible(false);
       form.resetFields();
       navigate(`/chat/${newSession.id}`);
     } catch (error) {
       console.error("Failed to create new chat session:", error);
+      message.error("Failed to create new chat session. Please try again.");
+    }
+  };
+
+  const handleRenameSession = (session: ChatSession) => {
+    setSessionToRename(session);
+    setRenameModalVisible(true);
+    renameForm.setFieldsValue({ title: session.title });
+  };
+
+  const handleRenameSubmit = async (values: { title: string }) => {
+    if (!sessionToRename) return;
+
+    try {
+      await updateSessionTitle(sessionToRename.id, values.title);
+      message.success("Chat session renamed successfully");
+      setRenameModalVisible(false);
+      setSessionToRename(null);
+      renameForm.resetFields();
+    } catch (error) {
+      console.error("Failed to rename session:", error);
+      message.error("Failed to rename chat session. Please try again.");
     }
   };
 
@@ -111,7 +147,7 @@ function ChatSessionsPage() {
       label: "Rename",
       onClick: (e) => {
         e?.domEvent?.stopPropagation();
-        // TODO: Implement rename functionality
+        handleRenameSession(session);
       },
     },
     {
@@ -269,6 +305,46 @@ function ChatSessionsPage() {
           <Form.Item className="mb-0 flex justify-end">
             <Button type="primary" htmlType="submit">
               Start Chat
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Rename Modal */}
+      <Modal
+        title="Rename Chat Session"
+        open={renameModalVisible}
+        onCancel={() => {
+          setRenameModalVisible(false);
+          setSessionToRename(null);
+          renameForm.resetFields();
+        }}
+        footer={null}
+      >
+        <Form form={renameForm} layout="vertical" onFinish={handleRenameSubmit}>
+          <Form.Item
+            name="title"
+            label="Chat Title"
+            rules={[
+              { required: true, message: "Please enter a title for your chat" },
+              { min: 1, message: "Title cannot be empty" },
+            ]}
+          >
+            <Input placeholder="Enter new chat title" />
+          </Form.Item>
+
+          <Form.Item className="mb-0 flex justify-end space-x-2">
+            <Button
+              onClick={() => {
+                setRenameModalVisible(false);
+                setSessionToRename(null);
+                renameForm.resetFields();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button type="primary" htmlType="submit">
+              Rename
             </Button>
           </Form.Item>
         </Form>

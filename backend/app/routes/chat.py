@@ -371,6 +371,50 @@ def update_message_rating(message_id):
         return jsonify({'error': 'Failed to update message rating'}), 500
 
 
+@chat_bp.route('/sessions/<session_id>', methods=['PUT'])
+@jwt_required()
+def update_chat_session(session_id):
+    """Update a chat session (e.g., title)."""
+    try:
+        user_id = get_jwt_identity()
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        db_service, _, _, _, _ = get_services()
+        
+        # Get session
+        session = db_service.get_chat_session_by_id(session_id)
+        
+        if not session:
+            return jsonify({'error': 'Chat session not found'}), 404
+        
+        # Verify user owns the session
+        if session.user_id != user_id:
+            return jsonify({'error': 'Access denied'}), 403
+        
+        # Update title if provided
+        if 'title' in data:
+            title = data['title'].strip()
+            if not title:
+                return jsonify({'error': 'Title cannot be empty'}), 400
+            
+            # Update session title
+            updated_session = db_service.update_chat_session_title(session_id, title)
+            
+            if updated_session:
+                return jsonify(updated_session.to_dict()), 200
+            else:
+                return jsonify({'error': 'Failed to update session'}), 500
+        
+        return jsonify({'error': 'No valid fields to update'}), 400
+        
+    except Exception as e:
+        print(f"Error updating session: {e}")
+        return jsonify({'error': 'Failed to update chat session'}), 500
+
+
 # Error handlers for chat blueprint
 @chat_bp.errorhandler(ValidationError)
 def handle_validation_error(e):

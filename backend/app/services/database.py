@@ -326,6 +326,20 @@ class DatabaseService:
             db.session.rollback()
             return False
     
+    def update_chat_session_title(self, session_id: str, title: str) -> Optional[ChatSession]:
+        """Update chat session title."""
+        try:
+            session = ChatSession.query.filter_by(id=session_id).first()
+            if not session:
+                return None
+            
+            session.title = title
+            db.session.commit()
+            return session
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            raise RuntimeError(f"Database error: {str(e)}")
+    
     # Message methods
     def create_message(self, session_id: str, sender: str, message: str, 
                       sources: Optional[List[str]] = None, attachment_filename: Optional[str] = None,
