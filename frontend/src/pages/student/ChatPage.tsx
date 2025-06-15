@@ -79,9 +79,22 @@ function ChatPage() {
   }, [attachment]);
 
   const handleSendMessage = async () => {
-    if ((!message.trim() && !attachment) || loading) return;
-
     const userMessage = message.trim();
+
+    // Validate message: must be at least 5 characters when no attachment
+    if (userMessage.length < 5) {
+      notify.error("Message must be at least 5 characters long");
+      return;
+    }
+
+    // At least one of message or attachment must be present
+    if (!userMessage && !attachment) {
+      notify.error("Please enter both message and or attach a file");
+      return;
+    }
+
+    if (loading) return;
+
     const attachmentFile = attachment;
 
     // Clear input immediately for better UX
@@ -136,6 +149,19 @@ function ChatPage() {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
+
+      const userMessage = message.trim();
+      // Check validation before sending
+      if (!attachment && userMessage.length < 5) {
+        notify.error("Message must be at least 5 characters long");
+        return;
+      }
+
+      if (!userMessage && !attachment) {
+        notify.error("Please enter a message or attach a file");
+        return;
+      }
+
       handleSendMessage();
     } else if (e.key === "Escape" && attachment) {
       // Allow users to clear attachment with Escape key
@@ -303,10 +329,25 @@ function ChatPage() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Type your message..."
+                placeholder="Type your message... (minimum 5 characters)"
                 autoSize={{ minRows: 1, maxRows: 4 }}
                 disabled={loading}
+                status={
+                  !attachment &&
+                  message.trim().length > 0 &&
+                  message.trim().length < 5
+                    ? "error"
+                    : undefined
+                }
               />
+              {!attachment &&
+                message.trim().length > 0 &&
+                message.trim().length < 5 && (
+                  <div className="text-xs text-red-500 mt-1">
+                    Message must be at least 5 characters (
+                    {message.trim().length}/5)
+                  </div>
+                )}
             </div>
             <div className="flex items-center gap-1">
               <FileAttachment
@@ -318,7 +359,11 @@ function ChatPage() {
                 type="primary"
                 icon={<SendOutlined />}
                 onClick={handleSendMessage}
-                disabled={(!message.trim() && !attachment) || loading}
+                disabled={
+                  loading ||
+                  (!attachment && message.trim().length < 5) ||
+                  (!message.trim() && !attachment)
+                }
                 className="h-auto"
               >
                 Send
@@ -328,7 +373,8 @@ function ChatPage() {
 
           <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
             Press Enter to send, Shift+Enter for new line
-            {attachment && ", Esc to clear attachment"} • Max 5MB file size
+            {attachment && ", Esc to clear attachment"} • Message must be at
+            least 5 characters • Max 5MB file size
           </div>
         </div>
       </Card>
