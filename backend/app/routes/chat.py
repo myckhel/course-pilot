@@ -302,10 +302,10 @@ def get_session_messages(session_id):
 @chat_bp.route('/sessions/<session_id>', methods=['DELETE'])
 @jwt_required()
 def delete_chat_session(session_id):
-    """Delete a chat session (for future implementation)."""
+    """Delete a chat session and all its associated resources."""
     try:
         user_id = get_jwt_identity()
-        db_service, _, _, _, _ = get_services()
+        db_service, _, _, file_service, _ = get_services()
         
         # Verify session exists and user has access
         session = db_service.get_chat_session_by_id(session_id)
@@ -316,11 +316,40 @@ def delete_chat_session(session_id):
         if session.user_id != user_id:
             return jsonify({'error': 'Access denied'}), 403
         
-        # For now, return a message that this feature will be implemented
-        # In a full implementation, you would delete the session and its messages
-        return jsonify({'message': 'Session deletion feature will be implemented'}), 501
+        # Get all attachment file paths before deleting database records
+        attachment_paths = db_service.get_session_attachment_paths(session_id)
+        
+        # Delete session and messages from database
+        if db_service.delete_chat_session(session_id):
+            # Clean up file attachments
+            cleanup_success = True
+            
+            # Delete individual attachment files
+            for file_path in attachment_paths:
+                if not file_service.delete_file(file_path):
+                    cleanup_success = False
+                    current_app.logger.warning(f"Failed to delete attachment file: {file_path}")
+            
+            # Clean up session directory (this will remove any remaining files and the directory)
+            if not file_service.cleanup_session_files(session_id):
+                cleanup_success = False
+                current_app.logger.warning(f"Failed to cleanup session directory: {session_id}")
+            
+            response_data = {
+                'message': 'Chat session deleted successfully',
+                'sessionId': session_id
+            }
+            
+            # Include warning if file cleanup had issues
+            if not cleanup_success:
+                response_data['warning'] = 'Session deleted but some attachment files could not be removed'
+            
+            return jsonify(response_data), 200
+        else:
+            return jsonify({'error': 'Failed to delete session from database'}), 500
         
     except Exception as e:
+        current_app.logger.error(f"Error deleting session {session_id}: {str(e)}")
         return jsonify({'error': 'Failed to delete session'}), 500
 
 

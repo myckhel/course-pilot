@@ -5,6 +5,7 @@ from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services.database import DatabaseService
 from app.services.vector_store import VectorStoreService
+from app.utils.file_upload import FileUploadService
 from app.utils.exceptions import AuthorizationError
 
 admin_bp = Blueprint('admin', __name__)
@@ -14,7 +15,8 @@ def get_services():
     """Get service instances."""
     db_service = DatabaseService()
     vector_service = VectorStoreService(current_app.config['CHROMA_PERSIST_DIR'])
-    return db_service, vector_service
+    file_service = FileUploadService(current_app.config.get('UPLOAD_DIR', 'uploads/attachments'))
+    return db_service, vector_service, file_service
 
 
 def verify_admin(user_id: str, db_service: DatabaseService):
@@ -31,7 +33,7 @@ def get_admin_dashboard():
     """Get admin dashboard statistics."""
     try:
         user_id = get_jwt_identity()
-        db_service, vector_service = get_services()
+        db_service, vector_service, _ = get_services()
         
         # Verify admin access
         verify_admin(user_id, db_service)
@@ -66,7 +68,7 @@ def get_all_users():
     """Get all users (admin only)."""
     try:
         user_id = get_jwt_identity()
-        db_service, _ = get_services()
+        db_service, _, _ = get_services()
         
         # Verify admin access
         verify_admin(user_id, db_service)
@@ -114,7 +116,7 @@ def update_user_role(user_id):
     """Update user role (admin only)."""
     try:
         current_user_id = get_jwt_identity()
-        db_service, _ = get_services()
+        db_service, _, _ = get_services()
         
         # Verify admin access
         verify_admin(current_user_id, db_service)
@@ -163,7 +165,7 @@ def delete_user(user_id):
     """Delete user (admin only)."""
     try:
         current_user_id = get_jwt_identity()
-        db_service, _ = get_services()
+        db_service, _, file_service = get_services()
         
         # Verify admin access
         verify_admin(current_user_id, db_service)
@@ -177,16 +179,26 @@ def delete_user(user_id):
         if not user:
             return jsonify({'error': 'User not found'}), 404
         
-        # Delete user
+        # Delete user sessions with file cleanup first
+        cleanup_success = db_service.delete_user_sessions_with_cleanup(user_id, file_service)
+        
+        # Delete user (this will handle remaining database cleanup)
         success = db_service.delete_user(user_id)
         if not success:
             return jsonify({'error': 'Failed to delete user'}), 500
         
-        return jsonify({'message': 'User deleted successfully'}), 200
+        response_data = {'message': 'User deleted successfully'}
+        
+        # Include warning if file cleanup had issues
+        if not cleanup_success:
+            response_data['warning'] = 'User deleted but some attachment files could not be removed'
+        
+        return jsonify(response_data), 200
         
     except AuthorizationError as e:
         return jsonify({'error': str(e)}), 403
     except Exception as e:
+        current_app.logger.error(f"Error deleting user {user_id}: {str(e)}")
         return jsonify({'error': 'Failed to delete user'}), 500
 
 
@@ -196,7 +208,7 @@ def reindex_topic(topic_id):
     """Reindex a topic's documents."""
     try:
         user_id = get_jwt_identity()
-        db_service, vector_service = get_services()
+        db_service, vector_service, _ = get_services()
         
         # Verify admin access
         verify_admin(user_id, db_service)
@@ -225,7 +237,7 @@ def get_system_status():
     """Get system status and health information."""
     try:
         user_id = get_jwt_identity()
-        db_service, vector_service = get_services()
+        db_service, vector_service, _ = get_services()
         
         # Verify admin access
         verify_admin(user_id, db_service)
@@ -268,7 +280,7 @@ def get_analytics():
     """Get system analytics and usage statistics."""
     try:
         user_id = get_jwt_identity()
-        db_service, _ = get_services()
+        db_service, _, _ = get_services()
         
         # Verify admin access
         verify_admin(user_id, db_service)
@@ -293,7 +305,7 @@ def cleanup_system():
     """Perform system cleanup operations."""
     try:
         user_id = get_jwt_identity()
-        db_service, vector_service = get_services()
+        db_service, vector_service, _ = get_services()
         
         # Verify admin access
         verify_admin(user_id, db_service)
@@ -317,7 +329,7 @@ def get_admin_nps_analytics():
     """Get system-wide NPS analytics (admin only)."""
     try:
         user_id = get_jwt_identity()
-        db_service, _ = get_services()
+        db_service, _, _ = get_services()
         
         # Verify admin access
         verify_admin(user_id, db_service)

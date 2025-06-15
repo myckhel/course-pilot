@@ -175,6 +175,38 @@ class DatabaseService:
             db.session.rollback()
             return False
     
+    def delete_user_sessions_with_cleanup(self, user_id: str, file_service=None) -> bool:
+        """Delete all sessions for a user with proper file cleanup."""
+        try:
+            # Get all sessions for the user
+            user_sessions = self.get_user_chat_sessions(user_id)
+            
+            if file_service:
+                # Clean up files for each session
+                for session in user_sessions:
+                    # Get attachment paths for this session
+                    attachment_paths = self.get_session_attachment_paths(session.id)
+                    
+                    # Delete individual attachment files
+                    for file_path in attachment_paths:
+                        file_service.delete_file(file_path)
+                    
+                    # Clean up session directory
+                    file_service.cleanup_session_files(session.id)
+            
+            # Delete all messages for user sessions
+            db.session.query(Message).join(ChatSession).filter(
+                ChatSession.user_id == user_id
+            ).delete(synchronize_session=False)
+            
+            # Delete all chat sessions for the user
+            ChatSession.query.filter_by(user_id=user_id).delete()
+            
+            return True
+        except SQLAlchemyError:
+            db.session.rollback()
+            return False
+
     # Topic methods
     def create_topic(self, name: str, description: str, created_by: str) -> Topic:
         """Create a new topic."""
@@ -312,19 +344,33 @@ class DatabaseService:
     def delete_chat_session(self, session_id: str) -> bool:
         """Delete a chat session and all its messages."""
         try:
-            # First delete all messages in the session
+            # Check if session exists
+            session = ChatSession.query.filter_by(id=session_id).first()
+            if not session:
+                return False
+            
+            # Delete all messages in the session (CASCADE should handle this, but explicit is better)
             Message.query.filter_by(session_id=session_id).delete()
             
-            # Then delete the session
-            session = ChatSession.query.filter_by(id=session_id).first()
-            if session:
-                db.session.delete(session)
-                db.session.commit()
-                return True
-            return False
+            # Delete the session
+            db.session.delete(session)
+            db.session.commit()
+            return True
         except SQLAlchemyError:
             db.session.rollback()
             return False
+
+    def get_session_attachment_paths(self, session_id: str) -> List[str]:
+        """Get all attachment file paths for a session."""
+        try:
+            messages = Message.query.filter_by(session_id=session_id).all()
+            attachment_paths = []
+            for message in messages:
+                if message.attachment_path:
+                    attachment_paths.append(message.attachment_path)
+            return attachment_paths
+        except SQLAlchemyError:
+            return []
     
     def update_chat_session_title(self, session_id: str, title: str) -> Optional[ChatSession]:
         """Update chat session title."""
