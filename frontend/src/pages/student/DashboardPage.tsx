@@ -155,7 +155,7 @@ function DashboardPage() {
               <span>Recent Chat Sessions</span>
               <Button
                 type="link"
-                onClick={() => navigate("/chat")}
+                onClick={() => navigate("/chats")}
                 icon={<RightOutlined />}
                 className="p-0"
               >
