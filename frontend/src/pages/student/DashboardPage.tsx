@@ -189,7 +189,7 @@ function DashboardPage() {
             />
           ) : (
             <Empty description="No chat sessions yet">
-              <Button type="primary" onClick={() => navigate("/chat")}>
+              <Button type="primary" onClick={() => navigate("/chats")}>
                 Start Your First Chat
               </Button>
             </Empty>
