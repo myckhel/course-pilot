@@ -16,7 +16,7 @@ def init_extensions(app):
     
     with app.app_context():
         # Import models to ensure they are registered with SQLAlchemy
-        from app.models import User, Topic, ChatSession, Message
+        from app.models import User, Topic, Document, ChatSession, Message
         
         # Create tables if they don't exist
         db.create_all()

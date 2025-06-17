@@ -281,23 +281,38 @@ class DatabaseService:
     def get_topic_document_count(self, topic_id: str) -> int:
         """Get the document count for a topic."""
         try:
-            topic = Topic.query.filter_by(id=topic_id).first()
-            return topic.document_count if topic else 0
+            # Count actual processed documents instead of using the counter
+            from app.models import Document
+            return Document.query.filter_by(topic_id=topic_id, is_processed=True).count()
         except SQLAlchemyError:
             return 0
     
-    def get_default_topic(self) -> Optional[Topic]:
-        """Get the default GST topic (first topic named 'GST' or the first topic)."""
+    def get_actual_topic_document_count(self, topic_id: str) -> int:
+        """Get the actual document count from the Document table."""
         try:
-            # First try to find a topic named 'GST'
-            gst_topic = Topic.query.filter(Topic.name.ilike('%GST%')).first()
-            if gst_topic:
-                return gst_topic
-            
-            # If no GST topic found, return the first available topic
-            return Topic.query.order_by(Topic.created_at.asc()).first()
+            from app.models import Document
+            return Document.query.filter_by(topic_id=topic_id, is_processed=True).count()
         except SQLAlchemyError:
-            return None
+            return 0
+    
+    def sync_topic_document_counts(self) -> bool:
+        """Sync document counts for all topics with actual document counts."""
+        try:
+            from app.models import Document
+            topics = self.get_all_topics()
+            
+            for topic in topics:
+                actual_count = Document.query.filter_by(
+                    topic_id=topic.id, 
+                    is_processed=True
+                ).count()
+                topic.document_count = actual_count
+            
+            db.session.commit()
+            return True
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return False
     
     # Chat session methods
     def create_chat_session(self, user_id: str, topic_id: str, title: str) -> ChatSession:

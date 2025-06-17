@@ -7,10 +7,12 @@ A Flask-based REST API backend for the AI Virtual Assistant application that hel
 - **User Authentication**: JWT-based authentication with role-based access control
 - **Topic Management**: Create and manage study topics with document uploads
 - **Document Processing**: PDF parsing and chunking using LangChain
+- **Document Deduplication**: Prevents duplicate documents in vector store and database
 - **Vector Store**: Semantic search using Chroma vector database
 - **Q&A System**: AI-powered question answering using OpenAI GPT models
 - **Chat Sessions**: Persistent chat sessions with message history
 - **Admin Panel**: Administrative features for user and content management
+- **Database Migrations**: Flask-Migrate integration for schema versioning
 
 ## Tech Stack
 
@@ -102,6 +104,41 @@ The API will be available at `http://localhost:8000`
 ### Health Check
 - `GET /api/health` - Service health status
 
+## Document Deduplication
+
+The backend includes a robust document deduplication system to prevent duplicate content from being processed:
+
+### Features
+
+- **File-level deduplication**: Prevents uploading identical files using SHA-256 file hashes
+- **Content-level deduplication**: Prevents processing documents with identical content even if file names differ
+- **Database tracking**: Maintains records of all uploaded documents with metadata
+- **Automatic cleanup**: Removes duplicate files automatically during upload
+
+### How it works
+
+1. When a document is uploaded, the system calculates both file hash and content hash
+2. Checks existing documents for duplicates using both hashes
+3. If duplicate is found, returns reference to existing document without processing
+4. If unique, processes the document and adds to vector store
+5. Creates database record for tracking and future deduplication
+
+### API Response for Duplicates
+
+When uploading a duplicate document, the API returns:
+
+```json
+{
+  "message": "Document already exists",
+  "duplicate": true,
+  "existing_document": {
+    "id": "document_id",
+    "filename": "original_filename.pdf",
+    "upload_date": "2025-06-17T01:00:00Z"
+  }
+}
+```
+
 ## Testing
 
 Run the test suite:
@@ -156,18 +193,83 @@ CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "wsgi:app"]
 
 ## Development
 
-### Database Migrations
+## Database Migrations
 
-Run migrations:
+The application uses Flask-Migrate (Alembic) for database schema management.
+
+### Initialize Migrations (first time only)
 
 ```bash
-python migrations/migrate.py
+python3 manage_migrations.py init
 ```
 
-Reset database (development only):
+### Create New Migration
 
 ```bash
-python migrations/migrate.py --reset
+python3 manage_migrations.py migrate
+```
+
+### Apply Migrations
+
+```bash
+python3 manage_migrations.py upgrade
+```
+
+### Rollback Migrations
+
+```bash
+python3 manage_migrations.py downgrade
+```
+
+### Check Migration Status
+
+```bash
+python3 manage_migrations.py current    # Show current migration
+python3 manage_migrations.py history    # Show migration history
+```
+
+### Reset Database (Development Only)
+
+```bash
+python3 manage_migrations.py downgrade  # Rollback to base
+# Then delete the database file and re-run setup
+```
+
+## Document Deduplication
+
+The application includes robust document deduplication to prevent duplicate files from being processed:
+
+### Features
+
+- **File Hash Checking**: Prevents identical files from being uploaded
+- **Content Hash Checking**: Detects files with identical content but different names
+- **Per-Topic Deduplication**: Same file can exist in different topics
+- **Database Tracking**: All uploaded documents are tracked in the database
+
+### How It Works
+
+1. When a document is uploaded, the system calculates:
+   - **File Hash**: SHA-256 of the entire file
+   - **Content Hash**: SHA-256 of extracted text content
+
+2. Before processing, the system checks:
+   - Is this file hash already in the database for this topic?
+   - Is this content hash already in the database for this topic?
+
+3. If duplicate found:
+   - File upload is rejected with appropriate message
+   - No processing resources are wasted
+   - Vector store remains clean
+
+4. If no duplicate:
+   - Document is processed and added to vector store
+   - Document record is saved in database
+   - Vector store index is updated
+
+### Manual Deduplication Check
+
+```bash
+python3 check_duplicates.py
 ```
 
 ### Code Quality
@@ -218,3 +320,55 @@ The application supports multiple configuration environments:
 ## License
 
 This project is part of the AI Virtual Assistant application for educational purposes.
+
+## Database Migrations
+
+The backend uses Flask-Migrate for database schema management:
+
+### Migration Commands
+
+```bash
+# Initialize migration system (run once)
+python manage_migrations.py init
+
+# Create new migration after model changes
+python manage_migrations.py migrate -m "Description of changes"
+
+# Apply migrations to database
+python manage_migrations.py upgrade
+
+# Rollback to previous migration
+python manage_migrations.py downgrade
+
+# View migration history
+python manage_migrations.py history
+
+# View current migration version
+python manage_migrations.py current
+```
+
+### Migration Files
+
+- `migrations/versions/` - Contains all migration scripts
+- `migrations/alembic.ini` - Alembic configuration
+- `manage_migrations.py` - Unified migration management CLI
+
+### Document Model Migration
+
+The Document model was added to track uploaded files and enable deduplication:
+
+```sql
+CREATE TABLE document (
+    id VARCHAR(36) NOT NULL PRIMARY KEY,
+    filename VARCHAR(255) NOT NULL,
+    file_path VARCHAR(500) NOT NULL,
+    file_hash VARCHAR(64) NOT NULL,
+    content_hash VARCHAR(64) NOT NULL,
+    file_size INTEGER,
+    topic_id VARCHAR(36) NOT NULL,
+    uploader_id VARCHAR(36) NOT NULL,
+    upload_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    is_processed BOOLEAN DEFAULT FALSE,
+    chunk_count INTEGER
+);
+```

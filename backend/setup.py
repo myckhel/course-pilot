@@ -60,12 +60,14 @@ def initialize_database():
         app = create_app('development')
         
         with app.app_context():
-            # Create all tables
+            # Create all tables (including the new Document table)
             db.create_all()
             print("✓ Database tables created successfully")
             
-            # Create default admin user
+            # Sync document counts for existing topics
             db_service = DatabaseService()
+            if db_service.sync_topic_document_counts():
+                print("✓ Topic document counts synchronized")
             
             # Check if admin user already exists
             admin_email = 'admin@asked.com'
@@ -108,12 +110,11 @@ def initialize_database():
 
 
 def initialize_default_topic():
-    """Initialize default GST topic and upload its document."""
+    """Initialize default GST topic and upload its document with deduplication."""
     print("\n📚 Initializing default GST topic...")
     try:
         from app import create_app
         from app.services.database import DatabaseService
-        from app.services.document_loader import DocumentLoader
         from app.services.vector_store import VectorStoreService
         from pathlib import Path
         
@@ -132,49 +133,52 @@ def initialize_default_topic():
             
             # Check if GST topic already exists
             existing_topics = db_service.get_all_topics()
-            if any(topic.name.lower() == 'gst' for topic in existing_topics):
-                print("✓ GST topic already exists")
-                return
+            gst_topic = next((topic for topic in existing_topics if topic.name.lower() == 'gst'), None)
             
-            # Create default GST topic
-            topic = db_service.create_topic(
-                name="GST",
-                description="AI-powered companion for GST courses",
-                created_by=admin.id
-            )
-            print("✓ Default GST topic created successfully")
+            if not gst_topic:
+                # Create default GST topic
+                gst_topic = db_service.create_topic(
+                    name="GST",
+                    description="AI-powered companion for GST courses",
+                    created_by=admin.id
+                )
+                print("✓ Default GST topic created successfully")
+            else:
+                print("✓ GST topic already exists")
 
-            # Load and process the default GST document
+            # Load and process the default GST document with deduplication
             pdf_path = Path(__file__).parent / 'data' / 'CCMAS GST data .pdf'
             if pdf_path.exists():
                 try:
-                    print("📄 Processing GST document...")
-                    # Initialize services with smaller chunk size to handle token limits
-                    doc_loader = DocumentLoader(chunk_size=500, chunk_overlap=50)
+                    print("📄 Checking GST document...")
+                    
+                    # Initialize vector service with deduplication
                     vector_service = VectorStoreService('chroma_db')
                     
                     # Save file to uploads folder
-                    upload_dir = Path('uploads') / topic.id
+                    upload_dir = Path('uploads') / gst_topic.id
                     upload_dir.mkdir(exist_ok=True)
                     dest_path = upload_dir / 'CCMAS GST data .pdf'
-                    shutil.copy2(pdf_path, dest_path)
                     
-                    # Process document in chunks
-                    chunks = doc_loader.load_and_split_pdf(str(dest_path))
+                    # Copy file if it doesn't exist
+                    if not dest_path.exists():
+                        shutil.copy2(pdf_path, dest_path)
                     
-                    if not chunks:
-                        print("❌ No content could be extracted from the PDF")
-                        return
+                    # Process document with deduplication check
+                    success, message, chunk_count = vector_service.create_topic_index_with_deduplication(
+                        topic_id=gst_topic.id,
+                        file_path=str(dest_path),
+                        original_filename='CCMAS GST data .pdf',
+                        uploaded_by=admin.id
+                    )
                     
-                    # Create or update vector index
-                    if vector_service.topic_index_exists(topic.id):
-                        vector_service.update_topic_index(topic.id, chunks)
+                    if success:
+                        print(f"✓ {message}")
+                        # Sync topic document count
+                        db_service.sync_topic_document_counts()
                     else:
-                        vector_service.create_topic_index(topic.id, chunks)
-                    
-                    # Update topic document count
-                    db_service.increment_topic_document_count(topic.id)
-                    print(f"✓ GST document processed and indexed successfully ({len(chunks)} chunks created)")
+                        print(f"ℹ️  {message}")
+                        
                 except Exception as e:
                     print(f"❌ Failed to process GST document: {str(e)}")
             else:
@@ -221,6 +225,10 @@ def main():
     print("1. Edit .env file and add your OpenAI API key")
     print("2. Run the development server: python app.py")
     print("3. API will be available at: http://localhost:8000")
+    print("\nUtility Scripts:")
+    print("🔍 Check for duplicate documents: python check_duplicates.py")
+    print("🧹 Clean up duplicates: python check_duplicates.py --clean")
+    print("📊 Analyze only: python check_duplicates.py --analyze-only")
     print("\nFor production deployment:")
     print("- Use gunicorn: gunicorn -w 4 -b 0.0.0.0:8000 wsgi:app")
 

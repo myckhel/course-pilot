@@ -4,7 +4,7 @@ Data models for the application.
 from datetime import datetime
 from typing import Optional, List, Dict, Any
 import json
-from sqlalchemy import Column, String, Integer, DateTime, Text, ForeignKey
+from sqlalchemy import Column, String, Integer, DateTime, Text, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from app.extensions import db
 
@@ -23,6 +23,7 @@ class User(db.Model):
     # Relationships
     topics = relationship("Topic", back_populates="creator", lazy="dynamic")
     chat_sessions = relationship("ChatSession", back_populates="user", lazy="dynamic")
+    uploaded_documents = relationship("Document", back_populates="uploader", lazy="dynamic")
     
     def __init__(self, id: str, name: str, email: str, password_hash: str, role: str, created_at: datetime = None):
         self.id = id
@@ -61,6 +62,7 @@ class Topic(db.Model):
     # Relationships
     creator = relationship("User", back_populates="topics")
     chat_sessions = relationship("ChatSession", back_populates="topic", lazy="dynamic")
+    documents = relationship("Document", back_populates="topic", lazy="dynamic")
     
     def __init__(self, id: str, name: str, description: str, created_by: str, 
                  document_count: int = 0, created_at: datetime = None, updated_at: datetime = None):
@@ -86,6 +88,68 @@ class Topic(db.Model):
     
     def __repr__(self):
         return f'<Topic {self.name}>'
+
+
+class Document(db.Model):
+    """Document model to track uploaded files and prevent duplicates."""
+    __tablename__ = 'documents'
+    
+    id = Column(String(36), primary_key=True)
+    topic_id = Column(String(36), ForeignKey('topics.id'), nullable=False)
+    filename = Column(String(255), nullable=False)
+    original_filename = Column(String(255), nullable=False)
+    file_path = Column(String(500), nullable=False)
+    file_hash = Column(String(64), nullable=False, index=True)  # SHA-256 hash
+    file_size = Column(Integer, nullable=False)
+    content_hash = Column(String(64), nullable=False, index=True)  # Hash of extracted content
+    chunk_count = Column(Integer, default=0, nullable=False)
+    is_processed = Column(Boolean, default=False, nullable=False)
+    uploaded_by = Column(String(36), ForeignKey('users.id'), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    
+    # Relationships
+    topic = relationship("Topic", back_populates="documents")
+    uploader = relationship("User", back_populates="uploaded_documents")
+    
+    def __init__(self, id: str, topic_id: str, filename: str, original_filename: str,
+                 file_path: str, file_hash: str, file_size: int, content_hash: str,
+                 uploaded_by: str, chunk_count: int = 0, is_processed: bool = False,
+                 created_at: datetime = None, updated_at: datetime = None):
+        self.id = id
+        self.topic_id = topic_id
+        self.filename = filename
+        self.original_filename = original_filename
+        self.file_path = file_path
+        self.file_hash = file_hash
+        self.file_size = file_size
+        self.content_hash = content_hash
+        self.chunk_count = chunk_count
+        self.is_processed = is_processed
+        self.uploaded_by = uploaded_by
+        self.created_at = created_at or datetime.utcnow()
+        self.updated_at = updated_at or datetime.utcnow()
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert document to dictionary."""
+        return {
+            'id': self.id,
+            'topicId': self.topic_id,
+            'filename': self.filename,
+            'originalFilename': self.original_filename,
+            'filePath': self.file_path,
+            'fileHash': self.file_hash,
+            'fileSize': self.file_size,
+            'contentHash': self.content_hash,
+            'chunkCount': self.chunk_count,
+            'isProcessed': self.is_processed,
+            'uploadedBy': self.uploaded_by,
+            'createdAt': self.created_at.isoformat(),
+            'updatedAt': self.updated_at.isoformat()
+        }
+    
+    def __repr__(self):
+        return f'<Document {self.filename} for Topic {self.topic_id}>'
 
 
 class ChatSession(db.Model):

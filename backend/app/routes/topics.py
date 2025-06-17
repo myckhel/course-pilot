@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 from app.services.database import DatabaseService
 from app.services.document_loader import DocumentLoader
 from app.services.vector_store import VectorStoreService
+from app.services.document_service import DocumentService
 from app.utils.exceptions import ValidationError, AuthorizationError
 
 topics_bp = Blueprint('topics', __name__)
@@ -20,7 +21,8 @@ def get_services():
         chunk_overlap=current_app.config.get('CHUNK_OVERLAP', 200)
     )
     vector_service = VectorStoreService(current_app.config['CHROMA_PERSIST_DIR'])
-    return db_service, doc_loader, vector_service
+    doc_service = DocumentService(db_service)
+    return db_service, doc_loader, vector_service, doc_service
 
 
 @topics_bp.route('', methods=['GET'])
@@ -28,7 +30,7 @@ def get_services():
 def get_topics():
     """Get all topics."""
     try:
-        db_service, _, _ = get_services()
+        db_service, _, _, _ = get_services()
         topics = db_service.get_all_topics()
         
         return jsonify([topic.to_dict() for topic in topics]), 200
@@ -43,7 +45,7 @@ def create_topic():
     """Create a new topic (admin only)."""
     try:
         user_id = get_jwt_identity()
-        db_service, _, _ = get_services()
+        db_service, _, _, _ = get_services()
         
         # Check if user is admin
         user = db_service.get_user_by_id(user_id)
@@ -89,7 +91,7 @@ def create_topic():
 def get_topic(topic_id):
     """Get a specific topic by ID."""
     try:
-        db_service, _, vector_service = get_services()
+        db_service, _, vector_service, _ = get_services()
         
         topic = db_service.get_topic_by_id(topic_id)
         
@@ -113,7 +115,7 @@ def upload_document(topic_id):
     """Upload a document to a topic (admin only)."""
     try:
         user_id = get_jwt_identity()
-        db_service, doc_loader, vector_service = get_services()
+        db_service, doc_loader, vector_service, doc_service = get_services()
         
         # Check if user is admin
         user = db_service.get_user_by_id(user_id)
@@ -134,32 +136,29 @@ def upload_document(topic_id):
         if not doc_loader.validate_pdf_file(file):
             return jsonify({'error': 'Invalid PDF file'}), 400
         
-        # Save uploaded file
-        file_path = doc_loader.save_uploaded_file(
-            file, 
-            current_app.config['UPLOAD_FOLDER'], 
-            topic_id
+        # Use document service for deduplication and processing
+        result = doc_service.process_document_upload(
+            file=file,
+            topic_id=topic_id,
+            user_id=user_id,
+            upload_folder=current_app.config['UPLOAD_FOLDER']
         )
         
-        # Process document
-        chunks = doc_loader.load_and_split_pdf(file_path)
-        
-        if not chunks:
-            return jsonify({'error': 'No content could be extracted from the PDF'}), 400
-        
-        # Create or update vector index
-        if vector_service.topic_index_exists(topic_id):
-            vector_service.update_topic_index(topic_id, chunks)
-        else:
-            vector_service.create_topic_index(topic_id, chunks)
+        if result['is_duplicate']:
+            return jsonify({
+                'message': 'Document already exists',
+                'duplicate': True,
+                'existing_document': result['existing_document']
+            }), 200
         
         # Update topic document count
         db_service.increment_topic_document_count(topic_id)
         
         return jsonify({
             'message': 'Document uploaded and processed successfully',
-            'documentPath': file_path,
-            'chunksCreated': len(chunks)
+            'duplicate': False,
+            'document': result['document_record'],
+            'chunksCreated': result['chunks_created']
         }), 200
         
     except ValidationError as e:
@@ -176,7 +175,7 @@ def update_topic(topic_id):
     """Update a topic (admin only)."""
     try:
         user_id = get_jwt_identity()
-        db_service, _, _ = get_services()
+        db_service, _, _, _ = get_services()
         
         # Check if user is admin
         user = db_service.get_user_by_id(user_id)
@@ -204,7 +203,7 @@ def delete_topic(topic_id):
     """Delete a topic and its associated data (admin only)."""
     try:
         user_id = get_jwt_identity()
-        db_service, _, vector_service = get_services()
+        db_service, _, vector_service, _ = get_services()
         
         # Check if user is admin
         user = db_service.get_user_by_id(user_id)
@@ -233,7 +232,7 @@ def delete_topic(topic_id):
 def search_topic_documents(topic_id):
     """Search documents within a topic."""
     try:
-        db_service, _, vector_service = get_services()
+        db_service, _, vector_service, _ = get_services()
         
         # Check if topic exists
         topic = db_service.get_topic_by_id(topic_id)
