@@ -274,13 +274,11 @@ class DocumentService:
             
             # Create document record
             document_record = self.create_document_record(
-                filename=file.filename,
-                file_path=final_file_path,
-                file_hash=file_hash,
-                content_hash=content_hash,
                 topic_id=topic_id,
-                uploader_id=user_id,
-                file_size=os.path.getsize(final_file_path)
+                file_path=final_file_path,
+                original_filename=file.filename,
+                uploaded_by=user_id,
+                chunks=chunks
             )
             
             # Add to vector store
