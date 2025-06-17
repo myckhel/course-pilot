@@ -103,6 +103,7 @@ export interface Document {
   size: number;
   processing_status: "pending" | "processing" | "processed" | "failed";
   created_at: string;
+  originalFilename: string;
 }
 
 // ===== CHAT TYPES =====

@@ -3,11 +3,8 @@ Topics management routes.
 """
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from werkzeug.utils import secure_filename
 from app.services.database import DatabaseService
-from app.services.document_loader import DocumentLoader
 from app.services.vector_store import VectorStoreService
-from app.services.document_service import DocumentService
 from app.utils.exceptions import ValidationError, AuthorizationError
 
 topics_bp = Blueprint('topics', __name__)
@@ -16,13 +13,8 @@ topics_bp = Blueprint('topics', __name__)
 def get_services():
     """Get service instances."""
     db_service = DatabaseService()
-    doc_loader = DocumentLoader(
-        chunk_size=current_app.config.get('CHUNK_SIZE', 1000),
-        chunk_overlap=current_app.config.get('CHUNK_OVERLAP', 200)
-    )
     vector_service = VectorStoreService(current_app.config['CHROMA_PERSIST_DIR'])
-    doc_service = DocumentService(db_service)
-    return db_service, doc_loader, vector_service, doc_service
+    return db_service, vector_service
 
 
 @topics_bp.route('', methods=['GET'])
@@ -30,7 +22,7 @@ def get_services():
 def get_topics():
     """Get all topics."""
     try:
-        db_service, _, _, _ = get_services()
+        db_service, vector_service = get_services()
         topics = db_service.get_all_topics()
         
         return jsonify([topic.to_dict() for topic in topics]), 200
@@ -45,7 +37,7 @@ def create_topic():
     """Create a new topic (admin only)."""
     try:
         user_id = get_jwt_identity()
-        db_service, _, _, _ = get_services()
+        db_service, vector_service = get_services()
         
         # Check if user is admin
         user = db_service.get_user_by_id(user_id)
@@ -91,7 +83,7 @@ def create_topic():
 def get_topic(topic_id):
     """Get a specific topic by ID."""
     try:
-        db_service, _, vector_service, _ = get_services()
+        db_service, vector_service = get_services()
         
         topic = db_service.get_topic_by_id(topic_id)
         
@@ -109,73 +101,13 @@ def get_topic(topic_id):
         return jsonify({'error': 'Failed to fetch topic'}), 500
 
 
-@topics_bp.route('/<topic_id>/documents', methods=['POST'])
-@jwt_required()
-def upload_document(topic_id):
-    """Upload a document to a topic (admin only)."""
-    try:
-        user_id = get_jwt_identity()
-        db_service, doc_loader, vector_service, doc_service = get_services()
-        
-        # Check if user is admin
-        user = db_service.get_user_by_id(user_id)
-        if not user or user.role != 'admin':
-            return jsonify({'error': 'Admin access required'}), 403
-        
-        # Check if topic exists
-        topic = db_service.get_topic_by_id(topic_id)
-        if not topic:
-            return jsonify({'error': 'Topic not found'}), 404
-        
-        # Validate file upload
-        if 'file' not in request.files:
-            return jsonify({'error': 'No file provided'}), 400
-        
-        file = request.files['file']
-        
-        if not doc_loader.validate_pdf_file(file):
-            return jsonify({'error': 'Invalid PDF file'}), 400
-        
-        # Use document service for deduplication and processing
-        result = doc_service.process_document_upload(
-            file=file,
-            topic_id=topic_id,
-            user_id=user_id,
-            upload_folder=current_app.config['UPLOAD_FOLDER']
-        )
-        
-        if result['is_duplicate']:
-            return jsonify({
-                'message': 'Document already exists',
-                'duplicate': True,
-                'existing_document': result['existing_document']
-            }), 200
-        
-        # Update topic document count
-        db_service.increment_topic_document_count(topic_id)
-        
-        return jsonify({
-            'message': 'Document uploaded and processed successfully',
-            'duplicate': False,
-            'document': result['document_record'],
-            'chunksCreated': result['chunks_created']
-        }), 200
-        
-    except ValidationError as e:
-        return jsonify({'error': str(e)}), 400
-    except AuthorizationError as e:
-        return jsonify({'error': str(e)}), 403
-    except Exception as e:
-        return jsonify({'error': f'Failed to upload document: {str(e)}'}), 500
-
-
 @topics_bp.route('/<topic_id>', methods=['PUT'])
 @jwt_required()
 def update_topic(topic_id):
     """Update a topic (admin only)."""
     try:
         user_id = get_jwt_identity()
-        db_service, _, _, _ = get_services()
+        db_service, vector_service = get_services()
         
         # Check if user is admin
         user = db_service.get_user_by_id(user_id)
@@ -203,7 +135,7 @@ def delete_topic(topic_id):
     """Delete a topic and its associated data (admin only)."""
     try:
         user_id = get_jwt_identity()
-        db_service, _, vector_service, _ = get_services()
+        db_service, vector_service = get_services()
         
         # Check if user is admin
         user = db_service.get_user_by_id(user_id)
@@ -232,7 +164,7 @@ def delete_topic(topic_id):
 def search_topic_documents(topic_id):
     """Search documents within a topic."""
     try:
-        db_service, _, vector_service, _ = get_services()
+        db_service, vector_service = get_services()
         
         # Check if topic exists
         topic = db_service.get_topic_by_id(topic_id)

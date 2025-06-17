@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Card,
@@ -11,15 +11,20 @@ import {
   Typography,
   Alert,
   Divider,
+  List,
+  Empty,
+  Tooltip,
 } from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
   ReloadOutlined,
+  FileTextOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons";
 
 import { PageLoader } from "@/components/common";
-import type { Topic } from "@/types";
+import type { Topic, Document } from "@/types";
 import { ADMIN_ROUTES } from "@/constants";
 import { topicApi } from "../../apis/topics";
 
@@ -30,25 +35,42 @@ function TopicDetailsPage() {
   const navigate = useNavigate();
 
   const [topic, setTopic] = useState<Topic | null>(null);
+  const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
+  const [documentsLoading, setDocumentsLoading] = useState(false);
 
-  useEffect(() => {
-    if (id) {
-      fetchTopicDetails();
-    }
-  }, [id]);
-
-  const fetchTopicDetails = async () => {
+  const fetchTopicDetails = useCallback(async () => {
     try {
       setLoading(true);
       const response = await topicApi.getTopicById(id!);
       setTopic(response.data);
     } catch (error) {
+      console.error("Failed to fetch topic details:", error);
       message.error("Failed to fetch topic details");
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  const fetchDocuments = useCallback(async () => {
+    try {
+      setDocumentsLoading(true);
+      const response = await topicApi.getTopicDocuments(id!);
+      setDocuments(response.data);
+    } catch (error) {
+      console.error("Failed to fetch documents:", error);
+      message.error("Failed to fetch documents");
+    } finally {
+      setDocumentsLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      fetchTopicDetails();
+      fetchDocuments();
+    }
+  }, [id, fetchTopicDetails, fetchDocuments]);
 
   const handleEditTopic = () => {
     navigate(`${ADMIN_ROUTES.TOPICS}/edit/${id}`);
@@ -60,8 +82,49 @@ function TopicDetailsPage() {
       message.success("Topic deleted successfully");
       navigate(ADMIN_ROUTES.TOPICS);
     } catch (error) {
+      console.error("Failed to delete topic:", error);
       message.error("Failed to delete topic");
     }
+  };
+
+  const handleDeleteDocument = async (documentId: string, filename: string) => {
+    try {
+      await topicApi.deleteDocument(documentId);
+      message.success(`Document "${filename}" deleted successfully`);
+      // Refresh documents list and topic details
+      await Promise.all([fetchDocuments(), fetchTopicDetails()]);
+    } catch (error) {
+      console.error("Failed to delete document:", error);
+      message.error("Failed to delete document");
+    }
+  };
+
+  const handleDownloadDocument = async (
+    documentId: string,
+    filename: string
+  ) => {
+    try {
+      const response = await topicApi.downloadDocument(documentId);
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Failed to download document:", error);
+      message.error("Failed to download document");
+    }
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   const getStatusColor = (status: string) => {
@@ -106,6 +169,7 @@ function TopicDetailsPage() {
             icon={<ReloadOutlined />}
             onClick={() => {
               fetchTopicDetails();
+              fetchDocuments();
             }}
           >
             Refresh
@@ -157,6 +221,106 @@ function TopicDetailsPage() {
                   </div>
                 </div>
               </>
+            )}
+          </Card>
+        </div>
+
+        {/* Documents Section */}
+        <div className="lg:col-span-2">
+          <Card
+            title="Uploaded Documents"
+            loading={documentsLoading}
+            extra={
+              <Text type="secondary">
+                {documents.length} document{documents.length !== 1 ? "s" : ""}
+              </Text>
+            }
+          >
+            {documents.length === 0 ? (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={
+                  <span>
+                    No documents uploaded yet.
+                    <br />
+                    <Text type="secondary">
+                      Upload documents to enable Q&A functionality.
+                    </Text>
+                  </span>
+                }
+              />
+            ) : (
+              <List
+                dataSource={documents}
+                renderItem={(document) => (
+                  <List.Item
+                    actions={[
+                      <Tooltip title="Download document">
+                        <Button
+                          type="text"
+                          icon={<DownloadOutlined />}
+                          onClick={() =>
+                            handleDownloadDocument(
+                              document.id,
+                              document.filename
+                            )
+                          }
+                        />
+                      </Tooltip>,
+                      <Popconfirm
+                        title="Delete document"
+                        description={`Are you sure you want to delete "${document.filename}"?`}
+                        onConfirm={() =>
+                          handleDeleteDocument(document.id, document.filename)
+                        }
+                        okText="Yes"
+                        cancelText="No"
+                      >
+                        <Tooltip title="Delete document">
+                          <Button
+                            type="text"
+                            icon={<DeleteOutlined />}
+                            danger
+                          />
+                        </Tooltip>
+                      </Popconfirm>,
+                    ]}
+                  >
+                    <List.Item.Meta
+                      avatar={
+                        <FileTextOutlined className="text-lg text-blue-500" />
+                      }
+                      title={
+                        <div className="flex items-center gap-2">
+                          <Text strong className="truncate">
+                            {document.originalFilename}
+                          </Text>
+                          {document.size && (
+                            <Tag color="blue" className="text-xs">
+                              {formatFileSize(document.size)}
+                            </Tag>
+                          )}
+                        </div>
+                      }
+                      description={
+                        <div className="space-y-1">
+                          <div className="flex gap-2 text-xs">
+                            <Text type="secondary">
+                              Uploaded:{" "}
+                              {new Date(
+                                document.created_at
+                              ).toLocaleDateString()}
+                            </Text>
+                            <Text type="secondary">
+                              • Status: {document.processing_status}
+                            </Text>
+                          </div>
+                        </div>
+                      }
+                    />
+                  </List.Item>
+                )}
+              />
             )}
           </Card>
         </div>

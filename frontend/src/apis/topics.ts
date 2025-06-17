@@ -39,7 +39,7 @@ export const topicsApi = {
 
   getDocuments: async (topicId: string): Promise<TopicDocumentsResponse> => {
     const response = await apiClient.get<TopicDocumentsResponse>(
-      `/topics/${topicId}/documents`
+      `/documents/topics/${topicId}`
     );
     return response.data!;
   },
@@ -49,7 +49,7 @@ export const topicsApi = {
     formData: FormData
   ): Promise<TopicDocument> => {
     const response = await apiClient.post<TopicDocument>(
-      `/topics/${topicId}/documents`,
+      `/documents/topics/${topicId}`,
       formData,
       {
         headers: {
@@ -85,16 +85,16 @@ export const topicApi = {
   deleteTopic: (id: string): Promise<AxiosResponse<void>> =>
     apiClient.delete(`/topics/${id}`),
 
-  // Get topic documents
+  // Get topic documents - Note: This endpoint may need to be implemented on backend
   getTopicDocuments: (topicId: string): Promise<AxiosResponse<Document[]>> =>
-    apiClient.get(`/topics/${topicId}/documents`),
+    apiClient.get(`/documents/topics/${topicId}`),
 
   // Upload documents
   uploadDocuments: (
     topicId: string,
     formData: FormData
   ): Promise<AxiosResponse<Document[]>> =>
-    apiClient.post(`/topics/${topicId}/documents`, formData, {
+    apiClient.post(`/documents/topics/${topicId}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
