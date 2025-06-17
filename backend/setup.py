@@ -5,6 +5,7 @@ Setup script for the AI Virtual Assistant Flask Backend
 import os
 import sys
 import shutil
+import subprocess
 from pathlib import Path
 
 
@@ -48,21 +49,93 @@ def install_requirements():
 
 
 def initialize_database():
-    """Initialize the database."""
+    """Initialize the database using the migration system."""
     try:
         from app import create_app
         from app.extensions import db
         from app.services.database import DatabaseService
+        import subprocess
         
-        print("Initializing database...")
+        print("Initializing database using migration system...")
         
         # Create Flask application context
         app = create_app('development')
         
         with app.app_context():
-            # Create all tables (including the new Document table)
-            db.create_all()
-            print("✓ Database tables created successfully")
+            # Check if migration system is initialized
+            migration_dir = Path('migrations')
+            alembic_ini = migration_dir / 'alembic.ini'
+            
+            if not migration_dir.exists() or not alembic_ini.exists():
+                print("🔧 Initializing migration system...")
+                try:
+                    # Use subprocess to call our manage_migrations.py script
+                    result = subprocess.run([
+                        sys.executable, 'manage_migrations.py', 'init'
+                    ], capture_output=True, text=True, timeout=30)
+                    
+                    if result.returncode == 0:
+                        print("✓ Migration system initialized")
+                    else:
+                        print(f"⚠️  Migration init warning: {result.stderr}")
+                        print("📋 Falling back to direct initialization...")
+                        # Try direct import as fallback
+                        try:
+                            from flask_migrate import Migrate, init
+                            migrate = Migrate(app, db)
+                            init()
+                            print("✓ Migration system initialized (fallback)")
+                        except Exception as e:
+                            print(f"❌ Failed to initialize migration system: {str(e)}")
+                            print("📋 Using direct table creation...")
+                            db.create_all()
+                            print("✓ Database tables created using fallback method")
+                            
+                except subprocess.TimeoutExpired:
+                    print("⚠️  Migration init timeout, using fallback...")
+                    db.create_all()
+                    print("✓ Database tables created using fallback method")
+                except Exception as e:
+                    print(f"❌ Failed to run migration init: {str(e)}")
+                    print("📋 Using direct table creation...")
+                    db.create_all()
+                    print("✓ Database tables created using fallback method")
+            else:
+                print("✓ Migration system already initialized")
+            
+            # Apply any pending migrations
+            try:
+                print("🔄 Applying database migrations...")
+                result = subprocess.run([
+                    sys.executable, 'manage_migrations.py', 'upgrade'
+                ], capture_output=True, text=True, timeout=60)
+                
+                if result.returncode == 0:
+                    print("✓ Database migrations applied successfully")
+                else:
+                    print(f"⚠️  Migration upgrade issues: {result.stderr}")
+                    print("📋 Attempting direct migration...")
+                    # Try direct import as fallback
+                    try:
+                        from flask_migrate import Migrate, upgrade
+                        migrate = Migrate(app, db)
+                        upgrade()
+                        print("✓ Database migrations applied (fallback)")
+                    except Exception as e:
+                        print(f"⚠️  Direct migration failed: {str(e)}")
+                        print("📋 Using table creation as final fallback...")
+                        db.create_all()
+                        print("✓ Database tables created using final fallback")
+                        
+            except subprocess.TimeoutExpired:
+                print("⚠️  Migration upgrade timeout, using fallback...")
+                db.create_all()
+                print("✓ Database tables created using fallback method")
+            except Exception as e:
+                print(f"⚠️  Migration upgrade failed: {str(e)}")
+                print("📋 Using table creation as fallback...")
+                db.create_all()
+                print("✓ Database tables created using fallback method")
             
             # Sync document counts for existing topics
             db_service = DatabaseService()
