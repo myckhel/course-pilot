@@ -15,15 +15,14 @@ class QAChainService:
         self.llm = ChatOpenAI(model=model_name, temperature=temperature)
         self.prompt_template = PromptTemplate(
             template="""Use the following pieces of context to answer the question at the end. 
-            If you don't know the answer based on the context provided, just say that you don't know, 
-            don't try to make up an answer.
+            If you don't know the answer based on the context provided, just say that you don't know and avoid mentioning context.
 
             Context:
             {context}
 
             Question: {question}
             
-            Answer: Please provide a helpful and accurate answer based on the context provided above. 
+            Answer: Please provide a helpful and accurate answer, else if no answer just say you don know without mentioning `the context provided`. 
             If you reference specific information, mention that it comes from the course materials.""",
             input_variables=["context", "question"]
         )
@@ -35,7 +34,7 @@ class QAChainService:
             
             If the question is specifically about the uploaded file, prioritize information from the file content.
             If the question relates to both the course materials and the uploaded file, provide a comprehensive answer using both sources.
-            If you don't know the answer based on the provided context, just say that you don't know.
+            If you don't know the answer based on the provided context, just say that you don't know and avoid mentioning context.
 
             Course Materials Context:
             {context}
@@ -43,7 +42,7 @@ class QAChainService:
             User's Question and Attachment Context:
             {question}
             
-            Answer: Please provide a helpful and accurate answer based on the context provided above. 
+            Answer: Please provide a helpful and accurate answer, else if no answer just say you don know without mentioning `the context provided`. 
             When referencing information, clearly indicate whether it comes from the course materials or the uploaded file.""",
             input_variables=["context", "question"]
         )
