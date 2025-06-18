@@ -54,7 +54,10 @@ export const useAuthStore = create<AuthState & AuthActions>()(
           localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, response.token);
         } catch (error: unknown) {
           const errorMessage =
-            error instanceof Error ? error.message : "Login failed";
+            error instanceof Error
+              ? // @ts-expect-error ddd
+                error?.response?.data?.error || error.message
+              : "Login failed";
           set((state) => {
             state.error = errorMessage;
             state.isLoading = false;
