@@ -244,7 +244,7 @@ function AdminDashboardPage() {
       </Row>
 
       {/* Quick Actions */}
-      <Card title="Quick Actions">
+      {/* <Card title="Quick Actions">
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} md={6}>
             <Card
@@ -287,7 +287,7 @@ function AdminDashboardPage() {
             </Card>
           </Col>
         </Row>
-      </Card>
+      </Card> */}
     </div>
   );
 }

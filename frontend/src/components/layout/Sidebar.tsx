@@ -84,24 +84,24 @@ function Sidebar({ collapsed, onClose, isMobile = false }: SidebarProps) {
         if (isMobile && onClose) onClose();
       },
     },
-    {
-      key: "/admin/users",
-      icon: <UsergroupAddOutlined />,
-      label: "Users",
-      onClick: () => {
-        navigate("/admin/users");
-        if (isMobile && onClose) onClose();
-      },
-    },
-    {
-      key: "/admin/analytics",
-      icon: <BarChartOutlined />,
-      label: "Analytics",
-      onClick: () => {
-        navigate("/admin/analytics");
-        if (isMobile && onClose) onClose();
-      },
-    },
+    // {
+    //   key: "/admin/users",
+    //   icon: <UsergroupAddOutlined />,
+    //   label: "Users",
+    //   onClick: () => {
+    //     navigate("/admin/users");
+    //     if (isMobile && onClose) onClose();
+    //   },
+    // },
+    // {
+    //   key: "/admin/analytics",
+    //   icon: <BarChartOutlined />,
+    //   label: "Analytics",
+    //   onClick: () => {
+    //     navigate("/admin/analytics");
+    //     if (isMobile && onClose) onClose();
+    //   },
+    // },
     {
       type: "divider",
     },
