@@ -14,36 +14,33 @@ class QAChainService:
     def __init__(self, model_name: str = "gpt-3.5-turbo", temperature: float = 0.0):
         self.llm = ChatOpenAI(model=model_name, temperature=temperature)
         self.prompt_template = PromptTemplate(
-            template="""Use the following pieces of context to answer the question at the end. 
-            If you don't know the answer based on the context provided, just say that you don't know and avoid mentioning context.
+            template="""You are a helpful AI teaching assistant. Answer the student's question using the provided course materials. 
+            Provide clear, direct answers without mentioning the context or source limitations. 
+            If the information isn't available in the materials, simply say "I don't have information about the question" and suggest the student ask their instructor or check additional resources.
 
-            Context:
+            Course Materials:
             {context}
 
-            Question: {question}
+            Student Question: {question}
             
-            Answer: Please provide a helpful and accurate answer, else if no answer just say you don know without mentioning `the context provided`. 
-            If you reference specific information, mention that it comes from the course materials.""",
+            Answer: Provide a clear, direct response as if you're explaining to a student. When referencing specific information, you may mention it comes from the course materials topic title.""",
             input_variables=["context", "question"]
         )
         
         # Enhanced prompt template for handling attachments
         self.attachment_prompt_template = PromptTemplate(
-            template="""You are an AI teaching assistant. Use the following pieces of context to answer the question. 
-            The user has provided both course materials and an uploaded file attachment. 
+            template="""You are a helpful AI teaching assistant. The student has provided a question along with an uploaded file attachment in addition to the course materials. 
             
-            If the question is specifically about the uploaded file, prioritize information from the file content.
-            If the question relates to both the course materials and the uploaded file, provide a comprehensive answer using both sources.
-            If you don't know the answer based on the provided context, just say that you don't know and avoid mentioning context.
+            Provide a clear, direct answer without mentioning context limitations. Prioritize information from the uploaded file if the question is specifically about it, or combine both sources when relevant.
+            If you don't have the information needed, simply say "I don't have enough information about the question" and suggest consulting with the instructor.
 
-            Course Materials Context:
+            Course Materials:
             {context}
 
-            User's Question and Attachment Context:
+            Student's Question and Uploaded File Content:
             {question}
             
-            Answer: Please provide a helpful and accurate answer, else if no answer just say you don know without mentioning `the context provided`. 
-            When referencing information, clearly indicate whether it comes from the course materials or the uploaded file.""",
+            Answer: Provide a comprehensive and student-friendly response. When referencing information, clearly indicate whether it comes from the course materials topic title or the uploaded file.""",
             input_variables=["context", "question"]
         )
     
