@@ -13,7 +13,6 @@ import {
   BookOutlined,
   UserOutlined,
   MessageOutlined,
-  FileTextOutlined,
   BarChartOutlined,
   ClockCircleOutlined,
 } from "@ant-design/icons";
@@ -110,9 +109,9 @@ function AdminDashboardPage() {
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="Documents"
-              value={stats.totalDocuments}
-              prefix={<FileTextOutlined />}
+              title="Messages Sent"
+              value={stats.totalMessages}
+              prefix={<MessageOutlined />}
               valueStyle={{ color: "#fa8c16" }}
             />
           </Card>
@@ -124,7 +123,7 @@ function AdminDashboardPage() {
         {/* System Health */}
         <Col xs={24} lg={8}>
           <Card title="System Health" className="h-full">
-            <div className="space-y-4">
+            <div className="space-y-4 h-full justify-between flex flex-col">
               <div>
                 <div className="flex justify-between items-center mb-1">
                   <Text>Processing Status</Text>
@@ -153,7 +152,7 @@ function AdminDashboardPage() {
                 />
               </div>
 
-              <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+              <div className="pt-3 mt-auto border-t border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between">
                   <Text type="secondary">System Status</Text>
                   <div className="flex items-center space-x-2">
