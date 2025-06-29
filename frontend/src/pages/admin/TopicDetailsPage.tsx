@@ -27,6 +27,7 @@ import { PageLoader } from "@/components/common";
 import type { Topic, Document } from "@/types";
 import { ADMIN_ROUTES } from "@/constants";
 import { topicApi } from "../../apis/topics";
+import { format } from "date-fns-tz";
 
 const { Title, Text } = Typography;
 
@@ -197,9 +198,7 @@ function TopicDetailsPage() {
           <Card title="Topic Information">
             <Descriptions column={1} size="small">
               <Descriptions.Item label="Name">{topic.name}</Descriptions.Item>
-              <Descriptions.Item label="Status">
-                <Tag color={getStatusColor(topic.status)}>{topic.status}</Tag>
-              </Descriptions.Item>
+
               <Descriptions.Item label="Created">
                 {new Date(topic.createdAt).toLocaleDateString()}
               </Descriptions.Item>
@@ -307,12 +306,12 @@ function TopicDetailsPage() {
                           <div className="flex gap-2 text-xs">
                             <Text type="secondary">
                               Uploaded:{" "}
-                              {new Date(
-                                document.created_at
-                              ).toLocaleDateString()}
-                            </Text>
-                            <Text type="secondary">
-                              • Status: {document.processing_status}
+                              {document.createdAt
+                                ? format(
+                                    new Date(document.createdAt),
+                                    "yyyy-MM-dd HH:mm"
+                                  )
+                                : "-"}
                             </Text>
                           </div>
                         </div>
