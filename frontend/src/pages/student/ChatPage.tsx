@@ -108,9 +108,6 @@ function ChatPage() {
         message: userMessage || "📎 File attachment",
         attachment: attachmentFile || undefined,
       });
-
-      // Success - attachment is already cleared above
-      notify.success("Message sent successfully!");
     } catch (error) {
       console.error("Failed to send message:", error);
       notify.error("Failed to send message. Please try again.");
