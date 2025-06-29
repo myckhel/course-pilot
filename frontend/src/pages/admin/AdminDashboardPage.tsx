@@ -68,7 +68,7 @@ function AdminDashboardPage() {
       {/* Welcome Section */}
       <div className="bg-gradient-to-r from-purple-500 to-blue-600 rounded-lg p-6 text-white">
         <Title level={2} className="text-white mb-2">
-          Admin Dashboard 🛠️
+          Admin Dashboard
         </Title>
         <Text className="text-purple-100 text-lg">
           Manage your AI tutoring platform and monitor system performance.
