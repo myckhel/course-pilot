@@ -102,7 +102,7 @@ export interface Document {
   filename: string;
   size: number;
   processing_status: "pending" | "processing" | "processed" | "failed";
-  created_at: string;
+  createdAt: string;
   originalFilename: string;
 }
 
@@ -155,6 +155,7 @@ export interface AdminDashboardStats {
   totalDocuments: number;
   activeTopics: number;
   processingSuccess: number;
+  totalMessages: number;
   activeUsers24h: number;
   messagesToday: number;
   avgSessionTime: number;
