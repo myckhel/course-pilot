@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>AI Virtual Assistant for Student Q&amp;A - Project Documentation</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="ai-virtual-assistant-for-student-qa---project-documentation">AI Virtual Assistant for Student Q&amp;A - Project Documentation</h1>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#1-project-overview">Project Overview</a></li>
+<li><a href="#2-system-architecture--flow">System Architecture &amp; Flow</a></li>
+<li><a href="#3-entity-relationship-diagram-erd">Entity Relationship Diagram (ERD)</a></li>
+<li><a href="#4-user-flow">User Flow</a></li>
+<li><a href="#5-development-stack">Development Stack</a></li>
+<li><a href="#6-programming-languages--frameworks">Programming Languages &amp; Frameworks</a></li>
+<li><a href="#7-apis-and-services">APIs and Services</a></li>
+<li><a href="#8-frontend-components">Frontend Components</a></li>
+<li><a href="#9-state-management">State Management</a></li>
+<li><a href="#10-authentication--authorization">Authentication &amp; Authorization</a></li>
+<li><a href="#11-ai-layer">AI Layer</a></li>
+<li><a href="#12-tools--libraries">Tools &amp; Libraries</a></li>
+<li><a href="#13-deployment--environment-setup">Deployment &amp; Environment Setup</a></li>
+<li><a href="#14-future-enhancements--todos">Future Enhancements / TODOs</a></li>
+</ol>
+<hr>
+<h2 id="1-project-overview">1. Project Overview</h2>
+<h3 id="purpose">Purpose</h3>
+<p>The <strong>AI Virtual Assistant for Student Q&amp;A</strong> is a lightweight, AI-powered educational platform designed to enhance the learning experience of students in higher education. The system enables students to ask questions in natural language based on uploaded study materials (PDFs) and receive intelligent, context-aware answers sourced directly from the selected topic materials.</p>
+<h3 id="target-users">Target Users</h3>
+<ul>
+<li><strong>Students</strong>: Primary users who interact with the system to ask questions and receive AI-generated answers</li>
+<li><strong>Administrators</strong>: Educators or content managers who upload and manage study topics and documents</li>
+</ul>
+<h3 id="core-features">Core Features</h3>
+<ul>
+<li><strong>Topic Management</strong>: Create and organize study topics with associated documents</li>
+<li><strong>Document Processing</strong>: Upload and process PDF documents using advanced text chunking and embedding</li>
+<li><strong>AI-Powered Q&amp;A</strong>: Contextual question answering using Retrieval-Augmented Generation (RAG)</li>
+<li><strong>Chat Sessions</strong>: Persistent conversation history for continuous learning</li>
+<li><strong>User Management</strong>: Role-based access control for students and administrators</li>
+<li><strong>Document Deduplication</strong>: Prevents duplicate content in the vector store</li>
+<li><strong>Real-time Analytics</strong>: Dashboard insights for administrators</li>
+</ul>
+<h3 id="business-value">Business Value</h3>
+<ul>
+<li>Provides 24/7 availability for student queries</li>
+<li>Enhances comprehension through interactive learning</li>
+<li>Reduces instructor workload for repetitive questions</li>
+<li>Supports flipped classroom and self-directed learning models</li>
+<li>Demonstrates practical application of modern AI technologies in education</li>
+</ul>
+<hr>
+<h2 id="2-system-architecture--flow">2. System Architecture &amp; Flow</h2>
+<h3 id="high-level-architecture">High-Level Architecture</h3>
+<pre><code>┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Frontend      │    │   Backend       │    │   AI Services   │
+│   (React)       │◄──►│   (Flask)       │◄──►│   (OpenAI)      │
+│                 │    │                 │    │                 │
+│ • Student UI    │    │ • REST API      │    │ • GPT Models    │
+│ • Admin Panel   │    │ • Auth Service  │    │ • Embeddings    │
+│ • Chat Interface│    │ • Document Proc │    │                 │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         │                       ▼                       │
+         │              ┌─────────────────┐              │
+         │              │   Database      │              │
+         │              │   (SQLite)      │              │
+         │              │                 │              │
+         │              │ • Users         │              │
+         │              │ • Topics        │              │
+         │              │ • Documents     │              │
+         │              │ • Chat Sessions │              │
+         │              │ • Messages      │              │
+         │              └─────────────────┘              │
+         │                                               │
+         └──────────────────────────────────────────────────┐
+                                 │                          │
+                                 ▼                          ▼
+                        ┌─────────────────┐       ┌─────────────────┐
+                        │  Vector Store   │       │  File Storage   │
+                        │  (ChromaDB)     │       │  (Local/Cloud)  │
+                        │                 │       │                 │
+                        │ • Document      │       │ • PDF Files     │
+                        │   Embeddings    │       │ • Uploads       │
+                        │ • Semantic      │       │ • Logs          │
+                        │   Search        │       │                 │
+                        └─────────────────┘       └─────────────────┘
+</code></pre>
+<h3 id="component-interaction-flow">Component Interaction Flow</h3>
+<ol>
+<li>
+<p><strong>Authentication Flow</strong>:</p>
+<ul>
+<li>User logs in through React frontend</li>
+<li>Credentials validated against SQLite database</li>
+<li>JWT token issued and stored for session management</li>
+</ul>
+</li>
+<li>
+<p><strong>Document Upload Flow</strong> (Admin):</p>
+<ul>
+<li>Admin uploads PDF through frontend</li>
+<li>Backend processes document using LangChain</li>
+<li>Text chunked and embedded using OpenAI</li>
+<li>Vectors stored in ChromaDB with topic association</li>
+<li>Document metadata saved in SQLite</li>
+</ul>
+</li>
+<li>
+<p><strong>Question-Answer Flow</strong> (Student):</p>
+<ul>
+<li>Student selects topic and asks question</li>
+<li>Question embedded using OpenAI</li>
+<li>Semantic search performed in ChromaDB</li>
+<li>Relevant context retrieved and sent to GPT</li>
+<li>AI response generated and returned to frontend</li>
+<li>Conversation saved in chat session</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="3-entity-relationship-diagram-erd">3. Entity Relationship Diagram (ERD)</h2>
+<pre><code>┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│      User       │     │      Topic      │     │    Document     │
+├─────────────────┤     ├─────────────────┤     ├─────────────────┤
+│ id (PK)         │────►│ id (PK)         │◄────│ id (PK)         │
+│ name            │     │ title           │     │ title           │
+│ email (unique)  │     │ description     │     │ filename        │
+│ password_hash   │     │ creator_id (FK) │     │ file_path       │
+│ role            │     │ created_at      │     │ file_size       │
+│ created_at      │     │ updated_at      │     │ file_hash       │
+└─────────────────┘     │ is_active       │     │ topic_id (FK)   │
+         │               └─────────────────┘     │ uploader_id(FK) │
+         │                        │              │ created_at      │
+         │                        │              │ processed_at    │
+         │                        │              │ chunk_count     │
+         │                        │              └─────────────────┘
+         │                        │
+         │               ┌─────────────────┐
+         │               │  ChatSession    │
+         │               ├─────────────────┤
+         └──────────────►│ id (PK)         │
+                         │ user_id (FK)    │
+                         │ topic_id (FK)   │
+                         │ title           │
+                         │ created_at      │
+                         │ updated_at      │
+                         │ is_active       │
+                         └─────────────────┘
+                                  │
+                                  │
+                         ┌─────────────────┐
+                         │    Message      │
+                         ├─────────────────┤
+                         │ id (PK)         │
+                         │ session_id (FK) │
+                         │ content         │
+                         │ role            │
+                         │ timestamp       │
+                         │ tokens_used     │
+                         └─────────────────┘
+</code></pre>
+<h3 id="relationships">Relationships</h3>
+<ul>
+<li><strong>User</strong> → <strong>Topic</strong>: One-to-Many (creator relationship)</li>
+<li><strong>User</strong> → <strong>ChatSession</strong>: One-to-Many</li>
+<li><strong>User</strong> → <strong>Document</strong>: One-to-Many (uploader relationship)</li>
+<li><strong>Topic</strong> → <strong>Document</strong>: One-to-Many</li>
+<li><strong>Topic</strong> → <strong>ChatSession</strong>: One-to-Many</li>
+<li><strong>ChatSession</strong> → <strong>Message</strong>: One-to-Many</li>
+</ul>
+<hr>
+<h2 id="4-user-flow">4. User Flow</h2>
+<h3 id="student-user-journey">Student User Journey</h3>
+<pre><code>Login/Register → Topic Selection → Chat Interface → Ask Questions → Receive AI Answers → Session History
+</code></pre>
+<p><strong>Detailed Steps:</strong></p>
+<ol>
+<li>
+<p><strong>Authentication</strong></p>
+<ul>
+<li>Student visits application</li>
+<li>Logs in with email/password or registers new account</li>
+<li>Redirected to dashboard upon successful authentication</li>
+</ul>
+</li>
+<li>
+<p><strong>Topic Selection</strong></p>
+<ul>
+<li>Views available study topics</li>
+<li>Selects relevant topic based on study needs</li>
+<li>Can preview topic description and document count</li>
+</ul>
+</li>
+<li>
+<p><strong>Chat Interaction</strong></p>
+<ul>
+<li>Creates new chat session or continues existing one</li>
+<li>Types natural language questions related to topic</li>
+<li>Receives contextual AI-generated answers</li>
+<li>Can ask follow-up questions in same session</li>
+</ul>
+</li>
+<li>
+<p><strong>Session Management</strong></p>
+<ul>
+<li>Views chat history across sessions</li>
+<li>Can rename or delete sessions</li>
+<li>Access previous conversations for review</li>
+</ul>
+</li>
+</ol>
+<h3 id="admin-user-journey">Admin User Journey</h3>
+<pre><code>Login → Admin Dashboard → Topic Management → Document Upload → Analytics Review
+</code></pre>
+<p><strong>Detailed Steps:</strong></p>
+<ol>
+<li>
+<p><strong>Authentication &amp; Dashboard</strong></p>
+<ul>
+<li>Admin logs in with elevated privileges</li>
+<li>Views system overview with key metrics</li>
+<li>Monitors user activity and system health</li>
+</ul>
+</li>
+<li>
+<p><strong>Topic Management</strong></p>
+<ul>
+<li>Creates new study topics with descriptions</li>
+<li>Manages existing topics (edit, delete, activate/deactivate)</li>
+<li>Associates topics with specific courses or subjects</li>
+</ul>
+</li>
+<li>
+<p><strong>Document Processing</strong></p>
+<ul>
+<li>Uploads PDF documents to topics</li>
+<li>Monitors document processing status</li>
+<li>Reviews document chunking and embedding results</li>
+<li>Handles duplicate document detection</li>
+</ul>
+</li>
+<li>
+<p><strong>Analytics &amp; Monitoring</strong></p>
+<ul>
+<li>Reviews user engagement metrics</li>
+<li>Monitors AI response quality</li>
+<li>Tracks system performance and usage patterns</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="5-development-stack">5. Development Stack</h2>
+<h3 id="technology-selection-rationale">Technology Selection Rationale</h3>
+<p><strong>Frontend Stack:</strong></p>
+<ul>
+<li><strong>React 19</strong>: Latest stable version with improved performance and developer experience</li>
+<li><strong>TypeScript</strong>: Type safety and better IDE support for large-scale development</li>
+<li><strong>Vite</strong>: Fast build tool with hot module replacement for development efficiency</li>
+<li><strong>Ant Design</strong>: Professional UI component library with comprehensive design system</li>
+<li><strong>Tailwind CSS</strong>: Utility-first CSS framework for rapid custom styling</li>
+</ul>
+<p><strong>Backend Stack:</strong></p>
+<ul>
+<li><strong>Flask 3.0</strong>: Lightweight Python web framework suitable for API development</li>
+<li><strong>SQLite</strong>: File-based database perfect for development and small-scale deployment</li>
+<li><strong>LangChain</strong>: Framework for building applications with large language models</li>
+<li><strong>ChromaDB</strong>: Vector database optimized for similarity search and embeddings</li>
+</ul>
+<p><strong>AI &amp; ML Stack:</strong></p>
+<ul>
+<li><strong>OpenAI GPT</strong>: State-of-the-art language models for question answering</li>
+<li><strong>OpenAI Embeddings</strong>: High-quality text embeddings for semantic search</li>
+<li><strong>PyPDF</strong>: Python library for PDF text extraction and processing</li>
+</ul>
+<hr>
+<h2 id="6-programming-languages--frameworks">6. Programming Languages &amp; Frameworks</h2>
+<h3 id="backend-python">Backend (Python)</h3>
+<ul>
+<li><strong>Language</strong>: Python 3.9+</li>
+<li><strong>Web Framework</strong>: Flask 3.0</li>
+<li><strong>ORM</strong>: SQLAlchemy 2.0</li>
+<li><strong>Authentication</strong>: Flask-JWT-Extended</li>
+<li><strong>Database</strong>: SQLite3 (built-in)</li>
+<li><strong>AI Framework</strong>: LangChain</li>
+<li><strong>Document Processing</strong>: PyPDF, python-docx, unstructured</li>
+</ul>
+<h3 id="frontend-typescriptjavascript">Frontend (TypeScript/JavaScript)</h3>
+<ul>
+<li><strong>Language</strong>: TypeScript 5.8</li>
+<li><strong>Framework</strong>: React 19</li>
+<li><strong>Build Tool</strong>: Vite 6.3</li>
+<li><strong>Router</strong>: React Router DOM v7</li>
+<li><strong>HTTP Client</strong>: Axios</li>
+<li><strong>State Management</strong>: Zustand with persistence</li>
+</ul>
+<h3 id="configuration--devops">Configuration &amp; DevOps</h3>
+<ul>
+<li><strong>Environment</strong>: python-dotenv, environment variables</li>
+<li><strong>Testing</strong>: pytest (backend), Jest/React Testing Library (frontend)</li>
+<li><strong>Code Quality</strong>: Black, Flake8, ESLint, Prettier</li>
+<li><strong>Database Migration</strong>: Flask-Migrate</li>
+<li><strong>WSGI Server</strong>: Gunicorn (production)</li>
+</ul>
+<hr>
+<h2 id="7-apis-and-services">7. APIs and Services</h2>
+<h3 id="internal-api-endpoints">Internal API Endpoints</h3>
+<h4 id="authentication-endpoints">Authentication Endpoints</h4>
+<pre><code>POST   /api/auth/register    - User registration
+POST   /api/auth/login       - User authentication
+POST   /api/auth/refresh     - Token refresh
+DELETE /api/auth/logout      - User logout
+GET    /api/auth/me          - Current user profile
+</code></pre>
+<h4 id="topic-management">Topic Management</h4>
+<pre><code>GET    /api/topics           - List all topics
+POST   /api/topics           - Create new topic (admin)
+GET    /api/topics/{id}      - Get topic details
+PUT    /api/topics/{id}      - Update topic (admin)
+DELETE /api/topics/{id}      - Delete topic (admin)
+</code></pre>
+<h4 id="document-management">Document Management</h4>
+<pre><code>GET    /api/topics/{id}/documents        - List topic documents
+POST   /api/topics/{id}/documents        - Upload document (admin)
+DELETE /api/documents/{id}               - Delete document (admin)
+GET    /api/documents/{id}/status        - Processing status
+</code></pre>
+<h4 id="chat--messaging">Chat &amp; Messaging</h4>
+<pre><code>GET    /api/chat/sessions                - List user's chat sessions
+POST   /api/chat/sessions                - Create new chat session
+GET    /api/chat/sessions/{id}           - Get session details
+DELETE /api/chat/sessions/{id}           - Delete session
+GET    /api/chat/sessions/{id}/messages  - Get session messages
+POST   /api/chat/message                 - Send message/question
+</code></pre>
+<h4 id="admin--analytics">Admin &amp; Analytics</h4>
+<pre><code>GET    /api/admin/dashboard              - Admin dashboard stats
+GET    /api/admin/users                  - List all users
+GET    /api/admin/analytics              - System analytics
+</code></pre>
+<h4 id="system-health">System Health</h4>
+<pre><code>GET    /api/health                       - Health check endpoint
+</code></pre>
+<h3 id="external-services">External Services</h3>
+<h4 id="openai-api-integration">OpenAI API Integration</h4>
+<ul>
+<li><strong>Service</strong>: OpenAI GPT-3.5/GPT-4</li>
+<li><strong>Purpose</strong>: Text generation and embeddings</li>
+<li><strong>Authentication</strong>: API key-based</li>
+<li><strong>Rate Limits</strong>: Configured per OpenAI tier</li>
+<li><strong>Error Handling</strong>: Retry logic with exponential backoff</li>
+</ul>
+<h4 id="vector-database-chromadb">Vector Database (ChromaDB)</h4>
+<ul>
+<li><strong>Service</strong>: Local ChromaDB instance</li>
+<li><strong>Purpose</strong>: Semantic search and document retrieval</li>
+<li><strong>Collections</strong>: Organized by topic ID</li>
+<li><strong>Indexing</strong>: Automatic embedding indexing</li>
+</ul>
+<hr>
+<h2 id="8-frontend-components">8. Frontend Components</h2>
+<h3 id="component-architecture">Component Architecture</h3>
+<pre><code>src/
+├── components/
+│   ├── common/                 # Reusable UI components
+│   │   ├── Button/
+│   │   ├── Modal/
+│   │   ├── Loading/
+│   │   └── ErrorBoundary/
+│   ├── layout/                 # Layout components
+│   │   ├── Header/
+│   │   ├── Sidebar/
+│   │   ├── Footer/
+│   │   └── MainLayout/
+│   └── features/               # Feature-specific components
+│       ├── auth/
+│       ├── topics/
+│       ├── chat/
+│       └── admin/
+</code></pre>
+<h3 id="key-component-categories">Key Component Categories</h3>
+<h4 id="layout-components">Layout Components</h4>
+<ul>
+<li><strong>MainLayout</strong>: Root layout wrapper with navigation</li>
+<li><strong>Header</strong>: Top navigation with user menu and notifications</li>
+<li><strong>Sidebar</strong>: Navigation menu for different sections</li>
+<li><strong>Footer</strong>: Application footer with links and info</li>
+</ul>
+<h4 id="authentication-components">Authentication Components</h4>
+<ul>
+<li><strong>LoginForm</strong>: User login with validation</li>
+<li><strong>RegisterForm</strong>: New user registration</li>
+<li><strong>ProtectedRoute</strong>: Route wrapper for authenticated users</li>
+<li><strong>RoleGuard</strong>: Component-level authorization</li>
+</ul>
+<h4 id="topic-management-components">Topic Management Components</h4>
+<ul>
+<li><strong>TopicList</strong>: Display available topics with search/filter</li>
+<li><strong>TopicCard</strong>: Individual topic display component</li>
+<li><strong>TopicForm</strong>: Create/edit topic form (admin only)</li>
+<li><strong>DocumentUpload</strong>: PDF upload with progress tracking</li>
+</ul>
+<h4 id="chat-interface-components">Chat Interface Components</h4>
+<ul>
+<li><strong>ChatContainer</strong>: Main chat interface wrapper</li>
+<li><strong>MessageList</strong>: Display conversation history</li>
+<li><strong>MessageInput</strong>: Question input with send functionality</li>
+<li><strong>SessionSidebar</strong>: Chat session management</li>
+<li><strong>TypingIndicator</strong>: Shows when AI is generating response</li>
+</ul>
+<h4 id="admin-components">Admin Components</h4>
+<ul>
+<li><strong>AdminDashboard</strong>: System overview and metrics</li>
+<li><strong>UserManagement</strong>: User listing and administration</li>
+<li><strong>TopicManagement</strong>: Topic CRUD operations</li>
+<li><strong>Analytics</strong>: Usage statistics and insights</li>
+</ul>
+<h3 id="responsive-design-patterns">Responsive Design Patterns</h3>
+<ul>
+<li>Mobile-first approach using Tailwind CSS breakpoints</li>
+<li>Drawer navigation on mobile, sidebar on desktop</li>
+<li>Adaptive card layouts for different screen sizes</li>
+<li>Touch-friendly interaction elements</li>
+</ul>
+<hr>
+<h2 id="9-state-management">9. State Management</h2>
+<h3 id="zustand-store-architecture">Zustand Store Architecture</h3>
+<h4 id="store-structure">Store Structure</h4>
+<pre><code class="language-typescript"><span class="hljs-comment">// stores/authStore.ts - Authentication state</span>
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">AuthState</span> {
+  <span class="hljs-attr">user</span>: <span class="hljs-title class_">User</span> | <span class="hljs-literal">null</span>;
+  <span class="hljs-attr">token</span>: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>;
+  <span class="hljs-attr">isAuthenticated</span>: <span class="hljs-built_in">boolean</span>;
+  <span class="hljs-attr">isLoading</span>: <span class="hljs-built_in">boolean</span>;
+  <span class="hljs-attr">login</span>: <span class="hljs-function">(<span class="hljs-params">credentials: LoginCredentials</span>) =&gt;</span> <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt;;
+  <span class="hljs-attr">logout</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-built_in">void</span>;
+  <span class="hljs-attr">refreshToken</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt;;
+}
+
+<span class="hljs-comment">// stores/topicStore.ts - Topics and documents</span>
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">TopicState</span> {
+  <span class="hljs-attr">topics</span>: <span class="hljs-title class_">Topic</span>[];
+  <span class="hljs-attr">selectedTopic</span>: <span class="hljs-title class_">Topic</span> | <span class="hljs-literal">null</span>;
+  <span class="hljs-attr">documents</span>: <span class="hljs-title class_">Document</span>[];
+  <span class="hljs-attr">isLoading</span>: <span class="hljs-built_in">boolean</span>;
+  <span class="hljs-attr">fetchTopics</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt;;
+  <span class="hljs-attr">selectTopic</span>: <span class="hljs-function">(<span class="hljs-params">topicId: <span class="hljs-built_in">string</span></span>) =&gt;</span> <span class="hljs-built_in">void</span>;
+  <span class="hljs-attr">uploadDocument</span>: <span class="hljs-function">(<span class="hljs-params">file: File, topicId: <span class="hljs-built_in">string</span></span>) =&gt;</span> <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt;;
+}
+
+<span class="hljs-comment">// stores/chatStore.ts - Chat sessions and messages</span>
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">ChatState</span> {
+  <span class="hljs-attr">sessions</span>: <span class="hljs-title class_">ChatSession</span>[];
+  <span class="hljs-attr">activeSession</span>: <span class="hljs-title class_">ChatSession</span> | <span class="hljs-literal">null</span>;
+  <span class="hljs-attr">messages</span>: <span class="hljs-title class_">Message</span>[];
+  <span class="hljs-attr">isTyping</span>: <span class="hljs-built_in">boolean</span>;
+  <span class="hljs-attr">sendMessage</span>: <span class="hljs-function">(<span class="hljs-params">content: <span class="hljs-built_in">string</span></span>) =&gt;</span> <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt;;
+  <span class="hljs-attr">createSession</span>: <span class="hljs-function">(<span class="hljs-params">topicId: <span class="hljs-built_in">string</span></span>) =&gt;</span> <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt;;
+  <span class="hljs-attr">loadMessages</span>: <span class="hljs-function">(<span class="hljs-params">sessionId: <span class="hljs-built_in">string</span></span>) =&gt;</span> <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt;;
+}
+
+<span class="hljs-comment">// stores/uiStore.ts - UI state management</span>
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">UIState</span> {
+  <span class="hljs-attr">sidebarOpen</span>: <span class="hljs-built_in">boolean</span>;
+  <span class="hljs-attr">theme</span>: <span class="hljs-string">&#x27;light&#x27;</span> | <span class="hljs-string">&#x27;dark&#x27;</span>;
+  <span class="hljs-attr">notifications</span>: <span class="hljs-title class_">Notification</span>[];
+  <span class="hljs-attr">modals</span>: <span class="hljs-title class_">ModalState</span>;
+  <span class="hljs-attr">toggleSidebar</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-built_in">void</span>;
+  <span class="hljs-attr">setTheme</span>: <span class="hljs-function">(<span class="hljs-params">theme: <span class="hljs-built_in">string</span></span>) =&gt;</span> <span class="hljs-built_in">void</span>;
+  <span class="hljs-attr">addNotification</span>: <span class="hljs-function">(<span class="hljs-params">notification: Notification</span>) =&gt;</span> <span class="hljs-built_in">void</span>;
+}
+</code></pre>
+<h4 id="state-persistence">State Persistence</h4>
+<ul>
+<li><strong>Authentication</strong>: JWT tokens persisted in localStorage</li>
+<li><strong>UI Preferences</strong>: Theme and layout preferences stored locally</li>
+<li><strong>Chat History</strong>: Recent sessions cached for offline access</li>
+<li><strong>Topic Selection</strong>: Last selected topic remembered across sessions</li>
+</ul>
+<h4 id="state-updates-with-immer">State Updates with Immer</h4>
+<pre><code class="language-typescript"><span class="hljs-comment">// Example of complex state update using Immer</span>
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">updateMessage</span> = (<span class="hljs-params">messageId: <span class="hljs-built_in">string</span>, updates: Partial&lt;Message&gt;</span>) =&gt;
+  <span class="hljs-title function_">set</span>(
+    <span class="hljs-title function_">produce</span>(<span class="hljs-function">(<span class="hljs-params">state</span>) =&gt;</span> {
+      <span class="hljs-keyword">const</span> message = state.<span class="hljs-property">messages</span>.<span class="hljs-title function_">find</span>(<span class="hljs-function"><span class="hljs-params">m</span> =&gt;</span> m.<span class="hljs-property">id</span> === messageId);
+      <span class="hljs-keyword">if</span> (message) {
+        <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">assign</span>(message, updates);
+      }
+    })
+  );
+</code></pre>
+<h3 id="store-integration-patterns">Store Integration Patterns</h3>
+<ul>
+<li><strong>Shallow Selectors</strong>: Optimize component re-renders</li>
+<li><strong>Derived State</strong>: Computed values using selectors</li>
+<li><strong>Cross-Store Communication</strong>: Event-based updates between stores</li>
+<li><strong>Error Handling</strong>: Centralized error state management</li>
+</ul>
+<hr>
+<h2 id="10-authentication--authorization">10. Authentication &amp; Authorization</h2>
+<h3 id="jwt-based-authentication-flow">JWT-Based Authentication Flow</h3>
+<h4 id="authentication-process">Authentication Process</h4>
+<ol>
+<li>
+<p><strong>User Login</strong></p>
+<ul>
+<li>User submits credentials (email/password)</li>
+<li>Backend validates against database (password hashing with bcrypt)</li>
+<li>JWT access token generated with user claims</li>
+<li>Token returned to frontend and stored securely</li>
+</ul>
+</li>
+<li>
+<p><strong>Token Management</strong></p>
+<ul>
+<li>Access tokens expire after 24 hours</li>
+<li>Refresh tokens for session extension (optional)</li>
+<li>Automatic token refresh before expiration</li>
+<li>Secure token storage in httpOnly cookies (production) or localStorage (development)</li>
+</ul>
+</li>
+<li>
+<p><strong>Request Authorization</strong></p>
+<ul>
+<li>JWT token included in Authorization header</li>
+<li>Backend middleware validates token on protected routes</li>
+<li>User context extracted from token claims</li>
+<li>Role-based access control enforced</li>
+</ul>
+</li>
+</ol>
+<h4 id="security-implementation">Security Implementation</h4>
+<p><strong>Backend Security (Flask-JWT-Extended)</strong></p>
+<pre><code class="language-python"><span class="hljs-comment"># JWT Configuration</span>
+JWT_SECRET_KEY = os.getenv(<span class="hljs-string">&#x27;JWT_SECRET_KEY&#x27;</span>)
+JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=<span class="hljs-number">24</span>)
+JWT_ALGORITHM = <span class="hljs-string">&#x27;HS256&#x27;</span>
+
+<span class="hljs-comment"># Protected route decorator</span>
+<span class="hljs-meta">@jwt_required()</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">protected_endpoint</span>():
+    current_user = get_jwt_identity()
+    <span class="hljs-keyword">return</span> handle_request(current_user)
+
+<span class="hljs-comment"># Role-based authorization</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">admin_required</span>(<span class="hljs-params">f</span>):
+<span class="hljs-meta">    @wraps(<span class="hljs-params">f</span>)</span>
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">decorated_function</span>(<span class="hljs-params">*args, **kwargs</span>):
+        current_user = get_jwt_identity()
+        <span class="hljs-keyword">if</span> current_user.get(<span class="hljs-string">&#x27;role&#x27;</span>) != <span class="hljs-string">&#x27;admin&#x27;</span>:
+            <span class="hljs-keyword">return</span> {<span class="hljs-string">&#x27;error&#x27;</span>: <span class="hljs-string">&#x27;Admin access required&#x27;</span>}, <span class="hljs-number">403</span>
+        <span class="hljs-keyword">return</span> f(*args, **kwargs)
+    <span class="hljs-keyword">return</span> decorated_function
+</code></pre>
+<p><strong>Frontend Security (React)</strong></p>
+<pre><code class="language-typescript"><span class="hljs-comment">// Axios interceptor for token attachment</span>
+api.<span class="hljs-property">interceptors</span>.<span class="hljs-property">request</span>.<span class="hljs-title function_">use</span>(<span class="hljs-function">(<span class="hljs-params">config</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> token = authStore.<span class="hljs-title function_">getState</span>().<span class="hljs-property">token</span>;
+  <span class="hljs-keyword">if</span> (token) {
+    config.<span class="hljs-property">headers</span>.<span class="hljs-property">Authorization</span> = <span class="hljs-string">`Bearer <span class="hljs-subst">${token}</span>`</span>;
+  }
+  <span class="hljs-keyword">return</span> config;
+});
+
+<span class="hljs-comment">// Protected route component</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">ProtectedRoute</span>(<span class="hljs-params">{ children, requiredRole }: ProtectedRouteProps</span>) {
+  <span class="hljs-keyword">const</span> { isAuthenticated, user } = <span class="hljs-title function_">useAuthStore</span>();
+  
+  <span class="hljs-keyword">if</span> (!isAuthenticated) {
+    <span class="hljs-keyword">return</span> <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Navigate</span> <span class="hljs-attr">to</span>=<span class="hljs-string">&quot;/login&quot;</span> <span class="hljs-attr">replace</span> /&gt;</span></span>;
+  }
+  
+  <span class="hljs-keyword">if</span> (requiredRole &amp;&amp; user?.<span class="hljs-property">role</span> !== requiredRole) {
+    <span class="hljs-keyword">return</span> <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Navigate</span> <span class="hljs-attr">to</span>=<span class="hljs-string">&quot;/unauthorized&quot;</span> <span class="hljs-attr">replace</span> /&gt;</span></span>;
+  }
+  
+  <span class="hljs-keyword">return</span> <span class="language-xml"><span class="hljs-tag">&lt;&gt;</span>{children}<span class="hljs-tag">&lt;/&gt;</span></span>;
+}
+</code></pre>
+<h3 id="role-based-access-control">Role-Based Access Control</h3>
+<h4 id="user-roles">User Roles</h4>
+<ul>
+<li><strong>Student</strong>: Can view topics, create chat sessions, ask questions</li>
+<li><strong>Admin</strong>: Full system access including topic/document management</li>
+</ul>
+<h4 id="permission-matrix">Permission Matrix</h4>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Student</th>
+<th>Admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>View Topics</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Create Chat Sessions</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Ask Questions</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Create Topics</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Upload Documents</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Manage Users</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>View Analytics</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="11-ai-layer">11. AI Layer</h2>
+<h3 id="langchain-integration-architecture">LangChain Integration Architecture</h3>
+<h4 id="document-processing-pipeline">Document Processing Pipeline</h4>
+<pre><code class="language-python"><span class="hljs-comment"># 1. Document Loading</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">load_and_split_pdf</span>(<span class="hljs-params">file_path: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-type">List</span>[Document]:
+    loader = PyPDFLoader(file_path)
+    pages = loader.load()
+    
+    <span class="hljs-comment"># Text splitting for optimal chunking</span>
+    splitter = CharacterTextSplitter(
+        chunk_size=<span class="hljs-number">1000</span>,
+        chunk_overlap=<span class="hljs-number">200</span>,
+        separator=<span class="hljs-string">&quot;\n\n&quot;</span>
+    )
+    <span class="hljs-keyword">return</span> splitter.split_documents(pages)
+
+<span class="hljs-comment"># 2. Embedding Generation</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">create_embeddings</span>(<span class="hljs-params">chunks: <span class="hljs-type">List</span>[Document]</span>) -&gt; <span class="hljs-literal">None</span>:
+    embeddings = OpenAIEmbeddings(
+        openai_api_key=OPENAI_API_KEY,
+        model=<span class="hljs-string">&quot;text-embedding-ada-002&quot;</span>
+    )
+    
+    vectorstore = Chroma.from_documents(
+        documents=chunks,
+        embedding=embeddings,
+        persist_directory=<span class="hljs-string">f&quot;chroma_db/<span class="hljs-subst">{topic_id}</span>&quot;</span>
+    )
+    vectorstore.persist()
+</code></pre>
+<h4 id="question-answering-chain">Question-Answering Chain</h4>
+<pre><code class="language-python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">build_qa_chain</span>(<span class="hljs-params">topic_id: <span class="hljs-built_in">str</span></span>) -&gt; RetrievalQA:
+    <span class="hljs-comment"># Load vector store for topic</span>
+    embeddings = OpenAIEmbeddings()
+    vectorstore = Chroma(
+        persist_directory=<span class="hljs-string">f&quot;chroma_db/<span class="hljs-subst">{topic_id}</span>&quot;</span>,
+        embedding_function=embeddings
+    )
+    
+    <span class="hljs-comment"># Configure retriever</span>
+    retriever = vectorstore.as_retriever(
+        search_type=<span class="hljs-string">&quot;similarity&quot;</span>,
+        search_kwargs={<span class="hljs-string">&quot;k&quot;</span>: <span class="hljs-number">4</span>}
+    )
+    
+    <span class="hljs-comment"># LLM configuration</span>
+    llm = ChatOpenAI(
+        model_name=<span class="hljs-string">&quot;gpt-3.5-turbo&quot;</span>,
+        temperature=<span class="hljs-number">0.1</span>,
+        max_tokens=<span class="hljs-number">500</span>
+    )
+    
+    <span class="hljs-comment"># Create QA chain</span>
+    <span class="hljs-keyword">return</span> RetrievalQA.from_chain_type(
+        llm=llm,
+        chain_type=<span class="hljs-string">&quot;stuff&quot;</span>,
+        retriever=retriever,
+        return_source_documents=<span class="hljs-literal">True</span>
+    )
+</code></pre>
+<h3 id="rag-retrieval-augmented-generation-flow">RAG (Retrieval-Augmented Generation) Flow</h3>
+<ol>
+<li>
+<p><strong>Question Processing</strong></p>
+<ul>
+<li>User question received via API</li>
+<li>Question embedded using OpenAI embeddings</li>
+<li>Semantic search performed in ChromaDB</li>
+</ul>
+</li>
+<li>
+<p><strong>Context Retrieval</strong></p>
+<ul>
+<li>Top-k most relevant document chunks retrieved</li>
+<li>Source documents and relevance scores returned</li>
+<li>Context prepared for LLM prompt</li>
+</ul>
+</li>
+<li>
+<p><strong>Answer Generation</strong></p>
+<ul>
+<li>Retrieved context combined with user question</li>
+<li>Prompt sent to OpenAI GPT model</li>
+<li>Generated answer returned with source attribution</li>
+</ul>
+</li>
+<li>
+<p><strong>Response Enhancement</strong></p>
+<ul>
+<li>Answer quality validation</li>
+<li>Source document citation</li>
+<li>Confidence scoring (future enhancement)</li>
+</ul>
+</li>
+</ol>
+<h3 id="vector-database-chromadb-management">Vector Database (ChromaDB) Management</h3>
+<h4 id="collection-organization">Collection Organization</h4>
+<ul>
+<li><strong>Topic-based Collections</strong>: Each topic maintains separate collection</li>
+<li><strong>Metadata Storage</strong>: Document titles, page numbers, upload timestamps</li>
+<li><strong>Deduplication</strong>: File hash checking prevents duplicate embeddings</li>
+<li><strong>Incremental Updates</strong>: New documents added without full reprocessing</li>
+</ul>
+<h4 id="search-optimization">Search Optimization</h4>
+<ul>
+<li><strong>Similarity Threshold</strong>: Configurable relevance filtering</li>
+<li><strong>Hybrid Search</strong>: Combination of semantic and keyword search (future)</li>
+<li><strong>Result Ranking</strong>: Custom scoring algorithms for better relevance</li>
+</ul>
+<hr>
+<h2 id="12-tools--libraries">12. Tools &amp; Libraries</h2>
+<h3 id="backend-dependencies">Backend Dependencies</h3>
+<h4 id="core-framework">Core Framework</h4>
+<ul>
+<li><strong>Flask 3.0.0</strong>: Lightweight web framework for API development</li>
+<li><strong>Flask-CORS 4.0.0</strong>: Cross-origin resource sharing support</li>
+<li><strong>Flask-JWT-Extended 4.6.0</strong>: JWT authentication implementation</li>
+<li><strong>Werkzeug 3.0.1</strong>: WSGI utility library</li>
+</ul>
+<h4 id="database--orm">Database &amp; ORM</h4>
+<ul>
+<li><strong>SQLAlchemy 2.0.25</strong>: SQL toolkit and Object-Relational Mapping</li>
+<li><strong>Flask-SQLAlchemy 3.1.1</strong>: Flask integration for SQLAlchemy</li>
+<li><strong>Flask-Migrate 4.0.5</strong>: Database migration handling</li>
+</ul>
+<h4 id="ai--machine-learning">AI &amp; Machine Learning</h4>
+<ul>
+<li><strong>langchain 0.1.0</strong>: Framework for LLM application development</li>
+<li><strong>langchain-openai 0.0.5</strong>: OpenAI integration for LangChain</li>
+<li><strong>langchain-community 0.0.10</strong>: Community extensions for LangChain</li>
+<li><strong>openai ≥1.10.0</strong>: Official OpenAI Python client</li>
+<li><strong>chromadb ≥0.4.24</strong>: Vector database for embeddings</li>
+<li><strong>sentence-transformers 2.2.2</strong>: Sentence embedding models</li>
+</ul>
+<h4 id="document-processing">Document Processing</h4>
+<ul>
+<li><strong>pypdf ≥3.15.0</strong>: PDF text extraction and processing</li>
+<li><strong>python-multipart 0.0.6</strong>: File upload handling</li>
+<li><strong>unstructured ≥0.10.0</strong>: Universal document processing</li>
+<li><strong>python-docx ≥0.8.11</strong>: Microsoft Word document processing</li>
+<li><strong>openpyxl ≥3.1.2</strong>: Excel file processing</li>
+<li><strong>python-pptx ≥0.6.21</strong>: PowerPoint processing</li>
+<li><strong>pandas ≥2.0.0</strong>: Data manipulation and analysis</li>
+</ul>
+<h4 id="development--testing">Development &amp; Testing</h4>
+<ul>
+<li><strong>pytest 7.4.3</strong>: Testing framework</li>
+<li><strong>pytest-flask 1.3.0</strong>: Flask-specific testing utilities</li>
+<li><strong>pytest-cov 4.1.0</strong>: Test coverage reporting</li>
+<li><strong>black 23.11.0</strong>: Code formatting</li>
+<li><strong>flake8 6.1.0</strong>: Code linting and style guide enforcement</li>
+</ul>
+<h3 id="frontend-dependencies">Frontend Dependencies</h3>
+<h4 id="core-framework-1">Core Framework</h4>
+<ul>
+<li><strong>react 19.1.0</strong>: User interface library</li>
+<li><strong>react-dom 19.1.0</strong>: React DOM rendering</li>
+<li><strong>typescript 5.8.3</strong>: Static type checking</li>
+<li><strong>vite 6.3.5</strong>: Build tool and development server</li>
+</ul>
+<h4 id="ui--styling">UI &amp; Styling</h4>
+<ul>
+<li><strong>antd 5.25.3</strong>: Enterprise-class UI design language and components</li>
+<li><strong>@ant-design/icons 6.0.0</strong>: Icon components for Ant Design</li>
+<li><strong>@ant-design/v5-patch-for-react-19 1.0.3</strong>: React 19 compatibility patch</li>
+<li><strong>@tailwindcss/postcss 4.1.8</strong>: Utility-first CSS framework</li>
+</ul>
+<h4 id="routing--state-management">Routing &amp; State Management</h4>
+<ul>
+<li><strong>react-router-dom 7.6.1</strong>: Declarative routing for React</li>
+<li><strong>zustand 5.0.5</strong>: Small, fast, and scalable state management</li>
+<li><strong>immer 10.1.1</strong>: Immutable state updates</li>
+</ul>
+<h4 id="data--utilities">Data &amp; Utilities</h4>
+<ul>
+<li><strong>axios 1.9.0</strong>: Promise-based HTTP client</li>
+<li><strong>date-fns 4.1.0</strong>: Modern JavaScript date utility library</li>
+<li><strong>date-fns-tz 3.2.0</strong>: Timezone support for date-fns</li>
+<li><strong>recharts 2.15.3</strong>: Charts library built on React components</li>
+</ul>
+<h4 id="development-tools">Development Tools</h4>
+<ul>
+<li><strong>@vitejs/plugin-react 4.4.1</strong>: React plugin for Vite</li>
+<li><strong>eslint 9.25.0</strong>: JavaScript linting utility</li>
+<li><strong>typescript-eslint 8.30.1</strong>: TypeScript-specific linting rules</li>
+<li><strong>autoprefixer 10.4.21</strong>: PostCSS plugin for vendor prefixes</li>
+</ul>
+<h3 id="infrastructure--deployment">Infrastructure &amp; Deployment</h3>
+<ul>
+<li><strong>gunicorn 21.2.0</strong>: Python WSGI HTTP Server for production</li>
+<li><strong>python-dotenv ≥1.0.0</strong>: Environment variable management</li>
+<li><strong>Docker</strong>: Containerization for consistent deployment</li>
+<li><strong>SQLite3</strong>: Built-in Python database for development and small deployments</li>
+</ul>
+<hr>
+<h2 id="13-deployment--environment-setup">13. Deployment &amp; Environment Setup</h2>
+<h3 id="local-development-setup">Local Development Setup</h3>
+<h4 id="prerequisites">Prerequisites</h4>
+<ul>
+<li><strong>Python</strong>: 3.9 or higher</li>
+<li><strong>Node.js</strong>: 18.0 or higher</li>
+<li><strong>npm/yarn</strong>: Package manager</li>
+<li><strong>Git</strong>: Version control</li>
+</ul>
+<h4 id="backend-setup">Backend Setup</h4>
+<pre><code class="language-bash"><span class="hljs-comment"># Clone repository</span>
+git <span class="hljs-built_in">clone</span> &lt;repository-url&gt;
+<span class="hljs-built_in">cd</span> asked/backend
+
+<span class="hljs-comment"># Create virtual environment</span>
+python -m venv venv
+<span class="hljs-built_in">source</span> venv/bin/activate  <span class="hljs-comment"># On Windows: venv\Scripts\activate</span>
+
+<span class="hljs-comment"># Install dependencies</span>
+pip install -r requirements.txt
+
+<span class="hljs-comment"># Environment configuration</span>
+<span class="hljs-built_in">cp</span> .env.template .<span class="hljs-built_in">env</span>
+<span class="hljs-comment"># Edit .env with your configuration</span>
+
+<span class="hljs-comment"># Database initialization</span>
+python manage_migrations.py db init
+python manage_migrations.py db migrate -m <span class="hljs-string">&quot;Initial migration&quot;</span>
+python manage_migrations.py db upgrade
+
+<span class="hljs-comment"># Run development server</span>
+python app.py
+</code></pre>
+<h4 id="frontend-setup">Frontend Setup</h4>
+<pre><code class="language-bash"><span class="hljs-comment"># Navigate to frontend directory</span>
+<span class="hljs-built_in">cd</span> asked/frontend
+
+<span class="hljs-comment"># Install dependencies</span>
+npm install  <span class="hljs-comment"># or yarn install</span>
+
+<span class="hljs-comment"># Environment configuration</span>
+<span class="hljs-built_in">cp</span> .env.example .env.local
+<span class="hljs-comment"># Edit .env.local with backend URL</span>
+
+<span class="hljs-comment"># Start development server</span>
+npm run dev  <span class="hljs-comment"># or yarn dev</span>
+</code></pre>
+<h3 id="environment-variables">Environment Variables</h3>
+<h4 id="backend-environment-env">Backend Environment (.env)</h4>
+<pre><code class="language-bash"><span class="hljs-comment"># Flask Configuration</span>
+FLASK_ENV=development
+FLASK_DEBUG=True
+SECRET_KEY=your-secret-key-here
+
+<span class="hljs-comment"># JWT Configuration</span>
+JWT_SECRET_KEY=your-jwt-secret-key
+
+<span class="hljs-comment"># OpenAI Configuration</span>
+OPENAI_API_KEY=your-openai-api-key
+
+<span class="hljs-comment"># Database Configuration</span>
+DATABASE_URL=sqlite:///instance/assistant.db
+
+<span class="hljs-comment"># Upload Configuration</span>
+UPLOAD_FOLDER=uploads
+MAX_CONTENT_LENGTH=16777216  <span class="hljs-comment"># 16MB</span>
+
+<span class="hljs-comment"># Chroma Configuration</span>
+CHROMA_DB_PATH=chroma_db
+
+<span class="hljs-comment"># Logging</span>
+LOG_LEVEL=INFO
+LOG_FILE=logs/app.log
+</code></pre>
+<h4 id="frontend-environment-envlocal">Frontend Environment (.env.local)</h4>
+<pre><code class="language-bash">VITE_API_BASE_URL=http://localhost:5001
+VITE_APP_NAME=AI Teaching Assistant
+VITE_APP_VERSION=1.0.0
+</code></pre>
+<h3 id="docker-deployment">Docker Deployment</h3>
+<h4 id="docker-configuration">Docker Configuration</h4>
+<pre><code class="language-dockerfile"><span class="hljs-comment"># Backend Dockerfile</span>
+<span class="hljs-keyword">FROM</span> python:<span class="hljs-number">3.11</span>-slim
+
+<span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> requirements.txt .</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> pip install -r requirements.txt</span>
+
+<span class="hljs-keyword">COPY</span><span class="language-bash"> . .</span>
+<span class="hljs-keyword">EXPOSE</span> <span class="hljs-number">5001</span>
+
+<span class="hljs-keyword">CMD</span><span class="language-bash"> [<span class="hljs-string">&quot;gunicorn&quot;</span>, <span class="hljs-string">&quot;--bind&quot;</span>, <span class="hljs-string">&quot;0.0.0.0:5001&quot;</span>, <span class="hljs-string">&quot;wsgi:app&quot;</span>]</span>
+</code></pre>
+<h4 id="docker-compose">Docker Compose</h4>
+<pre><code class="language-yaml"><span class="hljs-attr">version:</span> <span class="hljs-string">&#x27;3.8&#x27;</span>
+<span class="hljs-attr">services:</span>
+  <span class="hljs-attr">backend:</span>
+    <span class="hljs-attr">build:</span> <span class="hljs-string">./backend</span>
+    <span class="hljs-attr">ports:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;5001:5001&quot;</span>
+    <span class="hljs-attr">environment:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">FLASK_ENV=production</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">DATABASE_URL=sqlite:///instance/assistant.db</span>
+    <span class="hljs-attr">volumes:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./backend/instance:/app/instance</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./backend/uploads:/app/uploads</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./backend/chroma_db:/app/chroma_db</span>
+
+  <span class="hljs-attr">frontend:</span>
+    <span class="hljs-attr">build:</span> <span class="hljs-string">./frontend</span>
+    <span class="hljs-attr">ports:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;3000:80&quot;</span>
+    <span class="hljs-attr">depends_on:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">backend</span>
+</code></pre>
+<h3 id="production-deployment-considerations">Production Deployment Considerations</h3>
+<h4 id="security">Security</h4>
+<ul>
+<li>Use secure JWT secret keys</li>
+<li>Configure HTTPS/SSL certificates</li>
+<li>Set up proper CORS policies</li>
+<li>Implement rate limiting</li>
+<li>Use environment-specific configuration</li>
+</ul>
+<h4 id="performance">Performance</h4>
+<ul>
+<li>Configure Gunicorn with appropriate worker processes</li>
+<li>Set up reverse proxy (Nginx) for static file serving</li>
+<li>Implement caching strategies</li>
+<li>Monitor resource usage and scaling needs</li>
+</ul>
+<h4 id="monitoring--logging">Monitoring &amp; Logging</h4>
+<ul>
+<li>Set up application logging with rotation</li>
+<li>Monitor API response times and error rates</li>
+<li>Track OpenAI API usage and costs</li>
+<li>Implement health checks for all services</li>
+</ul>
+<hr>
+<h2 id="14-future-enhancements--todos">14. Future Enhancements / TODOs</h2>
+<h3 id="phase-1-core-improvements">Phase 1: Core Improvements</h3>
+<h4 id="user-experience">User Experience</h4>
+<ul class="contains-task-list">
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>Enhanced Chat Interface</strong></p>
+<ul>
+<li>Message reactions and feedback system</li>
+<li>Export chat sessions to PDF/Word</li>
+<li>Advanced search within chat history</li>
+<li>Real-time typing indicators</li>
+</ul>
+</li>
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>Mobile Application</strong></p>
+<ul>
+<li>React Native mobile app</li>
+<li>Offline capability for cached content</li>
+<li>Push notifications for updates</li>
+<li>Mobile-optimized UI/UX</li>
+</ul>
+</li>
+</ul>
+<h4 id="document-processing-1">Document Processing</h4>
+<ul class="contains-task-list">
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>Multi-format Support</strong></p>
+<ul>
+<li>Microsoft Word (.docx) processing</li>
+<li>PowerPoint (.pptx) processing</li>
+<li>Excel (.xlsx) data extraction</li>
+<li>Web page content extraction</li>
+<li>YouTube transcript processing</li>
+</ul>
+</li>
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>Advanced Processing</strong></p>
+<ul>
+<li>OCR for scanned documents</li>
+<li>Table and figure extraction</li>
+<li>Mathematical formula recognition</li>
+<li>Multilingual document support</li>
+</ul>
+</li>
+</ul>
+<h3 id="phase-2-intelligence--analytics">Phase 2: Intelligence &amp; Analytics</h3>
+<h4 id="ai-enhancements">AI Enhancements</h4>
+<ul class="contains-task-list">
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>Improved RAG Pipeline</strong></p>
+<ul>
+<li>Hybrid search (semantic + keyword)</li>
+<li>Query expansion and reformulation</li>
+<li>Multi-step reasoning capabilities</li>
+<li>Confidence scoring for answers</li>
+</ul>
+</li>
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>Personalization</strong></p>
+<ul>
+<li>Learning style adaptation</li>
+<li>Personalized question suggestions</li>
+<li>Progress tracking and analytics</li>
+<li>Adaptive difficulty levels</li>
+</ul>
+</li>
+</ul>
+<h4 id="analytics--insights">Analytics &amp; Insights</h4>
+<ul class="contains-task-list">
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>Student Analytics</strong></p>
+<ul>
+<li>Learning progress visualization</li>
+<li>Knowledge gap identification</li>
+<li>Study pattern analysis</li>
+<li>Performance predictions</li>
+</ul>
+</li>
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>Content Analytics</strong></p>
+<ul>
+<li>Document effectiveness metrics</li>
+<li>Question pattern analysis</li>
+<li>Content recommendation engine</li>
+<li>Usage heat maps</li>
+</ul>
+</li>
+</ul>
+<h3 id="phase-3-advanced-features">Phase 3: Advanced Features</h3>
+<h4 id="collaboration--social-learning">Collaboration &amp; Social Learning</h4>
+<ul class="contains-task-list">
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>Study Groups</strong></p>
+<ul>
+<li>Shared chat sessions</li>
+<li>Collaborative note-taking</li>
+<li>Peer-to-peer Q&amp;A</li>
+<li>Group study session planning</li>
+</ul>
+</li>
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>Gamification</strong></p>
+<ul>
+<li>Point-based learning system</li>
+<li>Achievement badges</li>
+<li>Leaderboards and competitions</li>
+<li>Progress celebrations</li>
+</ul>
+</li>
+</ul>
+<h4 id="integration--automation">Integration &amp; Automation</h4>
+<ul class="contains-task-list">
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>LMS Integration</strong></p>
+<ul>
+<li>Canvas/Moodle/Blackboard plugins</li>
+<li>Grade passback capabilities</li>
+<li>Assignment integration</li>
+<li>Calendar synchronization</li>
+</ul>
+</li>
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>Advanced Automation</strong></p>
+<ul>
+<li>Automated content updates</li>
+<li>Smart notification system</li>
+<li>Bulk document processing</li>
+<li>API for third-party integrations</li>
+</ul>
+</li>
+</ul>
+<h3 id="phase-4-scalability--enterprise">Phase 4: Scalability &amp; Enterprise</h3>
+<h4 id="technical-scalability">Technical Scalability</h4>
+<ul class="contains-task-list">
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>Infrastructure Upgrades</strong></p>
+<ul>
+<li>PostgreSQL database migration</li>
+<li>Redis caching layer</li>
+<li>Microservices architecture</li>
+<li>Kubernetes deployment</li>
+</ul>
+</li>
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>Performance Optimization</strong></p>
+<ul>
+<li>CDN integration for static assets</li>
+<li>Database query optimization</li>
+<li>Caching strategies</li>
+<li>Load balancing</li>
+</ul>
+</li>
+</ul>
+<h4 id="enterprise-features">Enterprise Features</h4>
+<ul class="contains-task-list">
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>Multi-tenancy</strong></p>
+<ul>
+<li>Institution-level isolation</li>
+<li>Custom branding per tenant</li>
+<li>Usage-based billing</li>
+<li>Admin hierarchy management</li>
+</ul>
+</li>
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>Compliance &amp; Security</strong></p>
+<ul>
+<li>FERPA compliance</li>
+<li>GDPR compliance</li>
+<li>SSO integration (SAML/OAuth)</li>
+<li>Advanced audit logging</li>
+</ul>
+</li>
+</ul>
+<h3 id="development-process-improvements">Development Process Improvements</h3>
+<h4 id="code-quality--testing">Code Quality &amp; Testing</h4>
+<ul class="contains-task-list">
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>Enhanced Testing</strong></p>
+<ul>
+<li>Increase test coverage to &gt;90%</li>
+<li>Integration test suite</li>
+<li>Performance testing</li>
+<li>Accessibility testing</li>
+</ul>
+</li>
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>CI/CD Pipeline</strong></p>
+<ul>
+<li>Automated testing on PRs</li>
+<li>Staging environment deployment</li>
+<li>Blue-green production deployment</li>
+<li>Automated security scanning</li>
+</ul>
+</li>
+</ul>
+<h4 id="documentation--community">Documentation &amp; Community</h4>
+<ul class="contains-task-list">
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>Developer Resources</strong></p>
+<ul>
+<li>API documentation with Swagger</li>
+<li>SDK development for integrations</li>
+<li>Plugin architecture</li>
+<li>Community contribution guidelines</li>
+</ul>
+</li>
+<li class="task-list-item enabled">
+<p><input class="task-list-item-checkbox"type="checkbox"> <strong>User Resources</strong></p>
+<ul>
+<li>Video tutorial series</li>
+<li>Best practices guide</li>
+<li>FAQ and troubleshooting</li>
+<li>Community forum</li>
+</ul>
+</li>
+</ul>
+<h3 id="long-term-vision">Long-term Vision</h3>
+<h4 id="ai-research-integration">AI Research Integration</h4>
+<ul class="contains-task-list">
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> <strong>Cutting-edge AI Features</strong>
+<ul>
+<li>Integration with latest LLM models</li>
+<li>Multimodal AI (text, image, audio)</li>
+<li>Real-time learning from interactions</li>
+<li>Adaptive questioning strategies</li>
+</ul>
+</li>
+</ul>
+<h4 id="educational-impact">Educational Impact</h4>
+<ul class="contains-task-list">
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> <strong>Research &amp; Evaluation</strong>
+<ul>
+<li>Learning outcome studies</li>
+<li>Pedagogical effectiveness research</li>
+<li>A/B testing for feature impact</li>
+<li>Academic publication of findings</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="conclusion">Conclusion</h2>
+<p>The AI Virtual Assistant for Student Q&amp;A represents a modern approach to educational technology, leveraging state-of-the-art AI capabilities to enhance student learning experiences. Built with a robust technical foundation using React, Flask, and OpenAI technologies, the system provides a scalable platform for intelligent document-based question answering.</p>
+<p>The architecture prioritizes maintainability, security, and user experience while providing clear pathways for future enhancements and scalability. With its comprehensive feature set and planned improvements, this platform is positioned to make a significant impact in the educational technology space.</p>
+<hr>
+<p><em>This documentation serves as a living document and will be updated as the project evolves and new features are implemented.</em></p>
+
+            <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+            
+        </body>
+        </html>
