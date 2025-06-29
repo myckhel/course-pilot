@@ -83,7 +83,7 @@ function DashboardPage() {
       {/* Welcome Section */}
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-6 text-white">
         <Title level={2} className="text-white mb-2">
-          Welcome to GSTutor! 👋
+          Welcome to GSTutor!
         </Title>
         <Text className="text-blue-100 text-lg">
           Your AI-powered learning companion is ready to help you with your
