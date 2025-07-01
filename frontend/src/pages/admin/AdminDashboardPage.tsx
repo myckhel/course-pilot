@@ -14,7 +14,6 @@ import {
   UserOutlined,
   MessageOutlined,
   BarChartOutlined,
-  ClockCircleOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { adminApi } from "@/apis";
@@ -222,20 +221,6 @@ function AdminDashboardPage() {
                   <Text>Messages Today</Text>
                 </div>
                 <Text strong>{stats.messagesToday}</Text>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <ClockCircleOutlined className="text-orange-500" />
-                  <Text>Avg Session Time</Text>
-                </div>
-                <Text strong>{stats.avgSessionTime}m</Text>
-              </div>
-
-              <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
-                <Text type="secondary" className="text-sm">
-                  Peak hours: {stats.peakHours || "9 AM - 11 AM"}
-                </Text>
               </div>
             </div>
           </Card>

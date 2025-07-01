@@ -330,21 +330,9 @@ function ChatPage() {
                 autoSize={{ minRows: 1, maxRows: 4 }}
                 disabled={loading}
                 status={
-                  !attachment &&
-                  message.trim().length > 0 &&
-                  message.trim().length < 5
-                    ? "error"
-                    : undefined
+                  !attachment && message.trim().length > 0 ? "error" : undefined
                 }
               />
-              {!attachment &&
-                message.trim().length > 0 &&
-                message.trim().length < 5 && (
-                  <div className="text-xs text-red-500 mt-1">
-                    Message must be at least 5 characters (
-                    {message.trim().length}/5)
-                  </div>
-                )}
             </div>
             <div className="flex items-center gap-1">
               <FileAttachment

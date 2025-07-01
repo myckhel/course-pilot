@@ -245,24 +245,24 @@ function AdminTopicsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <Title level={2}>Topics Management</Title>
+          <Title level={2}>Courses Management</Title>
           <span className="text-gray-500">
-            Create and manage learning topics for students
+            Create and manage learning courses for students
           </span>
         </div>
-        <Button
+        {/* <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => navigate("/admin/topics/new")}
         >
           Create Topic
-        </Button>
+        </Button> */}
       </div>
 
       {/* Search and Filters */}
       <Card>
         <Search
-          placeholder="Search topics..."
+          placeholder="Search courses..."
           allowClear
           size="large"
           prefix={<SearchOutlined />}
@@ -305,8 +305,8 @@ function AdminTopicsPage() {
       >
         <div className="space-y-4">
           <div className="text-sm text-gray-600">
-            Upload PDF documents to enhance the AI's knowledge about this topic.
-            Supported formats: PDF
+            Upload PDF documents to enhance the AI's knowledge about this
+            course. Supported formats: PDF
           </div>
 
           <Upload

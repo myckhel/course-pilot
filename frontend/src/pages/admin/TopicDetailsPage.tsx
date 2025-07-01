@@ -149,7 +149,7 @@ function TopicDetailsPage() {
     return (
       <div className="p-6">
         <Alert
-          message="Topic Not Found"
+          message="Course Not Found"
           description="The requested topic could not be found."
           type="error"
           showIcon
@@ -176,7 +176,7 @@ function TopicDetailsPage() {
             Refresh
           </Button>
           <Button icon={<EditOutlined />} onClick={handleEditTopic}>
-            Edit Topic
+            Edit Course
           </Button>
           <Popconfirm
             title="Are you sure you want to delete this topic?"
@@ -186,7 +186,7 @@ function TopicDetailsPage() {
             cancelText="No"
           >
             <Button danger icon={<DeleteOutlined />}>
-              Delete Topic
+              Delete Course
             </Button>
           </Popconfirm>
         </Space>
@@ -195,7 +195,7 @@ function TopicDetailsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Topic Information */}
         <div className="lg:col-span-1">
-          <Card title="Topic Information">
+          <Card title="Course Information">
             <Descriptions column={1} size="small">
               <Descriptions.Item label="Name">{topic.name}</Descriptions.Item>
 
