@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Card, Typography, Button } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
@@ -11,15 +11,24 @@ const { Title, Paragraph } = Typography;
 function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
-
-  const from = location.state?.from?.pathname || ROUTES.DASHBOARD;
+  const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate(from, { replace: true });
+    if (isAuthenticated && user) {
+      // Check if user has a specific redirect path from previous location
+      const from = location.state?.from?.pathname;
+
+      // If there's a specific redirect path, use it
+      if (from) {
+        navigate(from, { replace: true });
+      } else {
+        // Default redirect based on user role
+        const defaultRoute =
+          user.role === "admin" ? ROUTES.ADMIN : ROUTES.DASHBOARD;
+        navigate(defaultRoute, { replace: true });
+      }
     }
-  }, [isAuthenticated, navigate, from]);
+  }, [isAuthenticated, user, navigate, location.state]);
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">

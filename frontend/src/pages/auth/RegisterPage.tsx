@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Typography, Button } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
@@ -10,13 +10,16 @@ const { Title, Paragraph } = Typography;
 
 function RegisterPage() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate(ROUTES.DASHBOARD);
+    if (isAuthenticated && user) {
+      // Default redirect based on user role
+      const defaultRoute =
+        user.role === "admin" ? ROUTES.ADMIN : ROUTES.DASHBOARD;
+      navigate(defaultRoute, { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">

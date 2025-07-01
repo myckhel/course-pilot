@@ -22,17 +22,19 @@ export function useAuth() {
   const handleLogin = useCallback(
     async (credentials: LoginRequest) => {
       await login(credentials);
-      navigate(ROUTES.DASHBOARD);
+      // Note: Navigation will be handled by the LoginPage component based on user role
+      // This allows for proper redirect handling including admin users
     },
-    [login, navigate]
+    [login]
   );
 
   const handleRegister = useCallback(
     async (userData: RegisterRequest) => {
       await register(userData);
-      navigate(ROUTES.DASHBOARD);
+      // Note: Navigation will be handled by the RegisterPage component based on user role
+      // This allows for proper redirect handling
     },
-    [register, navigate]
+    [register]
   );
 
   const handleLogout = useCallback(() => {
