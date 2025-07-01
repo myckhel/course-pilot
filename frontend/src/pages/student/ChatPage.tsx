@@ -181,12 +181,12 @@ function ChatPage() {
       <Row className="mb-4">
         <Card className="w-full flex-shrink-0">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                <MessageOutlined className="text-blue-500" />
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                <MessageOutlined className="text-blue-500 text-sm sm:text-base" />
               </div>
               <div>
-                <Title level={4} className="mb-0">
+                <Title level={4} className="mb-0 text-base sm:text-lg">
                   {currentSession?.title || "Chat Session"}
                 </Title>
               </div>
@@ -198,7 +198,7 @@ function ChatPage() {
       {/* Messages */}
       <Card className="flex-grow flex flex-col min-h-0 border-none shadow-none bg-transparent">
         <div
-          className="flex-grow overflow-y-auto px-2 md:px-6 py-4 space-y-2"
+          className="flex-grow overflow-y-auto px-2 sm:px-4 md:px-6 py-4 space-y-2"
           style={{ maxHeight: "60vh" }}
         >
           {messages.length > 0 ? (
@@ -212,7 +212,7 @@ function ChatPage() {
                     }`}
                   >
                     <div
-                      className={`max-w-[80%] flex items-end gap-2 md:gap-3 ${
+                      className={`max-w-[90%] sm:max-w-[80%] flex items-end gap-2 md:gap-3 ${
                         msg.sender === "user" ? "flex-row-reverse" : ""
                       }`}
                     >
@@ -229,7 +229,7 @@ function ChatPage() {
                             ? "bg-blue-500 shadow-md"
                             : "bg-green-500 shadow-md"
                         }
-                        size={40}
+                        size={{ xs: 32, sm: 40 }}
                         style={{ flexShrink: 0 }}
                       />
                       <div
@@ -240,10 +240,10 @@ function ChatPage() {
                         }`}
                       >
                         <div
-                          className={`px-4 py-2 rounded-2xl shadow-md text-base whitespace-pre-wrap break-words ${
+                          className={`px-3 sm:px-4 py-2 rounded-2xl shadow-md text-sm sm:text-base whitespace-pre-wrap break-words ${
                             msg.sender === "user"
-                              ? "bg-blue-500 text-white rounded-br-md ml-2 md:ml-4 chat-bubble-user"
-                              : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-bl-md mr-2 md:mr-4 chat-bubble-ai"
+                              ? "bg-blue-500 text-white rounded-br-md ml-1 sm:ml-2 md:ml-4 chat-bubble-user"
+                              : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-bl-md mr-1 sm:mr-2 md:mr-4 chat-bubble-ai"
                           }`}
                           style={{
                             borderBottomRightRadius:
@@ -329,6 +329,7 @@ function ChatPage() {
                 placeholder="Type your message... (minimum 5 characters)"
                 autoSize={{ minRows: 1, maxRows: 4 }}
                 disabled={loading}
+                className="text-sm sm:text-base"
                 status={
                   !attachment && message.trim().length > 0 ? "error" : undefined
                 }
@@ -344,22 +345,27 @@ function ChatPage() {
                 type="primary"
                 icon={<SendOutlined />}
                 onClick={handleSendMessage}
+                size="large"
+                className="h-auto min-h-[40px]"
                 disabled={
                   loading ||
                   (!attachment && message.trim().length < 5) ||
                   (!message.trim() && !attachment)
                 }
-                className="h-auto"
               >
-                Send
+                <span className="hidden sm:inline">Send</span>
+                <span className="sm:hidden">Send</span>
               </Button>
             </div>
           </div>
 
           <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-            Press Enter to send, Shift+Enter for new line
-            {attachment && ", Esc to clear attachment"} • Message must be at
-            least 5 characters • Max 5MB file size
+            <span className="hidden sm:inline">
+              Press Enter to send, Shift+Enter for new line
+            </span>
+            <span className="sm:hidden">Tap to send</span>
+            {attachment && <span>, Esc to clear attachment</span>} • Message
+            must be at least 5 characters • Max 5MB file size
           </div>
         </div>
       </Card>

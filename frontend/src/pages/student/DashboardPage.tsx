@@ -79,22 +79,22 @@ function DashboardPage() {
     .slice(0, 5);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-6 text-white">
-        <Title level={2} className="text-white mb-2">
+      <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 sm:p-6 text-white">
+        <Title level={2} className="text-white mb-2 text-xl sm:text-2xl">
           Welcome to GSTutor!
         </Title>
-        <Text className="text-blue-100 text-lg">
+        <Text className="text-blue-100 text-sm sm:text-lg">
           Your AI-powered learning companion is ready to help you with your
           studies.
         </Text>
       </div>
 
       {/* Statistics */}
-      <Row gutter={[16, 16]}>
+      <Row gutter={[12, 12]} className="sm:gutter-16">
         <Col xs={24} sm={12}>
-          <Card>
+          <Card className="h-full">
             <Statistic
               title="Total Chat Sessions"
               value={sessions.length}
@@ -104,7 +104,7 @@ function DashboardPage() {
           </Card>
         </Col>
         <Col xs={24} sm={12}>
-          <Card>
+          <Card className="h-full">
             <Statistic
               title="Recent Sessions"
               value={recentSessions.length}
@@ -117,92 +117,101 @@ function DashboardPage() {
 
       {/* NPS Analytics Section */}
       <Row>
-        <Card
-          title={
-            <div className="flex justify-between items-center">
-              <span>Your Learning Experience Rating</span>
-              <div className="flex items-center space-x-2">
-                <Select
-                  value={npsTimeRange}
-                  onChange={setNpsTimeRange}
-                  size="small"
-                  style={{ width: 120 }}
-                >
-                  <Select.Option value={7}>Last 7 days</Select.Option>
-                  <Select.Option value={30}>Last 30 days</Select.Option>
-                  <Select.Option value={90}>Last 90 days</Select.Option>
-                </Select>
+        <Col xs={24}>
+          <Card
+            title={
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
+                <span className="text-sm sm:text-base">
+                  Your Learning Experience Rating
+                </span>
+                <div className="flex items-center space-x-2">
+                  <Select
+                    value={npsTimeRange}
+                    onChange={setNpsTimeRange}
+                    size="small"
+                    style={{ width: 120 }}
+                  >
+                    <Select.Option value={7}>Last 7 days</Select.Option>
+                    <Select.Option value={30}>Last 30 days</Select.Option>
+                    <Select.Option value={90}>Last 90 days</Select.Option>
+                  </Select>
+                </div>
               </div>
-            </div>
-          }
-        >
-          <Row>
-            <NPSChart
-              data={npsData}
-              loading={npsLoading}
-              title=""
-              showDailyBreakdown={true}
-            />
-          </Row>
-        </Card>
+            }
+          >
+            <Row>
+              <NPSChart
+                data={npsData}
+                loading={npsLoading}
+                title=""
+                showDailyBreakdown={true}
+              />
+            </Row>
+          </Card>
+        </Col>
       </Row>
 
       {/* Recent Chat Sessions */}
       <Row>
-        <Card
-          title={
-            <div className="flex justify-between items-center">
-              <span>Recent Chat Sessions</span>
-              <Button
-                type="link"
-                onClick={() => navigate("/chats")}
-                icon={<RightOutlined />}
-                className="p-0"
-              >
-                View All
-              </Button>
-            </div>
-          }
-          className="h-full w-full"
-        >
-          {recentSessions.length > 0 ? (
-            <List
-              dataSource={recentSessions}
-              renderItem={(session: ChatSession) => (
-                <List.Item
-                  actions={[
-                    <Button
-                      type="link"
-                      onClick={() => navigate(`/chat/${session.id}`)}
-                      key="continue"
-                    >
-                      Continue
-                    </Button>,
-                  ]}
+        <Col xs={24}>
+          <Card
+            title={
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
+                <span className="text-sm sm:text-base">
+                  Recent Chat Sessions
+                </span>
+                <Button
+                  type="link"
+                  onClick={() => navigate("/chats")}
+                  icon={<RightOutlined />}
+                  className="p-0 text-xs sm:text-sm"
+                  size="small"
                 >
-                  <List.Item.Meta
-                    avatar={<MessageOutlined className="text-green-500" />}
-                    title={session.title || "Untitled Session"}
-                  />
-                </List.Item>
-              )}
-            />
-          ) : (
-            <Empty description="No chat sessions yet"></Empty>
-          )}
-        </Card>
+                  View All
+                </Button>
+              </div>
+            }
+            className="h-full w-full"
+          >
+            {recentSessions.length > 0 ? (
+              <List
+                dataSource={recentSessions}
+                renderItem={(session: ChatSession) => (
+                  <List.Item
+                    actions={[
+                      <Button
+                        type="link"
+                        onClick={() => navigate(`/chat/${session.id}`)}
+                        key="continue"
+                      >
+                        Continue
+                      </Button>,
+                    ]}
+                  >
+                    <List.Item.Meta
+                      avatar={<MessageOutlined className="text-green-500" />}
+                      title={session.title || "Untitled Session"}
+                    />
+                  </List.Item>
+                )}
+              />
+            ) : (
+              <Empty description="No chat sessions yet"></Empty>
+            )}
+          </Card>
+        </Col>
       </Row>
 
       {/* Quick Actions */}
       <Card title="Quick Actions">
-        <Row gutter={[16, 16]} className="justify-center">
+        <Row gutter={[12, 12]} className="justify-center sm:gutter-16">
           <Col xs={24} sm={12} md={8}>
             <Button
               type="primary"
               size="large"
               icon={<MessageOutlined />}
               onClick={() => navigate("/chats")}
-              className="w-full h-20 flex items-center justify-center"
+              className="w-full h-16 sm:h-20 flex items-center justify-center text-sm sm:text-base"
             >
               Start New Chat
             </Button>

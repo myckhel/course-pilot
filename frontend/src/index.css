@@ -98,3 +98,132 @@ body {
 .dark ::-webkit-scrollbar-thumb:hover {
   background: #6b7280;
 }
+
+/* Mobile Responsive Styles */
+.mobile-sidebar-drawer .ant-drawer-body {
+  padding: 0;
+  height: 100%;
+}
+
+.mobile-sidebar-drawer .ant-drawer-content {
+  background: transparent;
+}
+
+/* Responsive utilities */
+@media (max-width: 640px) {
+  .ant-layout-content {
+    padding: 12px !important;
+  }
+
+  .ant-menu-item {
+    margin: 0 !important;
+    height: 48px !important;
+    line-height: 48px !important;
+  }
+
+  .ant-menu-item-icon {
+    font-size: 18px;
+  }
+
+  .ant-typography {
+    word-break: break-word;
+  }
+}
+
+@media (max-width: 768px) {
+  .ant-layout-sider {
+    background: transparent !important;
+  }
+}
+
+/* Ensure content is scrollable on mobile */
+@media (max-width: 1024px) {
+  .ant-layout-content {
+    overflow-x: auto;
+  }
+
+  .max-w-7xl {
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+/* Fix for mobile chat bubbles */
+.chat-bubble-user,
+.chat-bubble-ai {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Mobile-first button improvements */
+@media (max-width: 640px) {
+  .ant-btn {
+    font-size: 14px;
+    height: auto;
+    min-height: 32px;
+    padding: 6px 12px;
+  }
+
+  .ant-btn-lg {
+    min-height: 40px;
+    padding: 8px 16px;
+  }
+
+  .ant-input,
+  .ant-input-affix-wrapper {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .ant-select {
+    font-size: 16px;
+  }
+}
+
+/* Improved mobile drawer styles */
+@media (max-width: 1024px) {
+  .mobile-sidebar-drawer .ant-drawer-content-wrapper {
+    width: 280px !important;
+  }
+
+  .mobile-sidebar-drawer .ant-layout-sider {
+    background: var(--ant-component-background) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    flex: none !important;
+  }
+}
+
+/* Better mobile spacing */
+@media (max-width: 768px) {
+  .ant-card {
+    margin-bottom: 12px;
+  }
+
+  .ant-card .ant-card-body {
+    padding: 16px 12px;
+  }
+
+  .ant-statistic {
+    text-align: center;
+  }
+}
+
+/* Mobile table improvements */
+@media (max-width: 640px) {
+  .ant-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .ant-table {
+    min-width: 600px;
+  }
+
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td {
+    padding: 8px 4px;
+    font-size: 12px;
+  }
+}

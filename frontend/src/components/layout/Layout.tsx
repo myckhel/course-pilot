@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Layout as AntLayout } from "antd";
+import { Layout as AntLayout, Drawer } from "antd";
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
@@ -26,33 +26,42 @@ function Layout() {
 
   return (
     <AntLayout className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Desktop Sidebar */}
-      <Sidebar collapsed={sidebarCollapsed} />
+      {/* Desktop Sidebar - Hidden on mobile */}
+      {lg && <Sidebar collapsed={sidebarCollapsed} />}
 
-      {/* Mobile Sidebar and Overlay */}
-      {!lg && mobileMenuVisible && (
-        <>
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300 ease-in-out"
-            onClick={handleMobileMenuClose}
-          />
+      {/* Mobile Drawer Sidebar */}
+      {!lg && (
+        <Drawer
+          title={null}
+          placement="left"
+          onClose={handleMobileMenuClose}
+          open={mobileMenuVisible}
+          styles={{
+            body: { padding: 0 },
+            header: { display: "none" },
+          }}
+          width={280}
+          className="mobile-sidebar-drawer"
+          maskClosable={true}
+          closable={false}
+        >
           <Sidebar
             collapsed={false}
             onClose={handleMobileMenuClose}
             isMobile={true}
           />
-        </>
+        </Drawer>
       )}
 
       {/* Main Content */}
       <AntLayout
         className={`transition-all duration-300 ease-in-out bg-gray-50 dark:bg-gray-900 ${
-          lg ? (sidebarCollapsed ? "" : "") : "ml-0"
+          lg ? "" : "ml-0"
         }`}
       >
         <Header onMenuToggle={handleMenuToggle} showMenuButton={true} />
-        <Content className="p-4 lg:p-6 min-h-[calc(100vh-64px)]">
-          <div className="max-w-7xl mx-auto bg-transparent">
+        <Content className="p-3 sm:p-4 lg:p-6 min-h-[calc(100vh-64px)]">
+          <div className="max-w-7xl mx-auto w-full">
             <Outlet />
           </div>
         </Content>

@@ -2,8 +2,6 @@ import { Layout, Menu, Button, Typography } from "antd";
 import {
   DashboardOutlined,
   BookOutlined,
-  UsergroupAddOutlined,
-  BarChartOutlined,
   CloseOutlined,
   MessageOutlined,
   UserOutlined,
@@ -124,11 +122,12 @@ function Sidebar({ collapsed, onClose, isMobile = false }: SidebarProps) {
     <Sider
       collapsed={collapsed}
       collapsedWidth={isMobile ? 0 : 80}
-      width={240}
+      width={isMobile ? "100%" : 240}
       className={`
-        fixed h-screen transition-all duration-300 ease-in-out
+        ${isMobile ? "h-full" : "fixed h-screen"} 
+        transition-all duration-300 ease-in-out
         bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700
-        ${isMobile ? "left-0 z-50" : "relative"}
+        ${isMobile ? "" : "relative"}
       `}
       style={{
         backgroundColor: theme === "dark" ? "#1f2937" : "#ffffff",
@@ -136,26 +135,23 @@ function Sidebar({ collapsed, onClose, isMobile = false }: SidebarProps) {
       trigger={null}
     >
       {/* Logo Section */}
-      <div className="flex items-center h-16 px-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center h-16 px-4 border-b border-gray-200 dark:border-gray-700 relative">
         {isMobile && (
           <Button
             type="text"
             icon={<CloseOutlined />}
             onClick={onClose}
-            className="absolute right-4 top-4 text-gray-600 dark:text-gray-300"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            size="small"
           />
         )}
-        <div
-          className={`flex justify-center items-center space-x-3 ${
-            collapsed && !isMobile ? "justify-center" : "justify-center"
-          }`}
-        >
+        <div className="flex justify-center items-center space-x-3 w-full">
           {!collapsed || isMobile ? (
-            <Title level={5} className="m-0 text-gray-900 dark:text-white">
+            <Title level={4} className="m-0 text-gray-900 dark:text-white">
               GSTutor
             </Title>
           ) : (
-            <Title level={5} className="m-0 text-gray-900 dark:text-white">
+            <Title level={4} className="m-0 text-gray-900 dark:text-white">
               GST
             </Title>
           )}
@@ -163,20 +159,31 @@ function Sidebar({ collapsed, onClose, isMobile = false }: SidebarProps) {
       </div>
 
       {/* Navigation Menu */}
-      <div className="py-4">
+      <div
+        className={`${
+          isMobile ? "py-4 h-[calc(100vh-128px)] overflow-y-auto" : "py-4"
+        }`}
+      >
         <Menu
           mode="inline"
           selectedKeys={[selectedKey]}
           items={menuItems}
           className="border-none bg-transparent"
           theme={theme === "dark" ? "dark" : "light"}
+          inlineCollapsed={collapsed && !isMobile}
         />
       </div>
 
-      {/* Bottom Section - Can add more items here */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700">
-        {/* You can add collapsed/expanded bottom content here */}
-      </div>
+      {/* Bottom Section - Only show on desktop or expanded mobile */}
+      {(!isMobile || !collapsed) && (
+        <div
+          className={`${
+            isMobile ? "absolute" : "absolute"
+          } bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700`}
+        >
+          {/* You can add collapsed/expanded bottom content here */}
+        </div>
+      )}
     </Sider>
   );
 }

@@ -61,7 +61,7 @@ function Header({ onMenuToggle, showMenuButton = false }: HeaderProps) {
   ];
 
   return (
-    <AntHeader className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 h-16 flex items-center sticky top-0 z-30 shadow-sm">
+    <AntHeader className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-3 sm:px-4 lg:px-6 h-16 flex items-center sticky top-0 z-30 shadow-sm">
       <div className="flex items-center justify-between w-full">
         {/* Left Section */}
         <div className="flex items-center">
@@ -72,23 +72,25 @@ function Header({ onMenuToggle, showMenuButton = false }: HeaderProps) {
                 <MenuUnfoldOutlined className="text-gray-600 dark:text-gray-300 text-lg" />
               }
               onClick={onMenuToggle}
-              className="mr-4 hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="mr-2 sm:mr-4 hover:bg-gray-100 dark:hover:bg-gray-700"
+              size="large"
             />
           )}
         </div>
 
         {/* Right Section */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 sm:space-x-4">
           {/* Theme Toggle */}
           <Space
             align="center"
-            className="border-r border-gray-200 dark:border-gray-700 pr-4"
+            className="border-r border-gray-200 dark:border-gray-700 pr-2 sm:pr-4"
           >
             <Switch
               checked={theme === "dark"}
               onChange={handleThemeToggle}
               checkedChildren={<MoonOutlined />}
               unCheckedChildren={<SunOutlined />}
+              size="small"
             />
           </Space>
 
@@ -101,14 +103,14 @@ function Header({ onMenuToggle, showMenuButton = false }: HeaderProps) {
             >
               <Button
                 type="text"
-                className="flex items-center space-x-2 h-auto py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                className="flex items-center space-x-1 sm:space-x-2 h-auto py-1 px-1 sm:px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
               >
                 <Avatar
                   size="small"
                   icon={<UserOutlined />}
                   className="bg-blue-500"
                 />
-                <Text className="hidden sm:inline text-gray-700 dark:text-gray-200">
+                <Text className="hidden sm:inline text-gray-700 dark:text-gray-200 text-sm">
                   {user.name || user.email}
                 </Text>
               </Button>
