@@ -331,7 +331,7 @@ function ChatPage() {
                 disabled={loading}
                 className="text-sm sm:text-base"
                 status={
-                  !attachment && message.trim().length > 0 ? "error" : undefined
+                  !attachment && message.trim().length < 0 ? "error" : undefined
                 }
               />
             </div>
